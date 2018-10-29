@@ -24,9 +24,9 @@ const dataSource = [{
   key: '1',
   name: '胡彦斌',
   status: '运行中',
-  includeApp: 'fuck',
-  image: 'fuck1',
-  createTime: 'fuck-fuck',
+  includeApp: '1',
+  image: '1',
+  createTime: '1',
 }];
 
 const columns = [{
