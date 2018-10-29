@@ -851,6 +851,17 @@
   version "1.1.2"
   resolved "http://192.168.1.3:4873/@nodelib%2ffs.stat/-/fs.stat-1.1.2.tgz#54c5a964462be3d4d78af631363c18d6fa91ac26"
 
+"@tenx-ui/editor@^1.0.8":
+  version "1.0.8"
+  resolved "http://192.168.1.3:4873/@tenx-ui%2feditor/-/editor-1.0.8.tgz#738df6b8dbcb25a7dfed8776e90997f4dc598cd5"
+  dependencies:
+    fscreen "^1.0.2"
+    react-codemirror2 "^4.2.1"
+
+"@tenx-ui/ellipsis@^0.0.4":
+  version "0.0.4"
+  resolved "http://192.168.1.3:4873/@tenx-ui%2fellipsis/-/ellipsis-0.0.4.tgz#40d498795dc4c0e5f1e1bd98385d065c3052e7b1"
+
 "@tenx-ui/icon@^2.1.2":
   version "2.1.4"
   resolved "http://192.168.1.3:4873/@tenx-ui%2ficon/-/icon-2.1.4.tgz#7589c05a86cd3cc9daea14d3e88f900ea2391b4c"
@@ -4343,6 +4354,10 @@ fs-write-stream-atomic@^1.0.8:
 fs.realpath@^1.0.0:
   version "1.0.0"
   resolved "http://192.168.1.3:4873/fs.realpath/-/fs.realpath-1.0.0.tgz#1504ad2523158caa40db4a2787cb01411994ea4f"
+
+fscreen@^1.0.2:
+  version "1.0.2"
+  resolved "http://192.168.1.3:4873/fscreen/-/fscreen-1.0.2.tgz#c4c51d96d819d75a19d728e0df445f9be9bb984f"
 
 fsevents@^1.0.0, fsevents@^1.2.2, fsevents@^1.2.3:
   version "1.2.4"
@@ -8379,6 +8394,10 @@ rc@^1.0.1, rc@^1.1.6, rc@^1.2.7:
     ini "~1.3.0"
     minimist "^1.2.0"
     strip-json-comments "~2.0.1"
+
+react-codemirror2@^4.2.1:
+  version "4.3.0"
+  resolved "http://192.168.1.3:4873/react-codemirror2/-/react-codemirror2-4.3.0.tgz#e79aedca4da60d22402d2cd74f2885a3e5c009fd"
 
 react-dev-utils@^5.0.0:
   version "5.0.3"
