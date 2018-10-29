@@ -28,6 +28,7 @@
   },
   "devDependencies": {
     "@tenx-ui/ellipsis": "^0.0.4",
+    "@tenx-ui/editor": "^1.0.8",
     "@tenx-ui/icon": "^2.1.2",
     "@tenx-ui/loader": "^0.0.3",
     "@tenx-ui/logs": "^1.1.6",

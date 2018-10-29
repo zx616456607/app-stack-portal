@@ -36,6 +36,9 @@ function RouterConfig({ history, app }) {
   }, {
     path: '/test',
     component: () => import('./containers/Test'),
+  }, {
+    path: '/createWorkLoad',
+    component: () => import('./containers/CreateWorkLoad'),
   },
   ]
   return (
