@@ -1,0 +1,72 @@
+{
+  "private": true,
+  "scripts": {
+    "dev": "cross-env ESLINT=none TSLINT=none roadhog dev",
+    "build": "cross-env NODE_ENV=production roadhog build",
+    "build:no-compress": "cross-env COMPRESS=none roadhog build",
+    "test": "roadhog test",
+    "lint": "npm run lint:es && npm run lint:ts && npm run lint:style",
+    "lint:es": "eslint --ext .js src test",
+    "lint:ts": "tslint 'src/**/*.tsx'",
+    "lint:style": "stylelint \"src/{containers,components,assets}/**/*.less\" --syntax less",
+    "lint-fix": "npm run lint-fix:es && npm run lint-fix:ts && npm run lint-fix:style",
+    "lint-fix:es": "eslint --ext .js src test --fix",
+    "lint-fix:ts": "tslint 'src/**/*.tsx' --fix",
+    "lint-fix:style": "stylelint \"src/{containers,components,assets}/**/*.less\" --syntax less --fix"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@gitlab.tenxcloud.com:enterprise-2.0/app-stack-portal.git"
+  },
+  "dependencies": {
+    "dva": "^2.3.1",
+    "immutability-helper": "^2.6.6",
+    "react": "^16.3.2",
+    "react-dnd": "^2.5.4",
+    "react-dnd-html5-backend": "^2.5.4",
+    "react-dom": "^16.3.2"
+  },
+  "devDependencies": {
+    "@tenx-ui/icon": "^2.1.2",
+    "@tenx-ui/loader": "^0.0.3",
+    "@tenx-ui/logs": "^1.1.6",
+    "@tenx-ui/modal": "^1.0.9",
+    "@tenx-ui/page": "^1.0.2",
+    "@tenx-ui/resource-custom-config": "^0.0.5",
+    "@tenx-ui/return-button": "^0.0.4",
+    "antd": "^3.7.0",
+    "babel-plugin-dva-hmr": "^0.4.1",
+    "babel-plugin-import": "^1.6.6",
+    "babel-plugin-transform-react-remove-prop-types": "^0.4.13",
+    "classnames": "^2.2.5",
+    "codemirror": "^5.36.0",
+    "cross-env": "^5.1.4",
+    "decode-uri-component": "^0.2.0",
+    "dva-loading": "^1.0.4",
+    "eslint-config-tenx": "^1.0.0",
+    "history": "^4.7.2",
+    "husky": "^1.0.0-rc.8",
+    "lodash": "^4.17.5",
+    "nprogress": "^0.2.0",
+    "path-to-regexp": "^2.2.0",
+    "rc-queue-anim": "^1.5.0",
+    "react-helmet": "^5.2.0",
+    "redbox-react": "^1.4.3",
+    "reselect": "^3.0.1",
+    "roadhog": "2.5.0-beta.2",
+    "strict-uri-encode": "^2.0.0",
+    "stylelint": "^9.1.2",
+    "stylelint-config-css-modules": "^1.2.0",
+    "stylelint-config-standard": "^18.2.0",
+    "svg-sprite-loader": "^3.7.3",
+    "svgo": "^1.0.5",
+    "svgo-loader": "^2.1.0",
+    "ts-import-plugin": "^1.4.4",
+    "tslint-config-tenx": "^1.0.2"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run lint-fix"
+    }
+  }
+}

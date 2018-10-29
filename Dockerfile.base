@@ -1,0 +1,13 @@
+# Dockerfile.alpine
+FROM mhart/alpine-node:8.9.1
+LABEL maintainer="zhangpc<zhangpc@tenxcloud.com>"
+
+# Create app directory
+RUN mkdir -p /usr/src/app
+WORKDIR /usr/src/app
+
+# Install dependencies modules
+RUN npm set registry http://192.168.1.3:4873
+RUN npm i yarn -g
+COPY package.json /usr/src/app/
+RUN yarn && rm -f package.json

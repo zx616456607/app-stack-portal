@@ -1,0 +1,38 @@
+/**
+ * Licensed Materials - Property of tenxcloud.com
+ * (C) Copyright 2018 TenxCloud. All Rights Reserved.
+ */
+
+/**
+ * style of content
+ *
+ * @author zhangpc
+ * @date 2018-05-24
+ */
+.customizeContent {
+  :global .ant-layout-content {
+    padding-bottom: 0;
+  }
+}
+
+.hideHeaderAndSider {
+  :global {
+    .ant-layout-header {
+      display: none;
+    }
+    .ant-layout-content {
+      margin-top: 0;
+    }
+    .ant-layout-sider {
+      display: none;
+    }
+    .ant-layout-footer {
+      visibility: hidden;
+    }
+  }
+}
+:global {
+  .ant-form-item-required:before {
+    content: '';
+  }
+}

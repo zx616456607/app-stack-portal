@@ -1,0 +1,79 @@
+/**
+ * Licensed Materials - Property of tenxcloud.com
+ * (C) Copyright 2017 TenxCloud. All Rights Reserved.
+ */
+
+/**
+ * Overwrite antd style
+ *
+ * 2017-11-03
+ * @author zhangpc
+ */
+@import "index.less";
+:global {
+  .ant-modal-content {
+    .ant-modal-header {
+      background-color: @background-color-navigation;
+      .ant-modal-title {
+        color: #fff;
+      }
+    }
+    .ant-modal-close {
+      color: rgba(255, 255, 255, 0.65);
+      &:hover {
+        color: #fff;
+      }
+    }
+  }
+
+  .ant-card.ant-card-wider-padding {
+    .ant-card-head {
+      padding: 0 @padding-medium;
+    }
+    .ant-card-body {
+      padding: @padding-medium;
+      & > .ant-table-wrapper {
+        margin-top: -16px;
+        margin-bottom: 16px;
+      }
+    }
+  }
+
+  .ant-table-body {
+    .ant-table-thead > tr > th {
+      font-weight: initial;
+      background-color: #fff;
+      border-bottom: 1px solid @border-color-base;
+    }
+  }
+
+  .ant-badge > .ant-badge-status {
+    &-dot {
+      width: 8px;
+      height: 8px;
+    }
+    &-success {
+      & + span {
+        color: @success-color;
+      }
+    }
+    &-error {
+      & + span {
+        color: @error-color;
+      }
+    }
+    &-warning {
+      & + span {
+        color: @warning-color;
+      }
+    }
+    &-processing {
+      & + span {
+        color: @primary-color;
+      }
+    }
+  }
+  .ant-tooltip-inner {
+    word-break: break-all;
+  }
+}
