@@ -17,7 +17,7 @@ import { connect } from 'dva'
 import { Switch, Route, routerRedux } from 'dva/router'
 import { Tabs } from 'antd'
 import Page from '@tenx-ui/page'
-import '@tenx-ui/page/assets/index.css'
+import ReturnButton from '@tenx-ui/return-button'
 import DetailHeader from './Header'
 import styles from './style/index.less'
 
@@ -53,11 +53,12 @@ const onTabChange = (key, id, dispatch) => {
   }))
 }
 
-const JobDetail = ({ dispatch, match, children, location: { pathname } }) => {
+const JobDetail = ({ dispatch, match, children, location: { pathname }, history }) => {
   const activeKey = getActiveKey(pathname)
   const { id } = match.params
   return (
     <div>
+      <ReturnButton onClick={history.goBack}>返回</ReturnButton>
       <DetailHeader/>
       <Page inner className={styles.page}>
         <div>
