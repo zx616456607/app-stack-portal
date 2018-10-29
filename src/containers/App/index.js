@@ -114,7 +114,7 @@ class App extends React.Component {
       <div>
         {/* <Loader fullScreen spinning={loading.effects['app/query']} /> */}
         <Helmet>
-          <title>ai-deep-learning</title>
+          <title>app-stack</title>
           <meta name="viewport" content="width=device-width, initial-scale=1.0" />
           {/* <link rel="icon" href={logo} type="image/x-icon" /> */}
         </Helmet>

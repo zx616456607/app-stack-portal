@@ -24,6 +24,15 @@ function RouterConfig({ history, app }) {
     component: () => import('./containers/Error'),
   })
   const routes = [{
+    path: '/stateful-set',
+    component: () => import('./containers/StatefulSet'),
+  }, {
+    path: '/job',
+    component: () => import('./containers/Job'),
+  }, {
+    path: '/cron-job',
+    component: () => import('./containers/CronJob'),
+  }, {
     path: '/test',
     component: () => import('./containers/Test'),
   },
@@ -33,7 +42,7 @@ function RouterConfig({ history, app }) {
       <LocaleProvider locale={zhCN}>
         <App>
           <Switch>
-            <Route exact path="/" render={() => (<Redirect to="/ai-deep-learning" />)} />
+            <Route exact path="/" render={() => (<Redirect to="/stateful-set" />)} />
             {
               routes.map(({ path, exact, render, ...dynamics }, key) => {
                 const routeProps = {
