@@ -28,6 +28,7 @@ function RouterConfig({ history, app }) {
     component: () => import('./containers/StatefulSet'),
   }, {
     path: '/job',
+    exact: false,
     component: () => import('./containers/Job'),
   }, {
     path: '/cron-job',
