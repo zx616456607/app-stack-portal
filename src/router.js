@@ -24,9 +24,9 @@ function RouterConfig({ history, app }) {
     component: () => import('./containers/Error'),
   })
   const routes = [{
-      path: '/test',
-      component: () => import('./containers/Test'),
-    },
+    path: '/test',
+    component: () => import('./containers/Test'),
+  },
   ]
   return (
     <ConnectedRouter history={history}>

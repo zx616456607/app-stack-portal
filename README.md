@@ -1,5 +1,5 @@
 # app-stack-portal
-Portal for AI deep learning.
+Portal for app stack.
 
 ## 开发构建
 
