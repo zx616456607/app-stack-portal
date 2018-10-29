@@ -11,7 +11,7 @@
  */
 const env = process.env
 const isProd = env.NODE_ENV === 'production'
-const publicDir = isProd ? '/ai/' : '/'
+const publicDir = isProd ? '/app-stack/' : '/'
 const path = require('path')
 
 export default {
@@ -23,8 +23,6 @@ export default {
     '@error-color': '#f85a5a',
     '@a-hover-color': '#57cfff',
     '@font-size-base': '12px',
-    '@icon-url': `'${publicDir}font/antd/3.x/iconfont'`,
-    '@tenx-icon-url': `'${publicDir}tenx-icon/iconfont'`,
   },
   browserslist: [
     '>1%',
