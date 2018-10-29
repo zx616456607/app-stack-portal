@@ -13,12 +13,13 @@
 */
 
 import React from 'react'
-import Pods from '../../../components/Pods'
 
-const JobPods = () => {
+const Pods = () => {
   return (
-    <Pods/>
+    <div>
+    pods Components
+    </div>
   )
 }
 
-export default JobPods
+export default Pods
