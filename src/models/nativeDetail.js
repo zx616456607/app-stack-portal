@@ -11,12 +11,15 @@
  */
 
 import {
-  getClusters,
-} from '../services/paas'
+  getNativeDetail,
+} from '../services/nativeDetail'
 
 export default {
   namespace: 'nativeDetail',
   state: {
+    type: '',
+    name: '',
+    detailData: {},
   },
 
   reducers: {
@@ -26,13 +29,14 @@ export default {
   },
 
   effects: {
-    * getNativeDetail(_, { call, put }) {
-      const res = yield call(getClusters)
-      if (res.clusters) {
+    * fetchNativeDetail(_, { call, put, select }) {
+      const { app: { cluster }, nativeDetail: { type, name } } = yield select(state => state)
+      const res = yield call(getNativeDetail, { cluster, type, name })
+      if (res.data) {
         yield put({
-          type: 'saveClusters',
+          type: 'updateState',
           payload: {
-            clusters: res.clusters || [],
+            detailData: res.data || {},
           },
         })
       }

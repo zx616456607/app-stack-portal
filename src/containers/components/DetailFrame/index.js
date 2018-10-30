@@ -24,7 +24,7 @@ const TabPane = Tabs.TabPane
 
 const routes = [
   {
-    pathname: '/job/:id',
+    pathname: '/Job/:id',
     component: require('../../Job/Detail/Pods').default,
     tabName: 'Pods',
     tabKey: 'default',

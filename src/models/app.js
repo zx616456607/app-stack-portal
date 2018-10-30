@@ -80,16 +80,16 @@ export default {
     user: {},
     menu: [
       {
-        text: 'stateful-set',
+        text: 'StatefulSet',
         icon: <Icon type="bulb" />,
-        key: 'stateful-set',
-        to: '/stateful-set',
+        key: 'StatefulSet',
+        to: '/StatefulSet',
       },
       {
-        text: 'job',
+        text: 'Job',
         icon: <Icon type="bulb" />,
-        key: 'job',
-        to: '/job',
+        key: 'Job',
+        to: '/Job',
       },
       {
         text: 'cron-job',

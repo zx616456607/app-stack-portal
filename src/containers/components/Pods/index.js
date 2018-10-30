@@ -24,7 +24,7 @@ export default class JobList extends React.PureComponent {
     width: '20%',
     key: 'name',
     render: () => (
-      <Link to={'/job/3'} style={{ whiteSpace: 'pre' }}>
+      <Link to={'/Job/3'} style={{ whiteSpace: 'pre' }}>
         test1
       </Link>
     ),

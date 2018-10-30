@@ -13,14 +13,12 @@
 */
 
 import React from 'react'
-import YamlTab from '../../../components/Yaml'
+import Pods from '../../components/Pods'
 
-const Yaml = () => {
+const JobPods = () => {
   return (
-    <div>
-      <YamlTab/>
-    </div>
+    <Pods/>
   )
 }
 
-export default Yaml
+export default JobPods
