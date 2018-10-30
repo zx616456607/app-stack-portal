@@ -8,7 +8,7 @@
  * @date Tuesday October 30th 2018
  */
 import request from '../utils/request'
-import { appStackApi } from '../utils/config'
+import { paasApiUrl } from '../utils/config'
 // import { encodeImageFullname } from '../utils/helper'
 // import queryString from 'query-string'
 
@@ -20,7 +20,7 @@ interface GetClusters {
 }
 // 创建k8s原生资源
 export const createNativeResource = ({ cluster, yaml }: GetClusters) => request({
-  url: `${appStackApi}/clusters/${cluster}/native`,
+  url: `${paasApiUrl}/clusters/${cluster}/native`,
   options: {
     method: 'POST',
     body: yaml,
