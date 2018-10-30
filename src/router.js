@@ -39,6 +39,10 @@ function RouterConfig({ history, app }) {
   }, {
     path: '/createWorkLoad',
     component: () => import('./containers/CreateWorkLoad'),
+    models: () => [
+      import('./models/createNativeResource'),
+
+    ],
   },
   ]
   return (
