@@ -13,7 +13,7 @@
 */
 
 import React from 'react'
-import Pods from '../../../components/Pods'
+import Pods from '../../components/Pods'
 
 const JobPods = () => {
   return (

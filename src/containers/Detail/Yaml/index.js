@@ -13,11 +13,12 @@
 */
 
 import React from 'react'
+import YamlTab from '../../components/Yaml'
 
 const Yaml = () => {
   return (
     <div>
-    yaml
+      <YamlTab/>
     </div>
   )
 }

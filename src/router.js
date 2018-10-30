@@ -24,15 +24,29 @@ function RouterConfig({ history, app }) {
     component: () => import('./containers/Error'),
   })
   const routes = [{
-    path: '/stateful-set',
+    path: '/StatefulSet',
     component: () => import('./containers/StatefulSet'),
   }, {
-    path: '/job',
+    path: '/StatefulSet/:id',
     exact: false,
-    component: () => import('./containers/Job'),
+    component: () => import('./containers/Detail'),
+    models: () => [
+      import('./models/nativeDetail'),
+    ],
+  }, {
+    path: '/Job',
+    exact: true,
+    component: () => import('./containers/Job/List'),
+  }, {
+    path: '/Job/:id',
+    exact: false,
+    component: () => import('./containers/Detail'),
+    models: () => [
+      import('./models/nativeDetail'),
+    ],
   }, {
     path: '/cron-job',
-    component: () => import('./containers/CronJob'),
+    component: () => import('./containers/CronJob/index.tsx'),
   }, {
     path: '/test',
     component: () => import('./containers/Test'),
@@ -50,7 +64,7 @@ function RouterConfig({ history, app }) {
       <LocaleProvider locale={zhCN}>
         <App>
           <Switch>
-            <Route exact path="/" render={() => (<Redirect to="/stateful-set" />)} />
+            <Route exact path="/" render={() => (<Redirect to="/StatefulSet" />)} />
             {
               routes.map(({ path, exact, render, ...dynamics }, key) => {
                 const routeProps = {
