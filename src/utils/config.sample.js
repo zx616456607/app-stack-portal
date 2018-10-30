@@ -13,10 +13,11 @@
 const isProd = process.env.NODE_ENV === 'production'
 
 const paasApi = {
-  protocol: '<TENX_API_EXTERNAL_PROTOCOL>',
-  host: '<TENX_API_EXTERNAL_HOST>',
+  protocol: 'http',
+  host: '192.168.1.230:48000',
   prefix: '/api/v2',
 }
+
 
 const userPortalApi = {
   protocol: 'http',
