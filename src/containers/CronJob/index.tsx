@@ -18,6 +18,7 @@ import '@tenx-ui/page/assets/index.css'
 import QueueAnim from 'rc-queue-anim'
 import { withRouter, RouteComponentProps } from 'dva/router'
 // import styles from './styles/index.less'
+import queryString from 'query-string'
 const Search = Input.Search
 
 const dataSource = [{
@@ -29,53 +30,61 @@ const dataSource = [{
   createTime: '1',
 }];
 
-const columns = [{
-  title: '名称',
-  dataIndex: 'name',
-  key: 'name',
-}, {
-  title: '状态',
-  dataIndex: 'status',
-  key: 'status',
-}, {
-  title: '所属应用',
-  dataIndex: 'includeApp',
-  key: 'includeApp',
-}, {
-  title: '镜像',
-  dataIndex: 'image',
-  key: 'image',
-}, {
-  title: '创建时间',
-  dataIndex: 'createTime',
-  key: 'createTime',
-}, {
-  title: '操作',
-  dataIndex: 'operation',
-  key: 'operation',
-  render: () => {
-    const dropdown = (
-      <Menu className="Moreoperations">
-        <Menu.Item key="0" >
-          <span ><i className="fa fa-refresh" /> 水平扩展</span>
-        </Menu.Item>
-        <Menu.Item key="1" >
-          <span ><i className="fa fa-trash-o" /> 删除</span>
-        </Menu.Item>
-      </Menu>
-    );
-    return (
-      <div className="actionBox commonData">
-      <Dropdown.Button
-        overlay={dropdown}
-        type="ghost"
-      >
-        查看/编辑Yaml
-      </Dropdown.Button>
-    </div>
-    )
-  },
-}];
+function getColumns(self) {
+  const { history, param } = self.props
+  const columns = [{
+    title: '名称',
+    dataIndex: 'name',
+    key: 'name',
+  }, {
+    title: '状态',
+    dataIndex: 'status',
+    key: 'status',
+  }, {
+    title: '所属应用',
+    dataIndex: 'includeApp',
+    key: 'includeApp',
+  }, {
+    title: '镜像',
+    dataIndex: 'image',
+    key: 'image',
+  }, {
+    title: '创建时间',
+    dataIndex: 'createTime',
+    key: 'createTime',
+  }, {
+    title: '操作',
+    dataIndex: 'operation',
+    key: 'operation',
+    render: () => {
+      const dropdown = (
+        <Menu className="Moreoperations">
+          <Menu.Item key="0" >
+            <span ><i className="fa fa-refresh" />运行</span>
+          </Menu.Item>
+          <Menu.Item key="1" >
+            <span ><i className="fa fa-trash-o" />停止</span>
+          </Menu.Item>
+          <Menu.Item key="1" >
+            <span ><i className="fa fa-trash-o" />删除</span>
+          </Menu.Item>
+        </Menu>
+      );
+      return (
+        <div className="actionBox commonData">
+        <Dropdown.Button
+          overlay={dropdown}
+          type="ghost"
+          onClick={() => history.push(`/createWorkLoad?${queryString.stringify({ edit: true })}`)}
+        >
+          查看/编辑Yaml
+        </Dropdown.Button>
+      </div>
+      )
+    },
+  }];
+  return columns
+}
 
 const rowSelection = {
   onChange: (selectedRowKeys, selectedRows) => {
@@ -87,12 +96,13 @@ const rowSelection = {
   }),
 };
 
-interface StatefulSetProps extends RouteComponentProps {
+interface CronJobProps extends RouteComponentProps {
 
 }
-class StatefulSet extends React.Component<StatefulSetProps, {}> {
+class CronJob extends React.Component<CronJobProps, {}> {
 render() {
   const { history } = this.props
+  const self = this
   return (
     <Page>
       <QueueAnim>
@@ -102,7 +112,7 @@ render() {
           icon="plus"
           onClick={() => history.push('/createWorkLoad')}
         >
-          StatefulSet
+          CronJob
         </Button>
         <Button icon="reload" >刷新</Button>
         <Button >启动</Button>
@@ -126,7 +136,7 @@ render() {
           <Table
             pagination={false}
             dataSource={dataSource}
-            columns={columns}
+            columns={getColumns(self)}
             rowSelection={rowSelection}
           />
         </Card>
@@ -136,4 +146,4 @@ render() {
   }
 }
 
-export default withRouter(StatefulSet)
+export default withRouter(CronJob)

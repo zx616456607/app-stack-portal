@@ -16,30 +16,41 @@ import { withRouter, RouteComponentProps } from 'dva/router'
 import TenxEditor from '@tenx-ui/editor'
 import '@tenx-ui/editor/assets/index.css'
 import 'codemirror/mode/yaml/yaml'
+import queryString from 'query-string'
 import styles from './styles/index.less'
+import { connect, SubscriptionAPI } from 'dva'
 
-interface CreateWorkLoadProps extends RouteComponentProps {
+interface CreateWorkLoadProps extends RouteComponentProps, SubscriptionAPI {
 
 }
 
 class CreateWorkLoad extends React.Component<CreateWorkLoadProps, any> {
   state = {
     value: 'echo',
+    editflag: false, // 默认是创建
   }
   onChange = value => {
     this.setState({ value })
   }
+  componentDidMount() {
+    const { history, location: { search }  } = this.props
+    const editflag = queryString.parse(search).edit || false
+    this.setState({ editflag })
+  }
+  createOrEditNative = () => {
+    if (!this.state.editflag) { // 创建
+      // const payload = { cluster:, yaml: this.state.value }
+      this.props.dispatch({ type: 'createNative/createNativeResource' })
+    }
+  }
   render() {
-    const { history } = this.props
     return(
       <Page>
       <QueueAnim>
-        <Row>
-          <Col span={24}>
           <TenxEditor
             onChange={this.onChange}
             title="Yaml"
-            options={{ mode: 'yaml', theme: 'default' }}
+            options={{ mode: 'xml', theme: 'base16-dark' }}
             value={this.state.value}
             headerExtraContent={
             <span className={styles.editOperation}>
@@ -47,21 +58,22 @@ class CreateWorkLoad extends React.Component<CreateWorkLoadProps, any> {
               <Icon type="save" theme="outlined" />
             </span>}
           />
-          </Col>
-          <Col span={0}>
-            <div>
-              "// TODO: 操作板, 下期做"
-            </div>
-          </Col>
-        </Row>
         <div className={styles.operationBar}>
           <div>
             <Button
-              onClick={() => history.goBack()}
+              className={styles.darkButton}
+              onClick={() => history.back()}
             >
               取消
             </Button>
-            <Button type="primary">确定</Button>
+            <Button
+              type="primary"
+              onClick={this.createOrEditNative}
+            >
+            {
+              this.state.editflag ? '保存' : '确定'
+            }
+            </Button>
           </div>
         </div>
       </QueueAnim>
@@ -70,4 +82,7 @@ class CreateWorkLoad extends React.Component<CreateWorkLoadProps, any> {
   }
 }
 
-export default withRouter(CreateWorkLoad)
+function mapStateToProps(state) {
+  return {}
+}
+export default withRouter(connect(mapStateToProps)(CreateWorkLoad))
