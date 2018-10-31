@@ -160,7 +160,6 @@ class CronJob extends React.Component<CronJobProps, CronJobState> {
       })
       this.setState({ CronJobListState: CronJobList })
     } catch (e) {
-      throw e;
       notification.error({ message: '获取CronJob列表失败', description: '' })
     }
   }
