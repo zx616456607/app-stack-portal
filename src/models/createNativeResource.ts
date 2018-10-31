@@ -8,7 +8,10 @@
  * @date Tuesday October 30th 2018
  */
 
-import { createNativeResource } from '../services/createNativeResource'
+import {
+  createNativeResource,
+  updateNativeResource,
+} from '../services/createNativeResource'
 
 export default {
   namespace: 'createNative',
@@ -19,6 +22,10 @@ export default {
   effects: {
     * createNativeResource({ payload }, { call }) {
       const res = yield call(createNativeResource , payload)
+      return res
+    },
+    * updateNativeResource({ payload }, { call }) {
+      const res = yield call(updateNativeResource, payload)
       return res
     },
   },

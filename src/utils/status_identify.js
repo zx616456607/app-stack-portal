@@ -1,0 +1,140 @@
+/**
+ * Licensed Materials - Property of tenxcloud.com
+ * (C) Copyright 2016 TenxCloud. All Rights Reserved.
+ */
+
+/**
+ * Status identify tools
+ * v0.1 - 2016-11-21
+ * @author Zhangpc
+ */
+import cloneDeep from 'lodash/cloneDeep'
+import { TENX_MARK } from './constants'
+const CONTAINER_MAX_RESTART_COUNT = 5
+
+/*
+ * Get container status
+ * one of [Pending, Running, Terminating, Failed, Unknown, Abnormal]
+ */
+export function getPodStatus(container) {
+  const { metadata } = container
+  const { deletionTimestamp } = metadata
+  const status = container.status || { phase: 'Pending' }
+  if (deletionTimestamp) {
+    status.phase = 'Terminating'
+  }
+  const { conditions, containerStatuses } = status
+  let restartCount = 0
+  let phase = status.phase
+  if (conditions) {
+    conditions.every(condition => {
+      if (condition.type !== 'Ready' && condition.status !== 'True') {
+        phase = 'Pending'
+        return false
+      }
+      return true
+    })
+  }
+  if (containerStatuses) {
+    containerStatuses.map(containerStatus => {
+      // const { ready } = containerStatus
+      const containerRestartCount = containerStatus.restartCount
+      if (containerRestartCount > restartCount) {
+        restartCount = containerRestartCount
+        if (!containerStatus.state || !containerStatus.state.running) {
+          // state 不存在或 state 不为 running
+          phase = 'Abnormal'
+        }
+      }
+      return null
+    })
+    if (restartCount >= CONTAINER_MAX_RESTART_COUNT) {
+      status.phase = phase
+      status.restartCount = restartCount
+    }
+  }
+  return status
+}
+
+/*
+ * Get service status
+ * return one of [Pending, Running, Deploying, Stopped]
+ */
+export function getNativeResourceStatus(_service) {
+  const service = cloneDeep(_service)
+  const { status, metadata } = service
+  if (!metadata.annotations) {
+    metadata.annotations = {}
+  }
+  const specReplicas = service.spec.replicas
+  let replicas = specReplicas
+  if (replicas === undefined) {
+    replicas = metadata.annotations[`${TENX_MARK}/replicas`]
+  }
+  let availableReplicas = 0
+  if (!status) {
+    return {
+      phase: 'Stopped',
+      availableReplicas: 0,
+      replicas,
+    }
+  }
+  availableReplicas = status.availableReplicas || 0
+  status.availableReplicas = availableReplicas
+  let {
+    phase,
+    updatedReplicas,
+    unavailableReplicas,
+    observedGeneration,
+    readyReplicas,
+  } = status
+  const { strategy = {} } = service.spec || {}
+  if (status.replicas > specReplicas && strategy.type === 'RollingUpdate') {
+    const newCount = metadata.annotations['rollingupdate/newCount']
+    if (newCount === undefined) {
+      phase = 'ScrollRelease'
+    } else {
+      phase = 'RollingUpdate'
+    }
+    return {
+      phase,
+      availableReplicas,
+      replicas,
+    }
+  }
+  status.replicas = replicas
+  if (phase && phase !== 'Running') {
+    return status
+  }
+  // For issue #CRYSTAL-2478
+  // Add spec.replicas analyzing conditions
+  if (specReplicas === 0 && availableReplicas > 0) {
+    status.phase = 'Stopping'
+    return status
+  }
+  if (observedGeneration >= metadata.generation && replicas === updatedReplicas &&
+    readyReplicas > 0) {
+    status.availableReplicas = readyReplicas
+    status.phase = 'Running'
+    return status
+  }
+  /* if (unavailableReplicas > 0 && (!availableReplicas || availableReplicas < replicas)) {
+    status.phase = 'Pending'
+  } */
+  if (specReplicas > 0 && availableReplicas < 1) {
+    status.unavailableReplicas = specReplicas
+    status.phase = 'Pending'
+    return status
+  }
+  if (updatedReplicas && unavailableReplicas) {
+    status.phase = 'Deploying'
+    status.progress = { status: false }
+    return status
+  }
+  if (availableReplicas < 1) {
+    status.phase = 'Stopped'
+    return status
+  }
+  status.phase = 'Running'
+  return status
+}

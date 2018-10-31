@@ -26,3 +26,11 @@ export const createNativeResource = ({ cluster, yaml }: GetClusters) => request(
     body: yaml,
   },
 })
+// 更新 k8s 原生资源
+export const updateNativeResource = ({ cluster, yaml }: GetClusters) => request({
+  url: `${paasApiUrl}/clusters/${cluster}/native`,
+  options: {
+    method: 'PUT',
+    body: yaml,
+  },
+})

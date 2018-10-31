@@ -26,6 +26,9 @@ function RouterConfig({ history, app }) {
   const routes = [{
     path: '/StatefulSet',
     component: () => import('./containers/StatefulSet'),
+    models: () => [
+      import('./models/nativeResourceList'),
+    ],
   }, {
     path: '/StatefulSet/:id',
     exact: false,
@@ -47,6 +50,9 @@ function RouterConfig({ history, app }) {
   }, {
     path: '/cron-job',
     component: () => import('./containers/CronJob/index.tsx'),
+    models: () => [
+      import('./models/nativeResourceList'),
+    ],
   }, {
     path: '/test',
     component: () => import('./containers/Test'),
@@ -55,7 +61,6 @@ function RouterConfig({ history, app }) {
     component: () => import('./containers/CreateWorkLoad'),
     models: () => [
       import('./models/createNativeResource'),
-
     ],
   },
   ]

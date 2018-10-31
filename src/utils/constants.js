@@ -18,3 +18,4 @@ export const URL_REG_EXP = /^https?:\/\/(([a-zA-Z0-9_-])+(\.)?)*(:\d+)?(\/((\.)?
 export const TENX_STORE = 'tenx_store'
 export const DEFAULT_TIME_FORMAT = 'YYYY-MM-DD HH:mm:ss'
 export const IN_PROGRESS_STATUS = [ 2, 32, 35, 36 ]
+export const TENX_MARK = 'tenxcloud.com'

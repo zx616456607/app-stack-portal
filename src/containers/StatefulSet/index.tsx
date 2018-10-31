@@ -12,22 +12,22 @@
  * (C) Copyright 2018 TenxCloud. All Rights Reserved.
 */
 import * as React from 'react'
-import { Button, Input, Icon, Card, Table, Menu, Dropdown, Pagination } from 'antd'
+import { Button, Input, Card, Table, Menu, Dropdown, Pagination, notification, Tooltip,
+ } from 'antd'
 import Page from '@tenx-ui/page'
 import '@tenx-ui/page/assets/index.css'
 import QueueAnim from 'rc-queue-anim'
 import { withRouter, RouteComponentProps } from 'dva/router'
+import { connect, SubscriptionAPI } from 'dva'
+import moment from 'moment'
+import {
+  formatDate, getDeepValue,
+} from '../../utils/helper'
+import { getNativeResourceStatus } from '../../utils/status_identify'
+import NativeStatus from '../../components/NativeStatus'
+import ImagePopCard from '../../components/ImagePopCard'
 // import styles from './styles/index.less'
 const Search = Input.Search
-
-const dataSource = [{
-  key: '1',
-  name: '胡彦斌',
-  status: '运行中',
-  includeApp: '1',
-  image: '1',
-  createTime: '1',
-}];
 
 const columns = [{
   title: '名称',
@@ -37,18 +37,34 @@ const columns = [{
   title: '状态',
   dataIndex: 'status',
   key: 'status',
-}, {
-  title: '所属应用',
-  dataIndex: 'includeApp',
-  key: 'includeApp',
+  render: (status) => {
+    const { phase, availableReplicas, replicas } = status
+    return <NativeStatus
+      status={{ availableReplicas, replicas }}
+      phase={phase}
+    />
+  },
 }, {
   title: '镜像',
   dataIndex: 'image',
   key: 'image',
+  render: (image) => {
+    return <ImagePopCard addressList={image}/>
+  },
 }, {
   title: '创建时间',
   dataIndex: 'createTime',
   key: 'createTime',
+  render: time => {
+  if (!time) { return <div>-</div> }
+  return (
+    <Tooltip
+      title={formatDate(time, undefined)}
+    >
+      {moment(time).fromNow()}
+    </Tooltip>
+  )
+  },
 }, {
   title: '操作',
   dataIndex: 'operation',
@@ -87,10 +103,48 @@ const rowSelection = {
   }),
 };
 
-interface StatefulSetProps extends RouteComponentProps {
-
+interface StatefulSetProps extends RouteComponentProps, SubscriptionAPI {
+  cluster: string
 }
-class StatefulSet extends React.Component<StatefulSetProps, {}> {
+
+interface StatefulSetListNode {
+  name: string;
+  createTime: string;
+  status: any;
+  imageArray: string[];
+}
+interface StatefulSetState {
+  StatefulSetListState: StatefulSetListNode[];
+}
+class StatefulSet extends React.Component<StatefulSetProps, StatefulSetState> {
+  state = {
+    StatefulSetListState: [],
+  }
+  componentDidMount() {
+    this.reload();
+  }
+  reload = async () => {
+    try {
+      const payload = { cluster: this.props.cluster , type: 'StatefulSet' }
+      const res =
+      await this.props.dispatch({ type: 'NativeResourceList/getNativeResourceList', payload })
+      const { data = [] } = ( res as any)
+      const StatefulSetList = data.map((StatefulSetNode) => {
+        const containerTemplateArray = getDeepValue(StatefulSetNode,
+          ['spec', 'template', 'spec', 'containers']) || [];
+        const imageArray = containerTemplateArray.map(({ image }) => image)
+        return {
+          name: StatefulSetNode.metadata.name,
+          createTime: StatefulSetNode.metadata.creationTimestamp,
+          status: getNativeResourceStatus(StatefulSetNode),
+          image: imageArray,
+        }
+      })
+      this.setState({ StatefulSetListState: StatefulSetList })
+    } catch (e) {
+      notification.error({ message: '获取StatefulSet列表失败', description: '' })
+    }
+  }
 render() {
   const { history } = this.props
   return (
@@ -104,7 +158,7 @@ render() {
         >
           StatefulSet
         </Button>
-        <Button icon="reload" >刷新</Button>
+        <Button icon="reload" onClick={this.reload} >刷新</Button>
         <Button >启动</Button>
         <Button >停止</Button>
         <Button >删除</Button>
@@ -125,7 +179,7 @@ render() {
         <Card key="body">
           <Table
             pagination={false}
-            dataSource={dataSource}
+            dataSource={this.state.StatefulSetListState}
             columns={columns}
             rowSelection={rowSelection}
           />
@@ -136,4 +190,9 @@ render() {
   }
 }
 
-export default withRouter(StatefulSet)
+function mapStateToProps(state) {
+  const { app: { cluster = '' } = {} } = state
+  return { cluster }
+}
+
+export default withRouter(connect(mapStateToProps)(StatefulSet))
