@@ -18,20 +18,9 @@ import { Tag as StatefulSetIcon } from '@tenx-ui/icon'
 import { Button } from 'antd'
 import { connect } from 'dva'
 import { getDeepValue } from '../../../utils/helper'
-import { getNativeResourceStatus } from '../../../utils/status_identify'
 import moment from 'moment'
-import NativeStatus from '../../../components/NativeStatus'
 
-const nativeStatus = status => {
-  const { phase, availableReplicas, replicas } = status
-  return <NativeStatus
-    status={{ availableReplicas, replicas }}
-    phase={phase}
-    hidePodInfo
-  />
-}
-
-const StatefulSetHeader = ({ data }) => {
+const JobHeader = ({ data }) => {
   if (!data.metadata) return <div/>
   return (
     <div className={styles.container}>
@@ -39,13 +28,11 @@ const StatefulSetHeader = ({ data }) => {
         <StatefulSetIcon className={styles.leftIcon}/>
         <span className={styles.firstColumn}>
           <div className={styles.title}>{getDeepValue(data, 'metadata.name') || '--'}</div>
-          <div className={styles.normal}>状态:&nbsp;&nbsp; {
-            nativeStatus(getNativeResourceStatus(data))
-          }</div>
-          <div className={styles.normal}>更新策略: {
+          <div className={styles.normal}>重启策略: {}</div>
+          <div className={styles.normal}>注释: {
             getDeepValue(data, 'spec.updateStrategy.type') === 'RollingUpdate' ? '滚动升级' : '普通升级'
           }</div>
-          <div className={styles.normal}>最小就绪时间: {
+          <div className={styles.normal}>标签: {
             getDeepValue(data, 'spec.template.spec.terminationGracePeriodSeconds') || '--'
           }s</div>
           <div className={styles.normal}>创建时间: {
@@ -53,10 +40,10 @@ const StatefulSetHeader = ({ data }) => {
           }</div>
         </span>
         <span className={styles.secondColumn}>
-          <div className={styles.normal}>注释: aaaaaa</div>
-          <div className={styles.normal}>标签: name:aaaaaa; nnn;</div>
-          <div className={styles.normal}>pod selector: name:test111</div>
-          <div className={styles.normal}>node selector: name:test222</div>
+          <div className={styles.normal}>运行: 1</div>
+          <div className={styles.normal}>并行: 1</div>
+          <div className={styles.normal}>完成: 1</div>
+          <div className={styles.normal}>失败: 1</div>
         </span>
       </div>
       <Button type="primary"> 编辑 Yaml</Button>
@@ -70,4 +57,4 @@ const mapStateToProps = ({ nativeDetail: { detailData = {} } }) => {
   }
 }
 
-export default connect(mapStateToProps)(StatefulSetHeader)
+export default connect(mapStateToProps)(JobHeader)

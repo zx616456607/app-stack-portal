@@ -19,6 +19,8 @@ import { Tabs, notification } from 'antd'
 import Page from '@tenx-ui/page'
 import ReturnButton from '@tenx-ui/return-button'
 import StatefulSetHeader from './Header/StatefulSetHeader'
+import CronJobHeader from './Header/CronJobHeader'
+import JobHeader from './Header/JobHeader'
 import styles from './style/index.less'
 
 const TabPane = Tabs.TabPane
@@ -79,7 +81,30 @@ class NativeDetail extends React.PureComponent {
         tabName: '监控',
         tabKey: 'monitor',
       },
+      {
+        path: `/${type}/:id/alarm`,
+        component: require('./Alarm').default,
+        tabName: '告警',
+        tabKey: 'alarm',
+      },
+      {
+        path: `/${type}/:id/log`,
+        component: require('./Log').default,
+        tabName: '日志',
+        tabKey: 'log',
+      },
+      {
+        path: `/${type}/:id/event`,
+        component: require('./Event').default,
+        tabName: '事件',
+        tabKey: 'event',
+      },
     ]
+  }
+  getHeader = type => {
+    if (type === 'StatefulSet') return <StatefulSetHeader/>
+    if (type === 'Job') return <JobHeader/>
+    return <CronJobHeader/>
   }
   render() {
     const { dispatch, children, location: { pathname }, history, type, name } = this.props
@@ -87,7 +112,9 @@ class NativeDetail extends React.PureComponent {
     return (
       <div>
         <ReturnButton onClick={history.goBack}>返回</ReturnButton>
-        <StatefulSetHeader/>
+        {
+          this.getHeader(type)
+        }
         <Page inner className={styles.page}>
           <div>
             <Tabs

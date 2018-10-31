@@ -18,45 +18,27 @@ import { Tag as StatefulSetIcon } from '@tenx-ui/icon'
 import { Button } from 'antd'
 import { connect } from 'dva'
 import { getDeepValue } from '../../../utils/helper'
-import { getNativeResourceStatus } from '../../../utils/status_identify'
 import moment from 'moment'
-import NativeStatus from '../../../components/NativeStatus'
+import classnames from 'classnames'
 
-const nativeStatus = status => {
-  const { phase, availableReplicas, replicas } = status
-  return <NativeStatus
-    status={{ availableReplicas, replicas }}
-    phase={phase}
-    hidePodInfo
-  />
-}
-
-const StatefulSetHeader = ({ data }) => {
+const JobHeader = ({ data }) => {
   if (!data.metadata) return <div/>
   return (
-    <div className={styles.container}>
+    <div className={classnames(styles.container, styles.cronJob)} >
       <div className={styles.left}>
         <StatefulSetIcon className={styles.leftIcon}/>
         <span className={styles.firstColumn}>
           <div className={styles.title}>{getDeepValue(data, 'metadata.name') || '--'}</div>
-          <div className={styles.normal}>状态:&nbsp;&nbsp; {
-            nativeStatus(getNativeResourceStatus(data))
-          }</div>
-          <div className={styles.normal}>更新策略: {
+          <div className={styles.normal}>正在进行任务书: {}</div>
+          <div className={styles.normal}>已完成任务数: {
             getDeepValue(data, 'spec.updateStrategy.type') === 'RollingUpdate' ? '滚动升级' : '普通升级'
-          }</div>
-          <div className={styles.normal}>最小就绪时间: {
-            getDeepValue(data, 'spec.template.spec.terminationGracePeriodSeconds') || '--'
-          }s</div>
-          <div className={styles.normal}>创建时间: {
-            moment(getDeepValue(data, 'metadata.creationTimestamp')).format('YYYY-MM-DD HH:mm:ss')
           }</div>
         </span>
         <span className={styles.secondColumn}>
-          <div className={styles.normal}>注释: aaaaaa</div>
-          <div className={styles.normal}>标签: name:aaaaaa; nnn;</div>
-          <div className={styles.normal}>pod selector: name:test111</div>
-          <div className={styles.normal}>node selector: name:test222</div>
+          <div className={styles.normal}>触发规则: 1</div>
+          <div className={styles.normal}>创建时间: {
+            moment(getDeepValue(data, 'metadata.creationTimestamp')).format('YYYY-MM-DD HH:mm:ss')
+          }</div>
         </span>
       </div>
       <Button type="primary"> 编辑 Yaml</Button>
@@ -70,4 +52,4 @@ const mapStateToProps = ({ nativeDetail: { detailData = {} } }) => {
   }
 }
 
-export default connect(mapStateToProps)(StatefulSetHeader)
+export default connect(mapStateToProps)(JobHeader)
