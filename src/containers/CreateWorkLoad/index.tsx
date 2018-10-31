@@ -43,7 +43,8 @@ class CreateWorkLoad extends React.Component<CreateWorkLoadProps, any> {
     try {
       const res = await
       this.props.dispatch({ type: 'NativeResourceList/getNativeResourceDetail', payload })
-      this.setState({ value: yaml.dump((res as any).data) })
+      const K8sConfigJson = { kind: config.type, ...(res as any).data }
+      this.setState({ value: yaml.dump(K8sConfigJson) })
     } catch (e) {
       notification.warn({ message: '获取详情失败', description: '' })
     }
@@ -54,6 +55,7 @@ class CreateWorkLoad extends React.Component<CreateWorkLoadProps, any> {
       try {
         await this.props.dispatch({ type: 'createNative/createNativeResource', payload })
         notification.success({ message: '创建成功', description: '' })
+        setTimeout( () => history.back(), 600)
       } catch (e) {
         const { code, reason } = e.response
         if (code === 409 && reason === 'AlreadyExists') {
@@ -70,12 +72,13 @@ class CreateWorkLoad extends React.Component<CreateWorkLoadProps, any> {
       try {
         await this.props.dispatch({ type: 'createNative/updateNativeResource', payload })
         notification.success({ message: '更新成功', description: '' })
+        setTimeout( () => history.back(), 600)
       } catch (e) {
         const { code } = e.response
         if (code === 500) {
           return notification.warn({ message: 'yaml格式错误', description: '' })
         }
-        notification.success({ message: '创建失败', description: '' })
+        notification.success({ message: '更新失败', description: '' })
       }
     }
   }

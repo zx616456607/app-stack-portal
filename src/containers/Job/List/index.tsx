@@ -22,10 +22,10 @@ import { connect, SubscriptionAPI } from 'dva'
 import moment from 'moment'
 import {
   formatDate, getDeepValue,
-} from '../../utils/helper'
-import { getNativeResourceStatus } from '../../utils/status_identify'
-import NativeStatus from '../../components/NativeStatus'
-import ImagePopCard from '../../components/ImagePopCard'
+} from '../../../utils/helper'
+import { getNativeResourceStatus } from '../../../utils/status_identify'
+import NativeStatus from '../../../components/NativeStatus'
+import ImagePopCard from '../../../components/ImagePopCard'
 import * as modal from '@tenx-ui/modal'
 import '@tenx-ui/modal/assets/index.css'
 import queryString from 'query-string'
@@ -85,9 +85,6 @@ function getColumns(self) {
     render: (_, record) => {
       const dropdown = (
         <Menu className="Moreoperations">
-          <Menu.Item key="0" >
-            <span ><i className="fa fa-refresh" /> 水平扩展</span>
-          </Menu.Item>
           <Menu.Item key="1" >
             <span onClick={() => self.delete(record.name)}>
               <i className="fa fa-trash-o" />删除</span>
@@ -101,7 +98,7 @@ function getColumns(self) {
           type="ghost"
           onClick={() =>
             history.push(`/createWorkLoad?${queryString.stringify(
-              { edit: true, type: 'StatefulSet', name: record.name })}`)}
+              { edit: true, type: 'Job', name: record.name })}`)}
         >
           查看/编辑Yaml
         </Dropdown.Button>
@@ -112,25 +109,25 @@ function getColumns(self) {
   return columns
 }
 
-interface StatefulSetProps extends RouteComponentProps, SubscriptionAPI {
+interface JobProps extends RouteComponentProps, SubscriptionAPI {
   cluster: string
 }
 
-interface StatefulSetListNode {
+interface JobListNode {
   name: string;
   createTime: string;
   status: any;
   imageArray: string[];
 }
-interface StatefulSetState {
-  StatefulSetListState: StatefulSetListNode[];
+interface JobState {
+  JobListState: JobListNode[];
   selectedRowKeys: number[];
   filter: string;
   currentPage: number;
 }
-class StatefulSet extends React.Component<StatefulSetProps, StatefulSetState> {
+class Job extends React.Component<JobProps, JobState> {
   state = {
-    StatefulSetListState: [],
+    JobListState: [],
     selectedRowKeys: [],
     filter: '',
     currentPage: 1,
@@ -140,25 +137,25 @@ class StatefulSet extends React.Component<StatefulSetProps, StatefulSetState> {
   }
   reload = async () => {
     try {
-      const payload = { cluster: this.props.cluster , type: 'StatefulSet' }
+      const payload = { cluster: this.props.cluster , type: 'Job' }
       const res =
       await this.props.dispatch({ type: 'NativeResourceList/getNativeResourceList', payload })
       const { data = [] } = ( res as any)
-      const StatefulSetList = data.map((StatefulSetNode) => {
-        const containerTemplateArray = getDeepValue(StatefulSetNode,
+      const JobList = data.map((JobNode) => {
+        const containerTemplateArray = getDeepValue(JobNode,
           ['spec', 'template', 'spec', 'containers']) || [];
         const imageArray = containerTemplateArray.map(({ image }) => image)
         return {
-          key: StatefulSetNode.metadata.name,
-          name: StatefulSetNode.metadata.name,
-          createTime: StatefulSetNode.metadata.creationTimestamp,
-          status: getNativeResourceStatus(StatefulSetNode),
+          key: JobNode.metadata.name,
+          name: JobNode.metadata.name,
+          createTime: JobNode.metadata.creationTimestamp,
+          status: getNativeResourceStatus(JobNode),
           image: imageArray,
         }
       })
-      this.setState({ StatefulSetListState: StatefulSetList })
+      this.setState({ JobListState: JobList })
     } catch (e) {
-      notification.error({ message: '获取StatefulSet列表失败', description: '' })
+      notification.error({ message: '获取Job列表失败', description: '' })
     }
   }
   onSelectChange = selectedRowKeys => {
@@ -166,10 +163,10 @@ class StatefulSet extends React.Component<StatefulSetProps, StatefulSetState> {
   }
   delete = (name) => {
     const self = this
-    let info = `您是否确定删除这${this.state.selectedRowKeys.length}个可以删除的 StatefulSet`
-    const payload = { cluster: this.props.cluster, type: 'StatefulSet', name }
+    let info = `您是否确定删除这${this.state.selectedRowKeys.length}个可以删除的 Job`
+    const payload = { cluster: this.props.cluster, type: 'Job', name }
     if (name) {
-      info = `您是否确定删除这1个可以删除的 StatefulSet`
+      info = `您是否确定删除这1个可以删除的 Job`
     }
     modal.confirm({
       modalTitle: '删除操作',
@@ -187,7 +184,7 @@ class StatefulSet extends React.Component<StatefulSetProps, StatefulSetState> {
   start = () => {
     modal.confirm({
       modalTitle: '启动操作',
-      title: `您是否确定启动这${this.state.selectedRowKeys.length}个可以启动的 StatefulSet`,
+      title: `您是否确定启动这${this.state.selectedRowKeys.length}个可以启动的 Job`,
       content: '',
       onOk() {
       },
@@ -197,7 +194,7 @@ class StatefulSet extends React.Component<StatefulSetProps, StatefulSetState> {
   stop = () => {
     modal.confirm({
       modalTitle: '停止操作',
-      title: `您是否确定停止这${this.state.selectedRowKeys.length}个可以停止的 StatefulSet`,
+      title: `您是否确定停止这${this.state.selectedRowKeys.length}个可以停止的 Job`,
       content: '',
       onOk() {
       },
@@ -208,7 +205,7 @@ class StatefulSet extends React.Component<StatefulSetProps, StatefulSetState> {
     this.setState({ currentPage: page })
   }
   selectData = () => {
-    return this.state.StatefulSetListState
+    return this.state.JobListState
     .filter(({ name }) => name.includes(this.state.filter))
     .filter((_, index) =>
     (this.state.currentPage - 1) * 10 <= index &&
@@ -233,21 +230,9 @@ render() {
           icon="plus"
           onClick={() => history.push('/createWorkLoad')}
         >
-          StatefulSet
+          Job
         </Button>
         <Button icon="reload" onClick={this.reload} >刷新</Button>
-        <Button
-          disabled={this.state.selectedRowKeys.length === 0}
-          onClick={this.start}
-        >
-          启动
-        </Button>
-        <Button
-          disabled={this.state.selectedRowKeys.length === 0}
-          onClick={this.stop}
-        >
-          停止
-        </Button>
         <Button
           onClick={this.delete}
           disabled={this.state.selectedRowKeys.length === 0}
@@ -261,7 +246,7 @@ render() {
           onChange={this.onSelect}
         />
         <Pagination
-          total={this.state.StatefulSetListState.length}
+          total={this.state.JobListState.length}
           showTotal={_total => `共计${_total}条`}
           pageSize={10}
           // defaultCurrent={t}
@@ -289,4 +274,4 @@ function mapStateToProps(state) {
   return { cluster }
 }
 
-export default withRouter(connect(mapStateToProps)(StatefulSet))
+export default withRouter(connect(mapStateToProps)(Job))
