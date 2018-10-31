@@ -15,10 +15,10 @@
 import React from 'react'
 import { connect } from 'dva'
 import { Switch, Route, routerRedux } from 'dva/router'
-import { Tabs } from 'antd'
+import { Tabs, notification } from 'antd'
 import Page from '@tenx-ui/page'
 import ReturnButton from '@tenx-ui/return-button'
-import DetailHeader from './Header'
+import StatefulSetHeader from './Header/StatefulSetHeader'
 import styles from './style/index.less'
 
 const TabPane = Tabs.TabPane
@@ -38,7 +38,7 @@ class NativeDetail extends React.PureComponent {
     })
     dispatch({
       type: 'nativeDetail/fetchNativeDetail',
-    })
+    }).catch(() => notification.warn({ message: '获取应用详情出错' }))
   }
   onTabChange = (key, id, dispatch, type) => {
     let _pathname = `/${type}/${id}/${key}`
@@ -73,6 +73,12 @@ class NativeDetail extends React.PureComponent {
         tabName: 'Yaml',
         tabKey: 'yaml',
       },
+      {
+        path: `/${type}/:id/monitor`,
+        component: require('./Monitor').default,
+        tabName: '监控',
+        tabKey: 'monitor',
+      },
     ]
   }
   render() {
@@ -81,7 +87,7 @@ class NativeDetail extends React.PureComponent {
     return (
       <div>
         <ReturnButton onClick={history.goBack}>返回</ReturnButton>
-        <DetailHeader/>
+        <StatefulSetHeader/>
         <Page inner className={styles.page}>
           <div>
             <Tabs

@@ -17,6 +17,11 @@ const getNativeDetail = ({ cluster, type, name }) => request({
   url: `${paasApiUrl}${CLUSTERS}/${cluster}/native/${type}/${name}`,
 })
 
+const getPodsList = ({ cluster, type, name }) => request({
+  url: `${paasApiUrl}${CLUSTERS}/${cluster}/native/${type}/${name}/instance`,
+})
+
 export {
   getNativeDetail,
+  getPodsList,
 }

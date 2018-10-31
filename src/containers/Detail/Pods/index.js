@@ -14,11 +14,27 @@
 
 import React from 'react'
 import Pods from '../../components/Pods'
+import { connect } from 'dva'
+import { withRouter } from 'dva/router'
 
-const JobPods = () => {
-  return (
-    <Pods/>
-  )
+class PodsContainer extends React.PureComponent {
+  componentDidMount() {
+    const { dispatch } = this.props
+    dispatch({
+      type: 'nativeDetail/fetchPodsList',
+    })
+  }
+  render() {
+    return (
+      <Pods { ...this.props } />
+    )
+  }
 }
 
-export default JobPods
+const mapStateToProps = ({ nativeDetail: { pods } }) => {
+  return {
+    data: pods || [],
+  }
+}
+
+export default connect(mapStateToProps)(withRouter(PodsContainer))

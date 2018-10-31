@@ -17,42 +17,58 @@ import { Pagination, Table, Dropdown, Menu } from 'antd'
 import Page from '@tenx-ui/page'
 import Queue from 'rc-queue-anim'
 import { Link } from 'dva/router'
+import moment from 'moment'
+import Ellipsis from '@tenx-ui/ellipsis'
 
-export default class JobList extends React.PureComponent {
+export default class Pods extends React.PureComponent {
+  state = {
+    current: 1,
+    size: 10,
+  }
+  getImages(item) {
+    const images = []
+    item.spec.containers.map(container => images.push(container.image))
+    return images.join(', ')
+  }
+  onPageChange = pageNum => {
+    this.setState({
+      current: pageNum,
+    })
+  }
   _renderColumn = history => [{
     title: '容器名称',
-    width: '20%',
+    width: '15%',
     key: 'name',
-    render: () => (
+    render: data => (
       <Link to={'/Job/3'} style={{ whiteSpace: 'pre' }}>
-        test1
+        <Ellipsis>{data.metadata.name}</Ellipsis>
       </Link>
     ),
   }, {
     title: '状态',
     width: '10%',
     key: 'status',
-    render: () => <div>正在启动</div>,
+    render: data => data.status.phase,
   }, {
     title: '所属应用',
     width: '15%',
     key: 'belong',
-    render: () => <div>hello-world</div>,
+    render: () => <div>TODO</div>,
   }, {
     title: '镜像',
     width: '15%',
     key: 'image',
-    render: () => <div>192.168.1.52/public/hello-wo</div>,
+    render: data => this.getImages(data),
   }, {
     title: '访问地址',
     width: '10%',
     key: 'address',
-    render: () => <div>172.31.0.85</div>,
+    render: data => (data.status && data.status.podIP) || '-',
   }, {
     title: '创建时间',
-    width: '10%',
+    width: '15%',
     key: 'time',
-    render: () => <div>4小时前</div>,
+    render: data => moment(data.metadata.creationTimestamp).format('YYYY-MM-DD HH:mm:ss'),
   }, {
     title: '操作',
     width: '15%',
@@ -69,6 +85,8 @@ export default class JobList extends React.PureComponent {
     </Dropdown.Button>,
   }]
   render() {
+    const { data = [], history } = this.props
+    const { current, size } = this.state
     return (
       <Page>
         <Queue>
@@ -83,18 +101,21 @@ export default class JobList extends React.PureComponent {
               placeholder={'请输入名称搜索'}
             /> */}
             <Pagination
-              total={0}
+              total={data.length}
               showTotal={_total => `共计${_total}条`}
-              pageSize={10}
+              pageSize={size}
               defaultCurrent={1}
-              current={1}
+              current={current}
+              onChange={this.onPageChange}
               size={'small'}
             />
           </div>
           <Table
-            rowKey={'id'}
+            rowKey={item => item.metadata.name}
             key={'table'}
-            dataSource={[{ id: '1' }]}
+            dataSource={data.filter(
+              (item, index) => index < (current * size) && index >= ((current - 1) * size)
+            )}
             columns={this._renderColumn(history)}
             pagination={false}
           />

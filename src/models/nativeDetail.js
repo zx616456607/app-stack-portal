@@ -12,6 +12,7 @@
 
 import {
   getNativeDetail,
+  getPodsList,
 } from '../services/nativeDetail'
 
 export default {
@@ -20,6 +21,7 @@ export default {
     type: '',
     name: '',
     detailData: {},
+    pods: [],
   },
 
   reducers: {
@@ -37,6 +39,18 @@ export default {
           type: 'updateState',
           payload: {
             detailData: res.data || {},
+          },
+        })
+      }
+    },
+    * fetchPodsList(_, { call, put, select }) {
+      const { app: { cluster }, nativeDetail: { type, name } } = yield select(state => state)
+      const res = yield call(getPodsList, { cluster, type, name })
+      if (res.data) {
+        yield put({
+          type: 'updateState',
+          payload: {
+            pods: (res.data && res.data.items) || [],
           },
         })
       }
