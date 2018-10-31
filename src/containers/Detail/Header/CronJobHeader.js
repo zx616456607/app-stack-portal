@@ -20,6 +20,7 @@ import { connect } from 'dva'
 import { getDeepValue } from '../../../utils/helper'
 import moment from 'moment'
 import classnames from 'classnames'
+import { DEFAULT_TIME_FORMAT } from '../../../utils/constants'
 
 const JobHeader = ({ data }) => {
   if (!data.metadata) return <div/>
@@ -37,7 +38,7 @@ const JobHeader = ({ data }) => {
         <span className={styles.secondColumn}>
           <div className={styles.normal}>触发规则: 1</div>
           <div className={styles.normal}>创建时间: {
-            moment(getDeepValue(data, 'metadata.creationTimestamp')).format('YYYY-MM-DD HH:mm:ss')
+            moment(getDeepValue(data, 'metadata.creationTimestamp')).format(DEFAULT_TIME_FORMAT)
           }</div>
         </span>
       </div>

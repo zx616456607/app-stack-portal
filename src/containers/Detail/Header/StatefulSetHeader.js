@@ -21,6 +21,7 @@ import { getDeepValue } from '../../../utils/helper'
 import { getNativeResourceStatus } from '../../../utils/status_identify'
 import moment from 'moment'
 import NativeStatus from '../../../components/NativeStatus'
+import { DEFAULT_TIME_FORMAT } from '../../../utils/constants'
 
 const nativeStatus = status => {
   const { phase, availableReplicas, replicas } = status
@@ -49,7 +50,7 @@ const StatefulSetHeader = ({ data }) => {
             getDeepValue(data, 'spec.template.spec.terminationGracePeriodSeconds') || '--'
           }s</div>
           <div className={styles.normal}>创建时间: {
-            moment(getDeepValue(data, 'metadata.creationTimestamp')).format('YYYY-MM-DD HH:mm:ss')
+            moment(getDeepValue(data, 'metadata.creationTimestamp')).format(DEFAULT_TIME_FORMAT)
           }</div>
         </span>
         <span className={styles.secondColumn}>

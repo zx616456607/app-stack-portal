@@ -19,6 +19,7 @@ import { Button } from 'antd'
 import { connect } from 'dva'
 import { getDeepValue } from '../../../utils/helper'
 import moment from 'moment'
+import { DEFAULT_TIME_FORMAT } from '../../../utils/constants'
 
 const JobHeader = ({ data }) => {
   if (!data.metadata) return <div/>
@@ -36,7 +37,7 @@ const JobHeader = ({ data }) => {
             getDeepValue(data, 'spec.template.spec.terminationGracePeriodSeconds') || '--'
           }s</div>
           <div className={styles.normal}>创建时间: {
-            moment(getDeepValue(data, 'metadata.creationTimestamp')).format('YYYY-MM-DD HH:mm:ss')
+            moment(getDeepValue(data, 'metadata.creationTimestamp')).format(DEFAULT_TIME_FORMAT)
           }</div>
         </span>
         <span className={styles.secondColumn}>

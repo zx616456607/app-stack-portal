@@ -16,13 +16,14 @@ import React from 'react'
 import Pods from '../../components/Pods'
 import { connect } from 'dva'
 import { withRouter } from 'dva/router'
+import { notification } from 'antd'
 
 class PodsContainer extends React.PureComponent {
   componentDidMount() {
     const { dispatch } = this.props
     dispatch({
       type: 'nativeDetail/fetchPodsList',
-    })
+    }).catch(() => notification.warn({ message: '获取 Pods 失败' }))
   }
   render() {
     return (

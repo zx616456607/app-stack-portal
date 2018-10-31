@@ -19,6 +19,7 @@ import Queue from 'rc-queue-anim'
 import { Link } from 'dva/router'
 import moment from 'moment'
 import Ellipsis from '@tenx-ui/ellipsis'
+import { DEFAULT_TIME_FORMAT } from '../../../utils/constants'
 
 export default class Pods extends React.PureComponent {
   state = {
@@ -68,7 +69,7 @@ export default class Pods extends React.PureComponent {
     title: '创建时间',
     width: '15%',
     key: 'time',
-    render: data => moment(data.metadata.creationTimestamp).format('YYYY-MM-DD HH:mm:ss'),
+    render: data => moment(data.metadata.creationTimestamp).format(DEFAULT_TIME_FORMAT),
   }, {
     title: '操作',
     width: '15%',
