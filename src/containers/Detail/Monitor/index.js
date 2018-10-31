@@ -14,12 +14,12 @@
 
 import React from 'react'
 
-const Header = () => {
+const Yaml = () => {
   return (
     <div>
-    pods
+      监控
     </div>
   )
 }
 
-export default Header
+export default Yaml

@@ -21,6 +21,7 @@ export interface Status {
 export interface NativeStatusProps {
   phase: string;
   status: Status;
+  hidePodInfo?: boolean;
 }
 
 function SwitchToStatus(phase: string) {
@@ -64,17 +65,20 @@ function PodsStatus(status: Status) {
 
 export default class NativeStatus extends React.Component<NativeStatusProps, {}> {
   render() {
-    const { phase, status: { availableReplicas = 0, replicas = 0 } = {} } = this.props
+    const { phase, hidePodInfo = false, status: { availableReplicas = 0, replicas = 0 } = {} } = this.props
     const phaseInfo = SwitchToStatus(phase)
     return(
       <div className="NativeStatus">
         <div className={phaseInfo.color}>
           <CircleIcon/><span className={styles.phaseInfoText}>{phaseInfo.text}</span>
         </div>
-        <div className={styles.podInfo}>
-          <span>{`${availableReplicas}/${replicas}`}</span>
-          <span className={styles.podInfoText}>{PodsStatus(this.props.status)}</span>
-        </div>
+        {
+          !hidePodInfo &&
+          <div className={styles.podInfo}>
+            <span>{`${availableReplicas}/${replicas}`}</span>
+            <span className={styles.podInfoText}>{PodsStatus(this.props.status)}</span>
+          </div>
+        }
       </div>
     )
   }

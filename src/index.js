@@ -24,6 +24,7 @@ import '@tenx-ui/icon/assets/index.css'
 import '@tenx-ui/page/assets/index.css'
 import '@tenx-ui/ellipsis/assets/index.css'
 import '@tenx-ui/return-button/assets/index.css'
+import '@tenx-ui/logs/assets/index.css'
 const isProd = process.env.NODE_ENV === 'production'
 
 /* const logger = store => next => action => {
