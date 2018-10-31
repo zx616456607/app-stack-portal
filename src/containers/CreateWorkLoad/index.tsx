@@ -11,7 +11,7 @@ import * as React from 'react'
 import Page from '@tenx-ui/page'
 import '@tenx-ui/page/assets/index.css'
 import QueueAnim from 'rc-queue-anim'
-import { Icon, Row, Col, Button } from 'antd'
+import { Icon, Button, notification } from 'antd'
 import { withRouter, RouteComponentProps } from 'dva/router'
 import TenxEditor from '@tenx-ui/editor'
 import '@tenx-ui/editor/assets/index.css'
@@ -21,32 +21,58 @@ import styles from './styles/index.less'
 import { connect, SubscriptionAPI } from 'dva'
 
 interface CreateWorkLoadProps extends RouteComponentProps, SubscriptionAPI {
-
+  cluster: string
 }
 
 class CreateWorkLoad extends React.Component<CreateWorkLoadProps, any> {
   state = {
-    value: 'echo',
+    value: '',
     editflag: false, // 默认是创建
   }
   onChange = value => {
     this.setState({ value })
   }
   componentDidMount() {
-    const { history, location: { search }  } = this.props
+    const { location: { search }  } = this.props
     const editflag = queryString.parse(search).edit || false
     this.setState({ editflag })
   }
-  createOrEditNative = () => {
+  createOrEditNative = async () => {
+    const payload = { cluster: this.props.cluster, yaml: this.state.value }
     if (!this.state.editflag) { // 创建
-      // const payload = { cluster:, yaml: this.state.value }
-      this.props.dispatch({ type: 'createNative/createNativeResource' })
+      try {
+        await this.props.dispatch({ type: 'createNative/createNativeResource', payload })
+        notification.success({ message: '创建成功', description: '' })
+      } catch (e) {
+        const { code, reason } = e.response
+        if (code === 409 && reason === 'AlreadyExists') {
+          return notification.warn({ message: '该资源已经存在', description: '' })
+        }
+        if (code === 500) {
+          return notification.warn({ message: 'yaml格式错误', description: '' })
+        }
+        notification.error({ message: '创建失败', description: '' })
+      }
+      return
+    }
+    if (this.state.editflag) { // 编辑
+      try {
+        await this.props.dispatch({ type: 'createNative/updateNativeResource', payload })
+        notification.success({ message: '更新成功', description: '' })
+      } catch (e) {
+        const { code } = e.response
+        if (code === 500) {
+          return notification.warn({ message: 'yaml格式错误', description: '' })
+        }
+        notification.success({ message: '创建失败', description: '' })
+      }
     }
   }
   render() {
     return(
       <Page>
       <QueueAnim>
+        <div className={styles.createNativeEdit}>
           <TenxEditor
             onChange={this.onChange}
             title="Yaml"
@@ -58,6 +84,7 @@ class CreateWorkLoad extends React.Component<CreateWorkLoadProps, any> {
               <Icon type="save" theme="outlined" />
             </span>}
           />
+        </div>
         <div className={styles.operationBar}>
           <div>
             <Button
@@ -83,6 +110,7 @@ class CreateWorkLoad extends React.Component<CreateWorkLoadProps, any> {
 }
 
 function mapStateToProps(state) {
-  return {}
+  const { app: { cluster = '' } = {} } = state
+  return { cluster }
 }
 export default withRouter(connect(mapStateToProps)(CreateWorkLoad))
