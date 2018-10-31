@@ -40,18 +40,29 @@ class Log extends React.PureComponent {
       },
     }).catch(() => notification.warn({ message: '获取日志出错' }))
   }
+  getColorLogs = () => {
+    this.logRef && this.logRef.clearLogs()
+    const { logs } = this.props
+    const res = []
+    logs.map(log => res.push(`
+<span style="color: #ffc20e">[${log.name}]</span>
+<span style="color: #ff0">[${
+      moment(parseInt(log.time_nano / 1000))
+        .format(DEFAULT_TIME_FORMAT)
+      }]</span>
+<span style="color: #37fc34">${log.log}</span><div/>
+`)
+    )
+    this.logRef && this.logRef.writelns(res)
+  }
   render() {
-    const logsz = [
-      '[0] node app.js',
-      '[1] hello world',
-    ]
+    this.getColorLogs()
     return (
-      <div>
-        <TenxLogs
-          ref={ref => (this.logRef = ref)}
-          logs={logsz}
-        />
-      </div>
+      <TenxLogs
+        ref={ref => (this.logRef = ref)}
+        logs={[]}
+        isDangerouslySetInnerHTML={true}
+      />
     )
   }
 }

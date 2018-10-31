@@ -73,7 +73,7 @@ export default {
       const { app: { cluster }, nativeDetail: { name } } = yield select(state => state)
       const res = yield call(getNativeLogs, { cluster, name, body })
       // const res = JSON.parse('{"status":"Success","code":200,"data":{"logs":[{"name":"haitao-test-app2-f84879bbb-mch9z","kind":"instance","log":"Listening port :80\\n","id":"AWbI97iZIvzSRRXCoWKC","time_nano":"1540969967709223188","filename":""},{"name":"haitao-test-app2-f84879bbb-5jwft","kind":"instance","log":"Listening port :80\\n","id":"AWbJQ9LSIvzSRRXCptFt","time_nano":"1540974956214183658","filename":""}],"count":2},"statusCode":200}')
-      if (res.data && res.data) {
+      if (res.data && res.data.logs) {
         yield put({
           type: 'updateState',
           payload: {

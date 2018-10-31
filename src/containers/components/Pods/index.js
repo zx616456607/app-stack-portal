@@ -28,7 +28,7 @@ export default class Pods extends React.PureComponent {
   }
   getImages(item) {
     const images = []
-    item.spec.containers.map(container => images.push(container.image))
+    item.spec.containers && item.spec.containers.map(container => images.push(container.image))
     return images.join(', ')
   }
   onPageChange = pageNum => {

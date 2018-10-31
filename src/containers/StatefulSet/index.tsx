@@ -40,7 +40,7 @@ function getColumns(self) {
     dataIndex: 'name',
     key: 'name',
     render: (name) => {
-      return <Link to={`/Job/${name}`}>
+      return <Link to={`/StatefulSet/${name}`}>
       <Ellipsis length={8} title={name}>
       {name}
     </Ellipsis>

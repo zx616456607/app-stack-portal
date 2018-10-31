@@ -92,10 +92,10 @@ export default {
         to: '/Job',
       },
       {
-        text: 'cron-job',
+        text: 'CronJob',
         icon: <Icon type="bulb" />,
-        key: 'cron-job',
-        to: '/cron-job',
+        key: 'CronJob',
+        to: '/CronJob',
       },
       {
         text: 'test',
