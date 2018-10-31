@@ -28,8 +28,14 @@ interface DeleteNativeResourceList extends NativeResourceListParam {
 // 删除k8s原生资源列表
 export const deleteNativeResourceList = ({ cluster, type, name }: DeleteNativeResourceList) =>
 request({
-  url: `${paasApiUrl}/clusters/${cluster}/native/${type}`,
+  url: `${paasApiUrl}/clusters/${cluster}/native/${type}/${name}`,
   options: {
     method: 'DELETE',
   },
+})
+
+// 获取 k8s 原生资源详情
+export const getNativeResourceDetail = ({ cluster, type, name }: DeleteNativeResourceList) =>
+request({
+  url: `${paasApiUrl}/clusters/${cluster}/native/${type}/${name}`,
 })

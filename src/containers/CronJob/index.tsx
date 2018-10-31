@@ -31,7 +31,7 @@ const dataSource = [{
 }];
 
 function getColumns(self) {
-  const { history, param } = self.props
+  const { history } = self.props
   const columns = [{
     title: '名称',
     dataIndex: 'name',
