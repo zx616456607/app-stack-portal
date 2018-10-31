@@ -61,6 +61,7 @@ function RouterConfig({ history, app }) {
     component: () => import('./containers/CreateWorkLoad'),
     models: () => [
       import('./models/createNativeResource'),
+      import('./models/nativeResourceList'),
     ],
   },
   ]

@@ -48,6 +48,7 @@
     "eslint-config-tenx": "^1.0.0",
     "history": "^4.7.2",
     "husky": "^1.0.0-rc.8",
+    "js-yaml": "^3.12.0",
     "lodash": "^4.17.5",
     "nprogress": "^0.2.0",
     "path-to-regexp": "^2.2.0",
