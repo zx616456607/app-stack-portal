@@ -19,7 +19,7 @@ import Queue from 'rc-queue-anim'
 import { Link } from 'dva/router'
 import moment from 'moment'
 import Ellipsis from '@tenx-ui/ellipsis'
-import { getNativeResourceStatus } from '../../../utils/status_identify'
+import { getNativeResourceStatus, getJobStatus } from '../../../utils/status_identify'
 import NativeStatus from '../../../components/NativeStatus'
 
 export default class Pods extends React.PureComponent {
@@ -54,6 +54,14 @@ export default class Pods extends React.PureComponent {
       width: '10%',
       key: 'status',
       render: data => {
+        if (cron) {
+          const { phase, availableReplicas, replicas } = getJobStatus(data)
+          return <NativeStatus
+            status={{ availableReplicas, replicas }}
+            phase={phase}
+            hidePodInfo
+          />
+        }
         const { phase, availableReplicas, replicas } = getNativeResourceStatus(data)
         return <NativeStatus phase={phase} status={{ availableReplicas, replicas }} hidePodInfo />
       },

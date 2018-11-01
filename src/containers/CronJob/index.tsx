@@ -23,9 +23,8 @@ import moment from 'moment'
 import {
   formatDate, getDeepValue,
 } from '../../utils/helper'
-import { getNativeResourceStatus } from '../../utils/status_identify'
+import { getCronJobStatue } from '../../utils/status_identify'
 import NativeStatus from '../../components/NativeStatus'
-// import ImagePopCard from '../../components/ImagePopCard'
 import * as modal from '@tenx-ui/modal'
 import '@tenx-ui/modal/assets/index.css'
 import queryString from 'query-string'
@@ -55,6 +54,7 @@ function getColumns(self) {
       return <NativeStatus
         status={{ availableReplicas, replicas }}
         phase={phase}
+        hidePodInfo
       />
     },
   }, {
@@ -86,12 +86,20 @@ function getColumns(self) {
     render: (_, record) => {
       const dropdown = (
         <Menu className="Moreoperations">
-          <Menu.Item key="0" >
+          {/* <Menu.Item key="0" >
             <span ><i className="fa fa-refresh" /> 水平扩展</span>
-          </Menu.Item>
+          </Menu.Item> */}
           <Menu.Item key="1" >
             <span onClick={() => self.delete(record.name)}>
               <i className="fa fa-trash-o" />删除</span>
+          </Menu.Item>
+          <Menu.Item key="1" >
+            <span onClick={() => self.start(record.name)}>
+              <i className="fa fa-trash-o" />启动</span>
+          </Menu.Item>
+          <Menu.Item key="1" >
+            <span onClick={() => self.stop(record.name)}>
+              <i className="fa fa-trash-o" />停止</span>
           </Menu.Item>
         </Menu>
       );
@@ -153,7 +161,7 @@ class CronJob extends React.Component<CronJobProps, CronJobState> {
           key: CronJobNode.metadata.name,
           name: CronJobNode.metadata.name,
           createTime: CronJobNode.metadata.creationTimestamp,
-          status: getNativeResourceStatus(CronJobNode),
+          status: getCronJobStatue(CronJobNode),
           rule: CronJobNode.spec.schedule,
           podNumber: (getDeepValue(CronJobNode, [ 'status', 'active' ]) || []).length,
         }
@@ -180,28 +188,46 @@ class CronJob extends React.Component<CronJobProps, CronJobState> {
       onOk() {
         self.props.dispatch({ type: 'NativeResourceList/deleteNativeResourceList', payload })
           .then(() => self.reload())
-          .then(() => notification.success({ message: '删除成功', description: '' ))
+          .then(() => notification.success({ message: '删除成功', description: '' }))
         .catch(() => notification.error({ message: '删除操作失败', description: '' })
       },
       onCancel() {},
     })
   }
-  start = () => {
+  start = (name) => {
+    const self = this
+    const options =
+    `spec:
+      suspend: true`
+    const payload = { cluster: this.props.cluster, type: 'CronJob', name, options }
     modal.confirm({
       modalTitle: '启动操作',
-      title: `您是否确定启动这${this.state.selectedRowKeys.length}个可以启动的 CronJob`,
+      title: `您是否确定启动这1个可以启动的 CronJob`,
       content: '',
       onOk() {
+        self.props.dispatch({ type: 'NativeResourceList/operationNativeResource', payload })
+          .then(() => self.reload())
+          .then(() => notification.success({ message: '启动操作成功', description: '' }))
+        .catch(() => notification.error({ message: '启动操作操作失败', description: '' })
       },
       onCancel() {},
     })
   }
-  stop = () => {
+  stop = (name) => {
+    const self = this
+    const options =
+    `spec:
+      suspend: false`
+    const payload = { cluster: this.props.cluster, type: 'CronJob', name, options }
     modal.confirm({
       modalTitle: '停止操作',
-      title: `您是否确定停止这${this.state.selectedRowKeys.length}个可以停止的 CronJob`,
+      title: `您是否确定停止这1个可以停止的 CronJob`,
       content: '',
       onOk() {
+        self.props.dispatch({ type: 'NativeResourceList/operationNativeResource', payload })
+          .then(() => self.reload())
+          .then(() => notification.success({ message: '删除操作成功', description: '' }))
+        .catch(() => notification.error({ message: '删除操作操作失败', description: '' })
       },
       onCancel() {},
     })
@@ -239,18 +265,6 @@ render() {
           CronJob
         </Button>
         <Button icon="reload" onClick={this.reload} >刷新</Button>
-        <Button
-          disabled={this.state.selectedRowKeys.length === 0}
-          onClick={this.start}
-        >
-          启动
-        </Button>
-        <Button
-          disabled={this.state.selectedRowKeys.length === 0}
-          onClick={this.stop}
-        >
-          停止
-        </Button>
         <Button
           onClick={this.delete}
           disabled={this.state.selectedRowKeys.length === 0}
