@@ -48,10 +48,17 @@ function RouterConfig({ history, app }) {
       import('./models/nativeDetail'),
     ],
   }, {
-    path: '/cron-job',
+    path: '/CronJob',
     component: () => import('./containers/CronJob/index.tsx'),
     models: () => [
       import('./models/nativeResourceList'),
+    ],
+  }, {
+    path: '/CronJob/:id',
+    exact: false,
+    component: () => import('./containers/Detail'),
+    models: () => [
+      import('./models/nativeDetail'),
     ],
   }, {
     path: '/test',

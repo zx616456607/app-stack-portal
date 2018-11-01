@@ -90,7 +90,7 @@ class CreateWorkLoad extends React.Component<CreateWorkLoadProps, any> {
           <TenxEditor
             onChange={this.onChange}
             title="Yaml"
-            options={{ mode: 'xml', theme: 'base16-dark' }}
+            options={{ mode: 'yaml', theme: 'base16-dark' }}
             value={this.state.value}
             headerExtraContent={
             <span className={styles.editOperation}>
