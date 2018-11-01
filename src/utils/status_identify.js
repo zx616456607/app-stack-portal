@@ -138,3 +138,75 @@ export function getNativeResourceStatus(_service) {
   status.phase = 'Running'
   return status
 }
+
+export function getStatefulSetStatus(_service) {
+  const service = cloneDeep(_service)
+  const { status, metadata } = service
+
+  if (!metadata.annotations) {
+    metadata.annotations = {}
+  }
+  const specReplicas = service.spec.replicas
+  const replicas = specReplicas
+
+  let currentReplicas = 0
+  if (!status) {
+    return {
+      phase: 'Stopped',
+      currentReplicas: 0,
+      replicas,
+    }
+  }
+  currentReplicas = status.currentReplicas || 0
+  status.currentReplicas = currentReplicas
+  let {
+    phase,
+    updatedReplicas,
+    observedGeneration,
+    readyReplicas,
+  } = status
+  const { updateStrategy = {} } = service.spec || {}
+  if (status.replicas > specReplicas && updateStrategy.type === 'RollingUpdate') {
+    phase = 'RollingUpdate'
+    return {
+      phase,
+      currentReplicas,
+      replicas,
+    }
+  }
+  status.replicas = replicas
+  if (phase && phase !== 'Running') {
+    return status
+  }
+  // For issue #CRYSTAL-2478
+  // Add spec.replicas analyzing conditions
+  if (specReplicas === 0 && currentReplicas > 0) {
+    status.phase = 'Stopping'
+    return status
+  }
+  if (observedGeneration >= metadata.generation && replicas === updatedReplicas &&
+    readyReplicas > 0) {
+    status.currentReplicas = readyReplicas
+    status.phase = 'Running'
+    return status
+  }
+  /* if (uncurrentReplicas > 0 && (!currentReplicas || currentReplicas < replicas)) {
+    status.phase = 'Pending'
+  } */
+  if (specReplicas > 0 && currentReplicas < 1) {
+    status.uncurrentReplicas = specReplicas
+    status.phase = 'Pending'
+    return status
+  }
+  if (updatedReplicas && currentReplicas < specReplicas) {
+    status.phase = 'Deploying'
+    status.progress = { status: false }
+    return status
+  }
+  if (currentReplicas < 1) {
+    status.phase = 'Stopped'
+    return status
+  }
+  status.phase = 'Running'
+  return status
+}

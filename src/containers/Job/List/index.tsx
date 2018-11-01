@@ -212,6 +212,7 @@ class Job extends React.Component<JobProps, JobState> {
     index < (this.state.currentPage) * 10)
   }
   onSelect = (e) => {
+    if (this.state.currentPage !== 1) { this.setState({ currentPage: 1 }) }
     this.setState({ filter: e.target.value })
   }
 render() {

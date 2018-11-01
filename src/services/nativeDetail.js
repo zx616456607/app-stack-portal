@@ -29,8 +29,14 @@ const getNativeLogs = ({ cluster, name, body }) => request({
   },
 })
 
+// 获取 Pod的事件
+const getPodEvent = ({ cluster, name }) => request({
+  url: `${paasApiUrl}${CLUSTERS}/${cluster}/events/services/${name}/pods/events`,
+})
+
 export {
   getNativeDetail,
   getPodsList,
   getNativeLogs,
+  getPodEvent,
 }
