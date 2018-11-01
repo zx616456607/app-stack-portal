@@ -14,6 +14,7 @@ import {
   getNativeDetail,
   getPodsList,
   getNativeLogs,
+  getPodEvent,
 } from '../services/nativeDetail'
 
 export default {
@@ -81,6 +82,10 @@ export default {
           },
         })
       }
+      return res
+    },
+    * getPodEvent({ payload }, { call }) {
+      const res = yield call(getPodEvent, payload)
       return res
     },
   },

@@ -23,7 +23,7 @@ import moment from 'moment'
 import {
   formatDate, getDeepValue,
 } from '../../utils/helper'
-import { getNativeResourceStatus } from '../../utils/status_identify'
+import { getStatefulSetStatus } from '../../utils/status_identify'
 import NativeStatus from '../../components/NativeStatus'
 import ImagePopCard from '../../components/ImagePopCard'
 import * as modal from '@tenx-ui/modal'
@@ -51,7 +51,7 @@ function getColumns(self) {
     dataIndex: 'status',
     key: 'status',
     render: (status) => {
-      const { phase, availableReplicas, replicas } = status
+      const { phase, currentReplicas: availableReplicas, replicas } = status
       return <NativeStatus
         status={{ availableReplicas, replicas }}
         phase={phase}
@@ -152,7 +152,7 @@ class StatefulSet extends React.Component<StatefulSetProps, StatefulSetState> {
           key: StatefulSetNode.metadata.name,
           name: StatefulSetNode.metadata.name,
           createTime: StatefulSetNode.metadata.creationTimestamp,
-          status: getNativeResourceStatus(StatefulSetNode),
+          status: getStatefulSetStatus(StatefulSetNode),
           image: imageArray,
         }
       })
@@ -215,6 +215,7 @@ class StatefulSet extends React.Component<StatefulSetProps, StatefulSetState> {
     index < (this.state.currentPage) * 10)
   }
   onSelect = (e) => {
+    if (this.state.currentPage !== 1) { this.setState({ currentPage: 1 }) }
     this.setState({ filter: e.target.value })
   }
 render() {

@@ -25,7 +25,7 @@ import {
 } from '../../utils/helper'
 import { getNativeResourceStatus } from '../../utils/status_identify'
 import NativeStatus from '../../components/NativeStatus'
-import ImagePopCard from '../../components/ImagePopCard'
+// import ImagePopCard from '../../components/ImagePopCard'
 import * as modal from '@tenx-ui/modal'
 import '@tenx-ui/modal/assets/index.css'
 import queryString from 'query-string'
@@ -217,6 +217,7 @@ class CronJob extends React.Component<CronJobProps, CronJobState> {
     index < (this.state.currentPage) * 10)
   }
   onSelect = (e) => {
+    if (this.state.currentPage !== 1) { this.setState({ currentPage: 1 }) }
     this.setState({ filter: e.target.value })
   }
 render() {
