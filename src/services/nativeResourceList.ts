@@ -39,3 +39,17 @@ export const getNativeResourceDetail = ({ cluster, type, name }: DeleteNativeRes
 request({
   url: `${paasApiUrl}/clusters/${cluster}/native/${type}/${name}`,
 })
+
+interface OperationNativeResource extends DeleteNativeResourceList {
+  options: string;
+}
+// 打补丁
+export const operationNativeResource =
+({ cluster, type, name, options }: OperationNativeResource) =>
+ request({
+  url: `${paasApiUrl}/clusters/${cluster}/native/${type}/${name}`,
+  options: {
+    method: 'PATCH',
+    body: options,
+  },
+})

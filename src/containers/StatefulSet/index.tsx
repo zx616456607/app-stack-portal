@@ -85,13 +85,21 @@ function getColumns(self) {
     render: (_, record) => {
       const dropdown = (
         <Menu className="Moreoperations">
-          <Menu.Item key="0" >
+          {/* <Menu.Item key="0" >
             <span ><i className="fa fa-refresh" /> 水平扩展</span>
-          </Menu.Item>
+          </Menu.Item> */}
           <Menu.Item key="1" >
             <span onClick={() => self.delete(record.name)}>
               <i className="fa fa-trash-o" />删除</span>
           </Menu.Item>
+          {/* <Menu.Item key="2" >
+            <span onClick={() => self.start(record.name)} >
+              <i className="fa fa-trash-o" />启动</span>
+          </Menu.Item>
+          <Menu.Item key="3" >
+            <span onClick={() => self.stop(record.name)} >
+              <i className="fa fa-trash-o" />停止</span>
+          </Menu.Item> */}
         </Menu>
       );
       return (
@@ -237,18 +245,6 @@ render() {
           StatefulSet
         </Button>
         <Button icon="reload" onClick={this.reload} >刷新</Button>
-        <Button
-          disabled={this.state.selectedRowKeys.length === 0}
-          onClick={this.start}
-        >
-          启动
-        </Button>
-        <Button
-          disabled={this.state.selectedRowKeys.length === 0}
-          onClick={this.stop}
-        >
-          停止
-        </Button>
         <Button
           onClick={this.delete}
           disabled={this.state.selectedRowKeys.length === 0}

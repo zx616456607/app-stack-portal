@@ -29,22 +29,13 @@ function SwitchToStatus(phase: string) {
     color: 'black',
     text: '未定义',
   }
-  if (phase === 'Pending') {
-    status.color = styles.blue;
-    status.text = '正在启动';
-  }
-  if (phase === 'Running') {
-    status.color = styles.green;
-    status.text = '运行中';
-  }
-  if (phase === 'Stopping') {
-    status.color = styles.red;
-    status.text = '停止中';
-  }
-  if (phase === 'Stopped') {
-    status.color = styles.red;
-    status.text = '已停止';
-  }
+  if (phase === 'Pending') { status.color = styles.blue; status.text = '正在启动'; }
+  if (phase === 'Running') { status.color = styles.green; status.text = '运行中'; }
+  if (phase === 'Stopping') { status.color = styles.red; status.text = '停止中'; }
+  if (phase === 'Stopped') { status.color = styles.red; status.text = '已停止'; }
+  if (phase === 'Failure') { status.color = styles.red; status.text = '执行失败'; }
+  if (phase === 'Finish') { status.color = styles.green; status.text = '执行完成'; }
+  if (phase === 'Doing') { status.color = styles.blue; status.text = '执行中'; }
   return status
 }
 
