@@ -5,7 +5,7 @@
 
 /**
  *
- * Job container
+ * Detail container
  *
  * @author Songsz
  * @date 2018-10-29
@@ -18,9 +18,7 @@ import { Switch, Route, routerRedux } from 'dva/router'
 import { Tabs, notification } from 'antd'
 import Page from '@tenx-ui/page'
 import ReturnButton from '@tenx-ui/return-button'
-import StatefulSetHeader from './Header/StatefulSetHeader'
-import CronJobHeader from './Header/CronJobHeader'
-import JobHeader from './Header/JobHeader'
+import DetailHeader from './Header/index'
 import styles from './style/index.less'
 
 const TabPane = Tabs.TabPane
@@ -66,7 +64,7 @@ class NativeDetail extends React.PureComponent {
       {
         path: `/${type}/:id`,
         component: require('./Pods').default,
-        tabName: 'Pods',
+        tabName: type === 'CronJob' ? '执行记录' : 'Pods',
         tabKey: 'default',
       },
       {
@@ -80,12 +78,14 @@ class NativeDetail extends React.PureComponent {
         component: require('./Monitor').default,
         tabName: '监控',
         tabKey: 'monitor',
+        tabDisabled: type === 'CronJob',
       },
       {
         path: `/${type}/:id/alarm`,
         component: require('./Alarm').default,
         tabName: '告警',
         tabKey: 'alarm',
+        tabDisabled: true,
       },
       {
         path: `/${type}/:id/log`,
@@ -101,20 +101,16 @@ class NativeDetail extends React.PureComponent {
       },
     ]
   }
-  getHeader = type => {
-    if (type === 'StatefulSet') return <StatefulSetHeader/>
-    if (type === 'Job') return <JobHeader/>
-    return <CronJobHeader/>
-  }
+
   render() {
     const { dispatch, children, location: { pathname }, history, type, name } = this.props
     const routes = this.getRoutes(type)
     return (
       <div>
-        <ReturnButton onClick={history.goBack}>返回</ReturnButton>
-        {
-          this.getHeader(type)
-        }
+        <div className={styles.rtnBtn}>
+          <ReturnButton onClick={history.goBack}>返回</ReturnButton>
+        </div>
+        <DetailHeader/>
         <Page inner className={styles.page}>
           <div>
             <Tabs
@@ -123,7 +119,11 @@ class NativeDetail extends React.PureComponent {
             >
               {
                 routes.map(rt =>
-                  <TabPane tab={<div className={styles.tabs}>{rt.tabName}</div>} key={rt.tabKey} />
+                  <TabPane
+                    tab={<div className={styles.tabs}>{rt.tabName}</div>}
+                    key={rt.tabKey}
+                    disabled={rt.tabDisabled}
+                  />
                 )
               }
             </Tabs>

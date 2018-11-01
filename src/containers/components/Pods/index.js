@@ -13,13 +13,14 @@
 */
 
 import React from 'react'
-import { Pagination, Table, Dropdown, Menu } from 'antd'
+import { Pagination, Table, Dropdown, Menu, Button } from 'antd'
 import Page from '@tenx-ui/page'
 import Queue from 'rc-queue-anim'
 import { Link } from 'dva/router'
 import moment from 'moment'
 import Ellipsis from '@tenx-ui/ellipsis'
-import { DEFAULT_TIME_FORMAT } from '../../../utils/constants'
+import { getNativeResourceStatus } from '../../../utils/status_identify'
+import NativeStatus from '../../../components/NativeStatus'
 
 export default class Pods extends React.PureComponent {
   state = {
@@ -36,57 +37,73 @@ export default class Pods extends React.PureComponent {
       current: pageNum,
     })
   }
-  _renderColumn = history => [{
-    title: '容器名称',
-    width: '15%',
-    key: 'name',
-    render: data => (
-      <Link to={'/Job/3'} style={{ whiteSpace: 'pre' }}>
-        <Ellipsis>{data.metadata.name}</Ellipsis>
-      </Link>
-    ),
-  }, {
-    title: '状态',
-    width: '10%',
-    key: 'status',
-    render: data => data.status.phase,
-  }, {
-    title: '所属应用',
-    width: '15%',
-    key: 'belong',
-    render: () => <div>TODO</div>,
-  }, {
-    title: '镜像',
-    width: '15%',
-    key: 'image',
-    render: data => this.getImages(data),
-  }, {
-    title: '访问地址',
-    width: '10%',
-    key: 'address',
-    render: data => (data.status && data.status.podIP) || '-',
-  }, {
-    title: '创建时间',
-    width: '15%',
-    key: 'time',
-    render: data => moment(data.metadata.creationTimestamp).format(DEFAULT_TIME_FORMAT),
-  }, {
-    title: '操作',
-    width: '15%',
-    key: 'action',
-    render: () => <Dropdown.Button
-      trigger={[ 'click' ]}
-      overlay={
-        <Menu onClick={ () => {}}>
-          <Menu.Item key="delete"><div>删除</div></Menu.Item>
-        </Menu>}
-      onClick={() => { history.push('/id/2/update') }}
-    >
-      <div>查看/编辑 YAML</div>
-    </Dropdown.Button>,
-  }]
+  _renderColumn = (history, cron) => {
+    const res = [{
+      title: cron ? '普通任务名称' : '容器名称',
+      width: '15%',
+      key: 'name',
+      render: data => (
+        <Link
+          to={cron ? '/Job/3' : `/Pod/${data.metadata.name}`}
+          style={{ whiteSpace: 'pre' }}>
+          <Ellipsis>{data.metadata.name}</Ellipsis>
+        </Link>
+      ),
+    }, {
+      title: '状态',
+      width: '10%',
+      key: 'status',
+      render: data => {
+        const { phase, availableReplicas, replicas } = getNativeResourceStatus(data)
+        return <NativeStatus phase={phase} status={{ availableReplicas, replicas }} hidePodInfo />
+      },
+    }]
+    ;!cron && res.push({
+      title: '镜像',
+      width: '20%',
+      key: 'image',
+      render: data => this.getImages(data),
+    }, {
+      title: '访问地址',
+      width: '20%',
+      key: 'address',
+      render: data => ((data.status && data.status.podIP) ? <Ellipsis>{data.status.podIP}</Ellipsis> : '-'),
+    })
+    res.push({
+      title: '创建时间',
+      width: '15%',
+      key: 'time',
+      render: data => moment(data.metadata.creationTimestamp).fromNow(),
+    })
+    !cron && res.push({
+      title: '操作',
+      width: '15%',
+      key: 'action',
+      render: () => <Dropdown.Button
+        trigger={[ 'click' ]}
+        overlay={
+          <Menu onClick={ () => {}}>
+            <Menu.Item key="delete"><div>导出镜像</div></Menu.Item>
+            <Menu.Item key="delete"><div>强制删除</div></Menu.Item>
+            <Menu.Item key="delete"><div>重新分配</div></Menu.Item>
+          </Menu>}
+        onClick={() => {}}
+      >
+        <div>终端</div>
+      </Dropdown.Button>,
+    })
+    cron && res.push({
+      title: '操作',
+      width: '15%',
+      key: 'action',
+      render: () => <Button type="primary">
+        删除
+      </Button>,
+    })
+    return res
+  }
   render() {
-    const { data = [], history } = this.props
+    const { data = [], history, cron } = this.props
     const { current, size } = this.state
     return (
       <Page>
@@ -117,7 +134,7 @@ export default class Pods extends React.PureComponent {
             dataSource={data.filter(
               (item, index) => index < (current * size) && index >= ((current - 1) * size)
             )}
-            columns={this._renderColumn(history)}
+            columns={this._renderColumn(history, cron)}
             pagination={false}
           />
         </Queue>
