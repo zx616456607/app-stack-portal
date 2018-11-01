@@ -11,6 +11,7 @@ import {
   getNativeResourceList,
   deleteNativeResourceList,
   getNativeResourceDetail,
+  operationNativeResource,
 } from '../services/nativeResourceList'
 
 export default {
@@ -30,6 +31,10 @@ export default {
     },
     * getNativeResourceDetail({ payload }, { call }) {
       const res = yield call(getNativeResourceDetail, payload)
+      return res
+    },
+    * operationNativeResource({ payload }, { call }) {
+      const res = yield call(operationNativeResource, payload)
       return res
     },
   },

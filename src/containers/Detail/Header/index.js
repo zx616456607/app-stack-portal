@@ -22,7 +22,7 @@ import { getDeepValue } from '../../../utils/helper'
 import moment from 'moment'
 import { DEFAULT_TIME_FORMAT } from '../../../utils/constants'
 import queryString from 'query-string'
-import { getNativeResourceStatus } from '../../../utils/status_identify'
+import { getStatefulSetStatus } from '../../../utils/status_identify'
 import NativeStatus from '../../../components/NativeStatus'
 import classnames from 'classnames'
 
@@ -61,7 +61,7 @@ const DetailHeader = ({ data, dispatch, name, type }) => {
             type === 'StatefulSet' &&
               <React.Fragment>
                 <div className={styles.normal}>状态:&nbsp;&nbsp; {
-                  nativeStatus(getNativeResourceStatus(data))
+                  nativeStatus(getStatefulSetStatus(data))
                 }</div>
                 <div className={styles.normal}>更新策略: {
                   getDeepValue(data, 'spec.updateStrategy.type') === 'RollingUpdate' ? '滚动升级' : '普通升级'

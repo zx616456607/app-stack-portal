@@ -23,7 +23,7 @@ import moment from 'moment'
 import {
   formatDate, getDeepValue,
 } from '../../../utils/helper'
-import { getNativeResourceStatus } from '../../../utils/status_identify'
+import { getJobStatus } from '../../../utils/status_identify'
 import NativeStatus from '../../../components/NativeStatus'
 import ImagePopCard from '../../../components/ImagePopCard'
 import * as modal from '@tenx-ui/modal'
@@ -55,6 +55,7 @@ function getColumns(self) {
       return <NativeStatus
         status={{ availableReplicas, replicas }}
         phase={phase}
+        hidePodInfo
       />
     },
   }, {
@@ -149,7 +150,7 @@ class Job extends React.Component<JobProps, JobState> {
           key: JobNode.metadata.name,
           name: JobNode.metadata.name,
           createTime: JobNode.metadata.creationTimestamp,
-          status: getNativeResourceStatus(JobNode),
+          status: getJobStatus(JobNode),
           image: imageArray,
         }
       })

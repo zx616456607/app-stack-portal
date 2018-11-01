@@ -210,3 +210,36 @@ export function getStatefulSetStatus(_service) {
   status.phase = 'Running'
   return status
 }
+
+// 获取Job状态判断
+export function getJobStatus(_service) {
+  const service = cloneDeep(_service)
+  const status = { phase: 'null' }
+  const { status: { succeeded, active = [], failed } = {} } = service
+  const { spec: { completions } = {} } = service
+  if (typeof succeeded !== undefined && (succeeded === completions)) {
+    status.phase = 'Finish'
+  }
+  if (active > 0) {
+    status.phase = 'Doing'
+  }
+  if (typeof active !== undefined && typeof failed !== undefined &&
+    active === 0 && failed > 0 && succeeded < completions) {
+    status.phase = 'Failure'
+  }
+  return status
+}
+
+// CronJob 的状态判断
+export function getCronJobStatue(_service) {
+  const service = cloneDeep(_service)
+  const { spec: { suspend } } = service
+  const status = { phase: 'null' }
+  if (typeof suspend !== undefined && suspend === true) {
+    status.phase = 'Running'
+  }
+  if (typeof suspend !== undefined && suspend === false) {
+    status.phase = 'Stopped'
+  }
+  return status
+}
