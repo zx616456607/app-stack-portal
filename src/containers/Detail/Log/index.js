@@ -18,6 +18,7 @@ import { notification } from 'antd'
 import moment from 'moment'
 import { DEFAULT_TIME_FORMAT } from '../../../utils/constants'
 import TenxLogs from '@tenx-ui/logs'
+import styles from './style/index.less'
 
 const mapStateToProps =
   ({ nativeDetail: { logs: { logs = [], count = 0 }, name } }) => ({ logs, count, name })
@@ -41,27 +42,25 @@ class Log extends React.PureComponent {
     }).catch(() => notification.warn({ message: '获取日志出错' }))
   }
   getColorLogs = () => {
-    this.logRef && this.logRef.clearLogs()
     const { logs } = this.props
     const res = []
-    logs.map(log => res.push(`
-<span style="color: #ffc20e">[${log.name}]</span>
-<span style="color: #ff0">[${
-      moment(parseInt(log.time_nano / 1000))
-        .format(DEFAULT_TIME_FORMAT)
-      }]</span>
-<span style="color: #37fc34">${log.log}</span><div/>
-`)
-    )
-    this.logRef && this.logRef.writelns(res)
+    logs.map(log => res.push(
+      <div>
+        <span className={styles.name}>[{log.name}]&nbsp;</span>
+        <span className={styles.date}>[{
+          moment(parseInt(log.time_nano / 1000))
+            .format(DEFAULT_TIME_FORMAT)
+        }]&nbsp;</span>
+        <span className={styles.content}>{log.log}</span>
+      </div>
+    ))
+    return res
   }
   render() {
-    this.getColorLogs()
     return (
       <TenxLogs
         ref={ref => (this.logRef = ref)}
-        logs={[]}
-        isDangerouslySetInnerHTML={true}
+        logs={this.getColorLogs()}
       />
     )
   }
