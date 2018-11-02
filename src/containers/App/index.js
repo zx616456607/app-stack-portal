@@ -44,7 +44,7 @@ class App extends React.Component {
     this.mainContainer = document.getElementById('mainContainer')
     const { dispatch, history } = this.props
     if (window.parent.appStackIframeCallBack) {
-      window.parent.appStackIframeCallBack('aiPortalHistory', history)
+      window.parent.appStackIframeCallBack('appStackPortalHistory', history)
     }
     try {
       await dispatch({ type: 'app/authorize' })
