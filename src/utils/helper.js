@@ -11,6 +11,7 @@
  */
 
 import attempt from 'lodash/attempt'
+import isEmpty from 'lodash/isEmpty'
 import moment from 'moment'
 import { DEFAULT_TIME_FORMAT } from './constants'
 import cloneDeep from 'lodash/cloneDeep'
@@ -378,6 +379,28 @@ const getServiceStatus = _service => {
   return status
 }
 
+/**
+ * bizcharts 图例显示有问题，去掉服务名称后的数字（dsb-server-3375465363-1x4v5 => dsb-server-1x4v5）
+ * @param {object} data 数据源
+ * @return {object} 修改数据中的时间
+ */
+const formatInstanceMonitor = data => {
+  if (isEmpty(data)) {
+    return data
+  }
+  data.forEach(item => {
+    const { container_name, metrics } = item
+    let name = container_name.split('-')
+    name.splice(-2, 1)
+    name = name.join('-')
+    metrics.forEach(metric => {
+      metric.container_name = name
+      metric.timestamp = formatDate(metric.timestamp, 'MM-DD HH:mm:ss')
+    })
+  })
+  return data
+}
+
 export {
   delay,
   getType,
@@ -389,5 +412,6 @@ export {
   parseK8sSize,
   getBuildStatusTextAndClass,
   getServiceStatus,
+  formatInstanceMonitor,
 }
 
