@@ -15,7 +15,11 @@ import {
   getPodsList,
   getNativeLogs,
   getPodEvent,
+  getServiceMonitor,
 } from '../services/nativeDetail'
+import {
+  formatInstanceMonitor,
+} from '../utils/helper'
 
 export default {
   namespace: 'nativeDetail',
@@ -93,6 +97,39 @@ export default {
     * getPodEvent({ payload }, { call }) {
       const res = yield call(getPodEvent, payload)
       return res
+    },
+    * fetchMonitor({ payload: { cluster, name, query, namespace } }, { call, put, select }) {
+      const res = yield call(getServiceMonitor, { cluster, name, query, namespace })
+      const { nativeDetail: { monitor } } = yield select(state => state)
+      yield put({
+        type: 'updateState',
+        payload: {
+          monitor: {
+            ...monitor,
+            [query.type]: {
+              data: formatInstanceMonitor(res.data),
+            },
+          },
+        },
+      })
+    },
+    * fetchRealTimeMonitor(
+      { payload: { cluster, name, query, namespace } },
+      { call, put, select }
+    ) {
+      const res = yield call(getServiceMonitor, { cluster, name, query, namespace })
+      const { nativeDetail: { realTimeMonitor } } = yield select(state => state)
+      yield put({
+        type: 'updateState',
+        payload: {
+          realTimeMonitor: {
+            ...realTimeMonitor,
+            [query.type]: {
+              data: formatInstanceMonitor(res.data),
+            },
+          },
+        },
+      })
     },
   },
 }
