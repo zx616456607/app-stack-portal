@@ -111,7 +111,8 @@ function getColumns(self) {
 }
 
 interface JobProps extends RouteComponentProps, SubscriptionAPI {
-  cluster: string
+  cluster: string;
+  loading: boolean;
 }
 
 interface JobListNode {
@@ -176,8 +177,8 @@ class Job extends React.Component<JobProps, JobState> {
       onOk() {
         self.props.dispatch({ type: 'NativeResourceList/deleteNativeResourceList', payload })
           .then(() => self.reload())
-          .then(() => notification.success({ message: '删除成功', description: '' ))
-        .catch(() => notification.error({ message: '删除操作失败', description: '' })
+          .then(() => notification.success({ message: '删除成功', description: '' }))
+        .catch(() => notification.error({ message: '删除操作失败', description: '' }))
       },
       onCancel() {},
     })
@@ -216,14 +217,14 @@ class Job extends React.Component<JobProps, JobState> {
     if (this.state.currentPage !== 1) { this.setState({ currentPage: 1 }) }
     this.setState({ filter: e.target.value })
   }
-render() {
-  const { history } = this.props
-  const rowSelection = {
-    selectedRowKeys: this.state.selectedRowKeys,
-    onChange: this.onSelectChange,
-  };
-  const self = this
-  return (
+  render() {
+    const { history } = this.props
+    const rowSelection = {
+      selectedRowKeys: this.state.selectedRowKeys,
+      onChange: this.onSelectChange,
+    };
+    const self = this
+    return (
     <Page>
       <QueueAnim>
         <div className="layout-content-btns" key="btns">
@@ -259,6 +260,7 @@ render() {
         </div>
         <Card key="body">
           <Table
+            loading={this.props.loading}
             pagination={false}
             dataSource={this.selectData()}
             columns={getColumns(self)}
@@ -273,7 +275,9 @@ render() {
 
 function mapStateToProps(state) {
   const { app: { cluster = '' } = {} } = state
-  return { cluster }
+  const { loading: { effects = {} } = {} } = state
+  const loading = effects['NativeResourceList/getNativeResourceList']
+  return { cluster, loading }
 }
 
 export default withRouter(connect(mapStateToProps)(Job))

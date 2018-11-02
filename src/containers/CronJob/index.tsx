@@ -122,7 +122,8 @@ function getColumns(self) {
 }
 
 interface CronJobProps extends RouteComponentProps, SubscriptionAPI {
-  cluster: string
+  cluster: string;
+  loading: boolean;
 }
 
 interface CronJobListNode {
@@ -189,7 +190,7 @@ class CronJob extends React.Component<CronJobProps, CronJobState> {
         self.props.dispatch({ type: 'NativeResourceList/deleteNativeResourceList', payload })
           .then(() => self.reload())
           .then(() => notification.success({ message: '删除成功', description: '' }))
-        .catch(() => notification.error({ message: '删除操作失败', description: '' })
+        .catch(() => notification.error({ message: '删除操作失败', description: '' }))
       },
       onCancel() {},
     })
@@ -208,7 +209,7 @@ class CronJob extends React.Component<CronJobProps, CronJobState> {
         self.props.dispatch({ type: 'NativeResourceList/operationNativeResource', payload })
           .then(() => self.reload())
           .then(() => notification.success({ message: '启动操作成功', description: '' }))
-        .catch(() => notification.error({ message: '启动操作操作失败', description: '' })
+        .catch(() => notification.error({ message: '启动操作操作失败', description: '' }))
       },
       onCancel() {},
     })
@@ -227,7 +228,7 @@ class CronJob extends React.Component<CronJobProps, CronJobState> {
         self.props.dispatch({ type: 'NativeResourceList/operationNativeResource', payload })
           .then(() => self.reload())
           .then(() => notification.success({ message: '删除操作成功', description: '' }))
-        .catch(() => notification.error({ message: '删除操作操作失败', description: '' })
+        .catch(() => notification.error({ message: '删除操作操作失败', description: '' }))
       },
       onCancel() {},
     })
@@ -289,6 +290,7 @@ render() {
         </div>
         <Card key="body">
           <Table
+            loading={this.props.loading}
             pagination={false}
             dataSource={this.selectData()}
             columns={getColumns(self)}
@@ -303,7 +305,9 @@ render() {
 
 function mapStateToProps(state) {
   const { app: { cluster = '' } = {} } = state
-  return { cluster }
+  const { loading: { effects = {} } = {} } = state
+  const loading = effects['NativeResourceList/getNativeResourceList']
+  return { cluster, loading }
 }
 
 export default withRouter(connect(mapStateToProps)(CronJob))

@@ -11,7 +11,9 @@
  */
 import request from '../utils/request'
 import { CLUSTERS } from './constants'
+import { METRICS_DEFAULT_SOURCE } from '../utils/constants'
 import { paasApiUrl } from '../utils/config'
+import queryString from 'query-string'
 
 const getNativeDetail = ({ cluster, type, name }) => request({
   url: `${paasApiUrl}${CLUSTERS}/${cluster}/native/${type}/${name}`,
@@ -33,10 +35,24 @@ const getNativeLogs = ({ cluster, name, body }) => request({
 const getPodEvent = ({ cluster, name }) => request({
   url: `${paasApiUrl}${CLUSTERS}/${cluster}/events/services/${name}/pods/events`,
 })
+const getServiceMonitor = ({ cluster, name, query, namespace }) => {
+  query.source = METRICS_DEFAULT_SOURCE
+  return request({
+    // url: `${paasApiUrl}${CLUSTERS}/${cluster}/metric/services/${name}/metrics?${queryString.stringify(query)}`,
+
+    url: `http://192.168.1.230:48000/api/v2${CLUSTERS}/${cluster}/metric/services/${name}/metrics?${queryString.stringify(query)}`,
+    options: {
+      headers: {
+        project: namespace,
+      },
+    },
+  })
+}
 
 export {
   getNativeDetail,
   getPodsList,
   getNativeLogs,
   getPodEvent,
+  getServiceMonitor,
 }
