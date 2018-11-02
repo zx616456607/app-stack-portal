@@ -65,8 +65,13 @@ class Event extends React.Component<EventProps, {}> {
     const { events } = this.props
     return(
       <div className={styles.container}>
-        <div className={styles.leftLine} />
-        <Icon className={styles.leftCheckIcon} type="check-circle" theme="filled" />
+        {
+          !!events.length &&
+            <React.Fragment>
+              <div className={styles.leftLine} />
+              <Icon className={styles.leftCheckIcon} type="check-circle" theme="filled" />
+            </React.Fragment>
+        }
         <div className={styles.right}>
           {
             this.renderItem(events)

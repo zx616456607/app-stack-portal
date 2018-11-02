@@ -54,6 +54,13 @@ class Log extends React.PureComponent {
         <span className={styles.content}>{log.log}</span>
       </div>
     ))
+    if (!res.length) {
+      res.push(
+        <div className={styles.noLog}>
+        暂无日志
+        </div>
+      )
+    }
     return res
   }
   render() {
