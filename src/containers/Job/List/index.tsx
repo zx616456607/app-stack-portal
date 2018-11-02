@@ -111,7 +111,8 @@ function getColumns(self) {
 }
 
 interface JobProps extends RouteComponentProps, SubscriptionAPI {
-  cluster: string
+  cluster: string;
+  loading: boolean;
 }
 
 interface JobListNode {
@@ -259,6 +260,7 @@ render() {
         </div>
         <Card key="body">
           <Table
+            loading={this.props.loading}
             pagination={false}
             dataSource={this.selectData()}
             columns={getColumns(self)}
@@ -273,7 +275,9 @@ render() {
 
 function mapStateToProps(state) {
   const { app: { cluster = '' } = {} } = state
-  return { cluster }
+  const { loading: { effects = {} } = {} } = state
+  const loading = effects['NativeResourceList/getNativeResourceList']
+  return { cluster, loading }
 }
 
 export default withRouter(connect(mapStateToProps)(Job))

@@ -122,7 +122,8 @@ function getColumns(self) {
 }
 
 interface CronJobProps extends RouteComponentProps, SubscriptionAPI {
-  cluster: string
+  cluster: string;
+  loading: boolean;
 }
 
 interface CronJobListNode {
@@ -289,6 +290,7 @@ render() {
         </div>
         <Card key="body">
           <Table
+            loading={this.props.loading}
             pagination={false}
             dataSource={this.selectData()}
             columns={getColumns(self)}
@@ -303,7 +305,9 @@ render() {
 
 function mapStateToProps(state) {
   const { app: { cluster = '' } = {} } = state
-  return { cluster }
+  const { loading: { effects = {} } = {}} = state
+  const loading = effects['NativeResourceList/getNativeResourceList']
+  return { cluster, loading }
 }
 
 export default withRouter(connect(mapStateToProps)(CronJob))
