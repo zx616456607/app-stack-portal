@@ -187,8 +187,8 @@ class StatefulSet extends React.Component<StatefulSetProps, StatefulSetState> {
       onOk() {
         self.props.dispatch({ type: 'NativeResourceList/deleteNativeResourceList', payload })
           .then(() => self.reload())
-          .then(() => notification.success({ message: '删除成功', description: '' ))
-        .catch(() => notification.error({ message: '删除操作失败', description: '' })
+          .then(() => notification.success({ message: '删除成功', description: '' }))
+        .catch(() => notification.error({ message: '删除操作失败', description: '' }))
       },
       onCancel() {},
     })
@@ -227,14 +227,14 @@ class StatefulSet extends React.Component<StatefulSetProps, StatefulSetState> {
     if (this.state.currentPage !== 1) { this.setState({ currentPage: 1 }) }
     this.setState({ filter: e.target.value })
   }
-render() {
-  const { history } = this.props
-  const rowSelection = {
-    selectedRowKeys: this.state.selectedRowKeys,
-    onChange: this.onSelectChange,
-  };
-  const self = this
-  return (
+  render() {
+    const { history } = this.props
+    const rowSelection = {
+      selectedRowKeys: this.state.selectedRowKeys,
+      onChange: this.onSelectChange,
+    };
+    const self = this
+    return (
     <Page>
       <QueueAnim>
         <div className="layout-content-btns" key="btns">
