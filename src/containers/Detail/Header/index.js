@@ -89,7 +89,12 @@ const DetailHeader = ({ data, dispatch, name, type }) => {
             type === 'CronJob' &&
             <React.Fragment>
               <div className={styles.normal}>正在进行任务数: TODO</div>
-              <div className={styles.normal}>已完成任务数: TODO</div>
+              <div className={styles.normal}>任务成功历史限制数: {
+                getDeepValue(data, 'spec.successfulJobsHistoryLimit') || '--'
+              }</div>
+              <div className={styles.normal}>任务失败历史限制数: {
+                getDeepValue(data, 'spec.failedJobsHistoryLimit') || '--'
+              }</div>
             </React.Fragment>
           }
         </span>
