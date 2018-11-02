@@ -20,6 +20,7 @@ import {
 import {
   formatInstanceMonitor,
 } from '../utils/helper'
+import { getDeepValue } from '../utils/helper'
 
 export default {
   namespace: 'nativeDetail',
@@ -29,6 +30,7 @@ export default {
     detailData: {},
     pods: [],
     logs: {},
+    events: [],
   },
 
   reducers: {
@@ -83,7 +85,6 @@ export default {
         },
       })
       const res = yield call(getNativeLogs, { cluster, name, body })
-      // const res = JSON.parse('{"status":"Success","code":200,"data":{"logs":[{"name":"haitao-test-app2-f84879bbb-mch9z","kind":"instance","log":"Listening port :80\\n","id":"AWbI97iZIvzSRRXCoWKC","time_nano":"1540969967709223188","filename":""},{"name":"haitao-test-app2-f84879bbb-5jwft","kind":"instance","log":"Listening port :80\\n","id":"AWbJQ9LSIvzSRRXCptFt","time_nano":"1540974956214183658","filename":""}],"count":2},"statusCode":200}')
       if (res.data && res.data.logs) {
         yield put({
           type: 'updateState',
@@ -94,9 +95,20 @@ export default {
       }
       return res
     },
-    * getPodEvent({ payload }, { call }) {
-      const res = yield call(getPodEvent, payload)
-      return res
+    * fetchPodEvent({ payload }, { call, put }) {
+      yield put({
+        type: 'updateState',
+        payload: {
+          events: [],
+        },
+      })
+      const resPod = yield call(getPodEvent, payload)
+      yield put({
+        type: 'updateState',
+        payload: {
+          events: getDeepValue(resPod, 'data.events') || [],
+        },
+      })
     },
     * fetchMonitor({ payload: { cluster, name, query, namespace } }, { call, put, select }) {
       const res = yield call(getServiceMonitor, { cluster, name, query, namespace })
