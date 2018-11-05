@@ -15,7 +15,7 @@
 import React from 'react'
 import styles from './style/StatefulSetHeader.less'
 import { Tag as StatefulSetIcon } from '@tenx-ui/icon'
-import { Button } from 'antd'
+import { Button, Popover } from 'antd'
 import { connect } from 'dva'
 import { routerRedux } from 'dva/router'
 import { getDeepValue } from '../../../utils/helper'
@@ -25,6 +25,7 @@ import queryString from 'query-string'
 import { getStatefulSetStatus } from '../../../utils/status_identify'
 import NativeStatus from '../../../components/NativeStatus'
 import classnames from 'classnames'
+import Ellipsis from '@tenx-ui/ellipsis'
 
 const nativeStatus = status => {
   const { phase, availableReplicas, replicas } = status
@@ -44,6 +45,33 @@ const toYamlEditor = (dispatch, name, type) => {
       type,
     }),
   }))
+}
+
+const popoverContent = (rules, title) => (
+  <div className={styles['popover-content']}>
+    <span className={styles.title}>{title}</span>
+    {
+      (rules.length ? rules : [ '暂无' ]).map((rule, i) => (
+        <span className={styles.rule} key={i}>
+          <Ellipsis>{rule}</Ellipsis>
+        </span>
+      ))
+    }
+  </div>
+)
+
+const popoverItem = (data = {}, title) => {
+  const rules = []
+  for (const [ k, v ] of Object.entries(data)) {
+    rules.push(`${k}: ${v}`)
+  }
+  return (
+    <Popover content={popoverContent(rules, title)} placement="right">
+      <div className={styles.longLabel}>
+        <Ellipsis tooltip={false}>{`${title}: ${rules.join(',') || '--'}`}</Ellipsis>
+      </div>
+    </Popover>
+  )
 }
 
 const DetailHeader = ({ data, dispatch, name, type }) => {
@@ -77,9 +105,15 @@ const DetailHeader = ({ data, dispatch, name, type }) => {
           {
             type === 'Job' &&
             <React.Fragment>
-              <div className={styles.normal}>重启策略: TODO</div>
-              <div className={styles.normal}>注释: TODO</div>
-              <div className={styles.normal}>标签: TODO</div>
+              <div className={styles.normal}>重启策略: {
+                getDeepValue(data, 'spec.template.spec.restartPolicy') || '--'
+              }</div>
+              <div className={styles.normal}>注释: {
+                getDeepValue(data, 'metadata.annotations') || '--'
+              }</div>
+              <div className={styles.normal}>{
+                popoverItem(getDeepValue(data, 'metadata.labels'), '标签')
+              }</div>
               <div className={styles.normal}>创建时间: {
                 moment(getDeepValue(data, 'metadata.creationTimestamp')).format(DEFAULT_TIME_FORMAT)
               }</div>
@@ -88,7 +122,9 @@ const DetailHeader = ({ data, dispatch, name, type }) => {
           {
             type === 'CronJob' &&
             <React.Fragment>
-              <div className={styles.normal}>正在进行任务数: TODO</div>
+              <div className={styles.normal}>正在进行任务数: {
+                getDeepValue(data, 'status.active') ? getDeepValue(data, 'status.active').length : 0
+              }</div>
               <div className={styles.normal}>任务成功历史限制数: {
                 getDeepValue(data, 'spec.successfulJobsHistoryLimit') || '--'
               }</div>
@@ -102,19 +138,29 @@ const DetailHeader = ({ data, dispatch, name, type }) => {
           {
             type === 'StatefulSet' &&
               <React.Fragment>
-                <div className={styles.normal}>注释: TODO</div>
-                <div className={styles.normal}>标签: TODO</div>
-                <div className={styles.normal}>pod selector: TODO</div>
-                <div className={styles.normal}>node selector: TODO</div>
+                <div className={styles.normal}>注释: {
+                  getDeepValue(data, 'metadata.annotations') || '--'
+                }</div>
+                <div className={styles.normal}>{
+                  popoverItem(getDeepValue(data, 'metadata.labels'), '标签')
+                }</div>
+                <div className={styles.normal}>{
+                  popoverItem(getDeepValue(data, 'spec.selector.matchLabels') || {}, 'pod selector')
+                }</div>
+                <div className={styles.normal}>{
+                  popoverItem(getDeepValue(data, 'spec.template.spec.nodeSelector') || {}, 'node selector')
+                }</div>
               </React.Fragment>
           }
           {
             type === 'Job' &&
             <React.Fragment>
-              <div className={styles.normal}>运行: TODO</div>
-              <div className={styles.normal}>并行: {getDeepValue(data, 'spec.parallelism')}</div>
-              <div className={styles.normal}>完成: {getDeepValue(data, 'spec.completions')}</div>
-              <div className={styles.normal}>失败: TODO</div>
+              <div className={styles.normal}>运行: {
+                getDeepValue(data, 'status.active') || 0
+              }</div>
+              <div className={styles.normal}>并行: {getDeepValue(data, 'spec.parallelism') || 0}</div>
+              <div className={styles.normal}>完成: {getDeepValue(data, 'status.succeeded') || 0}</div>
+              <div className={styles.normal}>失败: {getDeepValue(data, 'status.failed') || 0}</div>
             </React.Fragment>
           }
           {

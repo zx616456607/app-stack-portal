@@ -70,7 +70,7 @@ export default class Pods extends React.PureComponent {
       title: '镜像',
       width: '20%',
       key: 'image',
-      render: data => this.getImages(data),
+      render: data => <Ellipsis length={30}>{this.getImages(data)}</Ellipsis>,
     }, {
       title: '访问地址',
       width: '20%',

@@ -23,8 +23,8 @@ const getPodsList = ({ cluster, type, name }) => request({
   url: `${paasApiUrl}${CLUSTERS}/${cluster}/native/${type}/${name}/instances`,
 })
 
-const getNativeLogs = ({ cluster, name, body }) => request({
-  url: `${paasApiUrl}${CLUSTERS}/${cluster}/logs/instances/${name}/logs`,
+const getNativeLogs = ({ cluster, body, instances }) => request({
+  url: `${paasApiUrl}${CLUSTERS}/${cluster}/logs/instances/${instances}/logs`,
   options: {
     method: 'POST',
     body,
