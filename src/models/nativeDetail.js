@@ -77,14 +77,19 @@ export default {
           logs: {},
         },
       })
-      const { app: { cluster }, nativeDetail: { name } } = yield select(state => state)
+      const { app: { cluster }, nativeDetail: { pods } } = yield select(state => state)
       yield put({
         type: 'updateState',
         payload: {
           logs: {},
         },
       })
-      const res = yield call(getNativeLogs, { cluster, name, body })
+      const instances = []
+      pods.map(pod => instances.push(pod.metadata.name))
+      const res = yield call(getNativeLogs, {
+        cluster, body,
+        instances: instances.join(','),
+      })
       if (res.data && res.data.logs) {
         yield put({
           type: 'updateState',

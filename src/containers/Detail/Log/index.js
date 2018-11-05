@@ -25,9 +25,13 @@ const mapStateToProps =
 
 @connect(mapStateToProps)
 class Log extends React.PureComponent {
-  componentDidMount() {
+  async componentDidMount() {
     const timeNow = moment(new Date()).format(DEFAULT_TIME_FORMAT.split(' ')[0])
     const { dispatch } = this.props
+    await dispatch({
+      type: 'nativeDetail/fetchPodsList',
+    }).catch(() => notification.warn({ message: '获取 Pods 失败' }))
+
     dispatch({
       type: 'nativeDetail/fetchNativeLogs',
       payload: {
@@ -37,6 +41,7 @@ class Log extends React.PureComponent {
           date_start: timeNow,
           date_end: timeNow,
           log_type: 'stdout',
+          kind: 'pod',
         },
       },
     }).catch(() => notification.warn({ message: '获取日志出错' }))
