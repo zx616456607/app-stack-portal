@@ -14,7 +14,6 @@
 
 import React from 'react'
 import styles from './style/StatefulSetHeader.less'
-import { Tag as StatefulSetIcon } from '@tenx-ui/icon'
 import { Button, Popover } from 'antd'
 import { connect } from 'dva'
 import { routerRedux } from 'dva/router'
@@ -26,6 +25,9 @@ import { getStatefulSetStatus } from '../../../utils/status_identify'
 import NativeStatus from '../../../components/NativeStatus'
 import classnames from 'classnames'
 import Ellipsis from '@tenx-ui/ellipsis'
+import CronJobIcon from '../../../assets/img/detailHeaderIcon/CronJob.png'
+import JobIcon from '../../../assets/img/detailHeaderIcon/Job.png'
+import StatefulSetIcon from '../../../assets/img/detailHeaderIcon/StatefulSet.png'
 
 const nativeStatus = status => {
   const { phase, availableReplicas, replicas } = status
@@ -74,6 +76,17 @@ const popoverItem = (data = {}, title) => {
   )
 }
 
+const getLeftIcon = type => {
+  let icon = CronJobIcon
+  if (type === 'StatefulSet') {
+    icon = StatefulSetIcon
+  }
+  if (type === 'Job') {
+    icon = JobIcon
+  }
+  return <img alt="detailHeaderIcon" src={icon} className={styles.leftIcon}/>
+}
+
 const DetailHeader = ({ data, dispatch, name, type }) => {
   if (!data.metadata) return <div/>
   return (
@@ -82,7 +95,7 @@ const DetailHeader = ({ data, dispatch, name, type }) => {
       [styles.cronJob]: type === 'CronJob',
     })}>
       <div className={styles.left}>
-        <StatefulSetIcon className={styles.leftIcon}/>
+        {getLeftIcon(type)}
         <span className={styles.firstColumn}>
           <div className={styles.title}>{getDeepValue(data, 'metadata.name') || '--'}</div>
           {
