@@ -55,7 +55,7 @@ function getColumns(self) {
       return <NativeStatus
         status={{ availableReplicas, replicas }}
         phase={phase}
-        hidePodInfo
+        // hidePodInfo
       />
     },
   }, {

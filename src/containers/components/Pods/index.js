@@ -59,7 +59,7 @@ export default class Pods extends React.PureComponent {
           return <NativeStatus
             status={{ availableReplicas, replicas }}
             phase={phase}
-            hidePodInfo
+            // hidePodInfo
           />
         }
         const { phase, availableReplicas, replicas } = getNativeResourceStatus(data)

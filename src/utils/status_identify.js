@@ -217,15 +217,21 @@ export function getJobStatus(_service) {
   const status = { phase: 'null' }
   const { status: { succeeded, active = [], failed } = {} } = service
   const { spec: { completions } = {} } = service
-  if (typeof succeeded !== undefined && (succeeded === completions)) {
+  if (succeeded !== undefined && (succeeded === completions)) {
     status.phase = 'Finish'
   }
   if (active > 0) {
     status.phase = 'Doing'
   }
-  if (typeof active !== undefined && typeof failed !== undefined &&
+  if (active !== undefined && failed !== undefined &&
     active === 0 && failed > 0 && succeeded < completions) {
     status.phase = 'Failure'
+  }
+  if (succeeded !== undefined && failed !== undefined) {
+    status.availableReplicas = succeeded + failed
+  }
+  if (completions !== undefined) {
+    status.replicas = completions
   }
   return status
 }
@@ -235,10 +241,10 @@ export function getCronJobStatue(_service) {
   const service = cloneDeep(_service)
   const { spec: { suspend } } = service
   const status = { phase: 'null' }
-  if (typeof suspend !== undefined && suspend === true) {
+  if (suspend !== undefined && suspend === true) {
     status.phase = 'Running'
   }
-  if (typeof suspend !== undefined && suspend === false) {
+  if (suspend !== undefined && suspend === false) {
     status.phase = 'Stopped'
   }
   return status
