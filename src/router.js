@@ -24,6 +24,19 @@ function RouterConfig({ history, app }) {
     component: () => import('./containers/Error'),
   })
   const routes = [{
+    path: '/Deployment',
+    component: () => import('./containers/Deployment'),
+    models: () => [
+      import('./models/nativeResourceList'),
+    ],
+  }, {
+    path: '/Deployment/:id',
+    exact: false,
+    component: () => import('./containers/Detail'),
+    models: () => [
+      import('./models/nativeDetail'),
+    ],
+  }, {
     path: '/StatefulSet',
     component: () => import('./containers/StatefulSet'),
     models: () => [
@@ -55,6 +68,19 @@ function RouterConfig({ history, app }) {
     ],
   }, {
     path: '/CronJob/:id',
+    exact: false,
+    component: () => import('./containers/Detail'),
+    models: () => [
+      import('./models/nativeDetail'),
+    ],
+  }, {
+    path: '/Pod',
+    component: () => import('./containers/Pod/index.tsx'),
+    models: () => [
+      import('./models/nativeResourceList'),
+    ],
+  }, {
+    path: '/Pod/:id',
     exact: false,
     component: () => import('./containers/Detail'),
     models: () => [
