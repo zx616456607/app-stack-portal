@@ -80,6 +80,12 @@ export default {
     user: {},
     menu: [
       {
+        text: 'Deployment',
+        icon: <Icon type="bulb" />,
+        key: 'Deployment',
+        to: '/Deployment',
+      },
+      {
         text: 'StatefulSet',
         icon: <Icon type="bulb" />,
         key: 'StatefulSet',
@@ -96,6 +102,12 @@ export default {
         icon: <Icon type="bulb" />,
         key: 'CronJob',
         to: '/CronJob',
+      },
+      {
+        text: 'Pod',
+        icon: <Icon type="bulb" />,
+        key: 'Pod',
+        to: '/Pod',
       },
       {
         text: 'test',
