@@ -38,9 +38,7 @@ const getPodEvent = ({ cluster, name }) => request({
 const getServiceMonitor = ({ cluster, name, query, namespace }) => {
   query.source = METRICS_DEFAULT_SOURCE
   return request({
-    // url: `${paasApiUrl}${CLUSTERS}/${cluster}/metric/services/${name}/metrics?${queryString.stringify(query)}`,
-
-    url: `http://192.168.1.230:48000/api/v2${CLUSTERS}/${cluster}/metric/services/${name}/metrics?${queryString.stringify(query)}`,
+    url: `${paasApiUrl}${CLUSTERS}/${cluster}/metric/services/${name}/metrics?${queryString.stringify(query)}`,
     options: {
       headers: {
         project: namespace,

@@ -15,7 +15,6 @@
 import React from 'react'
 import { connect } from 'dva'
 import { Spin } from 'antd'
-import isEmpty from 'lodash/isEmpty'
 import cloneDeep from 'lodash/cloneDeep'
 import Metric from '@tenx-ui/monitorChart'
 import '@tenx-ui/monitorChart/assets/index.css'
@@ -36,8 +35,8 @@ const mapStateToProps = ({
   nativeDetail: { monitor, realTimeMonitor },
 }) => {
   return {
-    cluster: 'CID-9fdb2cf8a9e7' || cluster,
-    project: 'all' || project,
+    cluster,
+    project,
     monitor,
     realTimeMonitor,
   }
@@ -95,7 +94,7 @@ class Monitor extends React.PureComponent {
       type: 'nativeDetail/fetchMonitor',
       payload: {
         cluster,
-        name: 'payment' || id,
+        name: id,
         query,
         namespace: project,
       },
@@ -126,7 +125,7 @@ class Monitor extends React.PureComponent {
       type: 'nativeDetail/fetchRealTimeMonitor',
       payload: {
         cluster,
-        name: 'payment' || id,
+        name: id,
         query,
         namespace: project,
       },
@@ -232,8 +231,11 @@ class Monitor extends React.PureComponent {
     return (
       <div className={styles.serviceMonitor}>
         {
-          !isEmpty(monitor) && !isEmpty(monitor[METRICS_CPU])
-          && !isEmpty(monitor[METRICS_CPU].data) ?
+          loading ?
+            <div className="loading">
+              <Spin size={'large'}/>
+            </div>
+            :
             <Metric
               value={currentValue}
               onChange={this.handleTimeChange}
@@ -242,10 +244,6 @@ class Monitor extends React.PureComponent {
               handleSwitch={this.handleSwitch}
               {...{ loading, freshInterval, realTimeChecked, realTimeLoading }}
             />
-            :
-            <div className="loading">
-              <Spin size={'large'}/>
-            </div>
         }
       </div>
     )
