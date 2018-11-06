@@ -133,14 +133,14 @@ interface StatefulSetListNode {
 }
 interface StatefulSetState {
   StatefulSetListState: StatefulSetListNode[];
-  selectedRowKeys: number[];
+  selectedRowKeys: Array<string> ;
   filter: string;
   currentPage: number;
 }
 class StatefulSet extends React.Component<StatefulSetProps, StatefulSetState> {
   state = {
-    StatefulSetListState: [],
-    selectedRowKeys: [],
+    StatefulSetListState: [] as StatefulSetListNode[],
+    selectedRowKeys: [] as Array<string>,
     filter: '',
     currentPage: 1,
   }
@@ -174,11 +174,13 @@ class StatefulSet extends React.Component<StatefulSetProps, StatefulSetState> {
     this.setState({ selectedRowKeys });
   }
   delete = (name) => {
+    const deleteName = this.state.selectedRowKeys.join(',')
     const self = this
     let info = `您是否确定删除这${this.state.selectedRowKeys.length}个可以删除的 StatefulSet`
-    const payload = { cluster: this.props.cluster, type: 'StatefulSet', name }
-    if (name) {
+    let payload = { cluster: this.props.cluster, type: 'StatefulSet', name: deleteName }
+    if (typeof name === 'string') {
       info = `您是否确定删除这1个可以删除的 StatefulSet`
+      payload = { cluster: this.props.cluster, type: 'StatefulSet', name }
     }
     modal.confirm({
       modalTitle: '删除操作',
@@ -187,7 +189,10 @@ class StatefulSet extends React.Component<StatefulSetProps, StatefulSetState> {
       onOk() {
         self.props.dispatch({ type: 'NativeResourceList/deleteNativeResourceList', payload })
           .then(() => self.reload())
-          .then(() => notification.success({ message: '删除成功', description: '' }))
+          .then(() => {
+            notification.success({ message: '删除成功', description: '' })
+            self.setState({ selectedRowKeys: [] as string[] })
+          })
         .catch(() => notification.error({ message: '删除操作失败', description: '' }))
       },
       onCancel() {},

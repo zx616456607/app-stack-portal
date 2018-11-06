@@ -60,7 +60,7 @@ export function getPodStatus(container) {
  * Get service status
  * return one of [Pending, Running, Deploying, Stopped]
  */
-export function getNativeResourceStatus(_service) {
+export function getDeploymentStatus(_service) {
   const service = cloneDeep(_service)
   const { status, metadata } = service
   if (!metadata.annotations) {
