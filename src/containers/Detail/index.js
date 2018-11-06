@@ -60,46 +60,65 @@ class NativeDetail extends React.PureComponent {
     return activeKey
   }
   getRoutes = type => {
-    return [
-      {
+    const res = []
+    if (type === 'Pod') {
+      res.push({
+        path: `/${type}/:id`,
+        component: require('./Config').default,
+        tabName: '配置',
+        tabKey: 'default',
+      })
+    }
+    if (type !== 'Pod') {
+      res.push({
         path: `/${type}/:id`,
         component: require('./Pods').default,
         tabName: type === 'CronJob' ? '执行记录' : 'Pods',
         tabKey: 'default',
-      },
-      {
+      }, {
         path: `/${type}/:id/yaml`,
         component: require('./Yaml').default,
         tabName: 'Yaml',
         tabKey: 'yaml',
-      },
-      {
-        path: `/${type}/:id/monitor`,
-        component: require('./Monitor').default,
-        tabName: '监控',
-        tabKey: 'monitor',
-        tabDisabled: type === 'CronJob',
-      },
-      {
+      })
+    }
+    res.push({
+      path: `/${type}/:id/monitor`,
+      component: require('./Monitor').default,
+      tabName: '监控',
+      tabKey: 'monitor',
+      tabDisabled: type === 'CronJob',
+    })
+    if (type !== 'Pod') {
+      res.push({
         path: `/${type}/:id/alarm`,
         component: require('./Alarm').default,
         tabName: '告警',
         tabKey: 'alarm',
         tabDisabled: true,
-      },
-      {
-        path: `/${type}/:id/log`,
-        component: require('./Log').default,
-        tabName: '日志',
-        tabKey: 'log',
-      },
-      {
-        path: `/${type}/:id/event`,
+      })
+    }
+    res.push({
+      path: `/${type}/:id/log`,
+      component: require('./Log').default,
+      tabName: '日志',
+      tabKey: 'log',
+    },
+    {
+      path: `/${type}/:id/event`,
+      component: require('./Event').default,
+      tabName: '事件',
+      tabKey: 'event',
+    })
+    if (type === 'Pod') {
+      res.push({
+        path: `/${type}/:id/process`,
         component: require('./Event').default,
-        tabName: '事件',
-        tabKey: 'event',
-      },
-    ]
+        tabName: '进程',
+        tabKey: 'process',
+      })
+    }
+    return res
   }
 
   render() {

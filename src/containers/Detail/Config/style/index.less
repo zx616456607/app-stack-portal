@@ -1,0 +1,41 @@
+/**
+ * Licensed Materials - Property of tenxcloud.com
+ * (C) Copyright 2018 TenxCloud. All Rights Reserved.
+ */
+
+/**
+ *
+ *
+ * @author
+ * @date 2018-11-06
+ */
+
+@import '~@/assets/style/core/index.less';
+
+.container {
+  display: flex;
+  flex-direction: column;
+  .row {
+    display: flex;
+    flex-direction: column;
+    .header {
+      font-size: 16px;
+      border-left: 3px @primary-color solid;
+      box-sizing: border-box;
+      padding-left: @padding-base;
+    }
+    .content {
+      display: flex;
+      margin: @padding-small @padding-large 0 @padding-large;
+      .cell {
+        width: 33%;
+        .title {
+          font-size: 15px;
+        }
+        .text {
+          margin-top: @padding-base;
+        }
+      }
+    }
+  }
+}
