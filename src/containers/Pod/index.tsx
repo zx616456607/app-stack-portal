@@ -23,7 +23,7 @@ import moment from 'moment'
 import {
   formatDate, getDeepValue,
 } from '../../utils/helper'
-import { getStatefulSetStatus } from '../../utils/status_identify'
+import { getPodStatus } from '../../utils/status_identify'
 import NativeStatus from '../../components/NativeStatus'
 import ImagePopCard from '../../components/ImagePopCard'
 import * as modal from '@tenx-ui/modal'
@@ -40,7 +40,7 @@ function getColumns(self) {
     dataIndex: 'name',
     key: 'name',
     render: (name) => {
-      return <Link to={`/StatefulSet/${name}`}>
+      return <Link to={`/Pod/${name}`}>
       <Ellipsis length={8} title={name}>
       {name}
     </Ellipsis>
@@ -109,7 +109,7 @@ function getColumns(self) {
           type="ghost"
           onClick={() =>
             history.push(`/createWorkLoad?${queryString.stringify(
-              { edit: true, type: 'StatefulSet', name: record.name })}`)}
+              { edit: true, type: 'Pod', name: record.name })}`)}
         >
           查看/编辑Yaml
         </Dropdown.Button>
@@ -120,27 +120,27 @@ function getColumns(self) {
   return columns
 }
 
-interface StatefulSetProps extends RouteComponentProps, SubscriptionAPI {
+interface PodProps extends RouteComponentProps, SubscriptionAPI {
   cluster: string;
   loading: boolean;
 }
 
-interface StatefulSetListNode {
+interface PodListNode {
   name: string;
   createTime: string;
   status: any;
   imageArray: string[];
 }
-interface StatefulSetState {
-  StatefulSetListState: StatefulSetListNode[];
-  selectedRowKeys: number[];
+interface PodState {
+  PodListState: PodListNode[];
+  selectedRowKeys: Array<string> ;
   filter: string;
   currentPage: number;
 }
-class StatefulSet extends React.Component<StatefulSetProps, StatefulSetState> {
+class Pod extends React.Component<PodProps, PodState> {
   state = {
-    StatefulSetListState: [],
-    selectedRowKeys: [],
+    PodListState: [] as PodListNode[],
+    selectedRowKeys: [] as Array<string>,
     filter: '',
     currentPage: 1,
   }
@@ -149,36 +149,38 @@ class StatefulSet extends React.Component<StatefulSetProps, StatefulSetState> {
   }
   reload = async () => {
     try {
-      const payload = { cluster: this.props.cluster , type: 'StatefulSet' }
+      const payload = { cluster: this.props.cluster , type: 'Pod' }
       const res =
       await this.props.dispatch({ type: 'NativeResourceList/getNativeResourceList', payload })
       const { data = [] } = ( res as any)
-      const StatefulSetList = data.map((StatefulSetNode) => {
-        const containerTemplateArray = getDeepValue(StatefulSetNode,
+      const PodList = data.map((PodNode) => {
+        const containerTemplateArray = getDeepValue(PodNode,
           ['spec', 'template', 'spec', 'containers']) || [];
         const imageArray = containerTemplateArray.map(({ image }) => image)
         return {
-          key: StatefulSetNode.metadata.name,
-          name: StatefulSetNode.metadata.name,
-          createTime: StatefulSetNode.metadata.creationTimestamp,
-          status: getStatefulSetStatus(StatefulSetNode),
+          key: PodNode.metadata.name,
+          name: PodNode.metadata.name,
+          createTime: PodNode.metadata.creationTimestamp,
+          status: getPodStatus(PodNode),
           image: imageArray,
         }
       })
-      this.setState({ StatefulSetListState: StatefulSetList })
+      this.setState({ PodListState: PodList })
     } catch (e) {
-      notification.error({ message: '获取StatefulSet列表失败', description: '' })
+      notification.error({ message: '获取Pod列表失败', description: '' })
     }
   }
   onSelectChange = selectedRowKeys => {
     this.setState({ selectedRowKeys });
   }
   delete = (name) => {
+    const deleteName = this.state.selectedRowKeys.join(',')
     const self = this
-    let info = `您是否确定删除这${this.state.selectedRowKeys.length}个可以删除的 StatefulSet`
-    const payload = { cluster: this.props.cluster, type: 'StatefulSet', name }
-    if (name) {
-      info = `您是否确定删除这1个可以删除的 StatefulSet`
+    let info = `您是否确定删除这${this.state.selectedRowKeys.length}个可以删除的 Pod`
+    let payload = { cluster: this.props.cluster, type: 'Pod', name: deleteName }
+    if (typeof name === 'string') {
+      info = `您是否确定删除这1个可以删除的 Pod`
+      payload = { cluster: this.props.cluster, type: 'Pod', name }
     }
     modal.confirm({
       modalTitle: '删除操作',
@@ -187,7 +189,10 @@ class StatefulSet extends React.Component<StatefulSetProps, StatefulSetState> {
       onOk() {
         self.props.dispatch({ type: 'NativeResourceList/deleteNativeResourceList', payload })
           .then(() => self.reload())
-          .then(() => notification.success({ message: '删除成功', description: '' }))
+          .then(() => {
+            notification.success({ message: '删除成功', description: '' })
+            self.setState({ selectedRowKeys: [] as string[] })
+          })
         .catch(() => notification.error({ message: '删除操作失败', description: '' }))
       },
       onCancel() {},
@@ -196,7 +201,7 @@ class StatefulSet extends React.Component<StatefulSetProps, StatefulSetState> {
   start = () => {
     modal.confirm({
       modalTitle: '启动操作',
-      title: `您是否确定启动这${this.state.selectedRowKeys.length}个可以启动的 StatefulSet`,
+      title: `您是否确定启动这${this.state.selectedRowKeys.length}个可以启动的 Pod`,
       content: '',
       onOk() {
       },
@@ -206,7 +211,7 @@ class StatefulSet extends React.Component<StatefulSetProps, StatefulSetState> {
   stop = () => {
     modal.confirm({
       modalTitle: '停止操作',
-      title: `您是否确定停止这${this.state.selectedRowKeys.length}个可以停止的 StatefulSet`,
+      title: `您是否确定停止这${this.state.selectedRowKeys.length}个可以停止的 Pod`,
       content: '',
       onOk() {
       },
@@ -217,7 +222,7 @@ class StatefulSet extends React.Component<StatefulSetProps, StatefulSetState> {
     this.setState({ currentPage: page })
   }
   selectData = () => {
-    return this.state.StatefulSetListState
+    return this.state.PodListState
     .filter(({ name }) => name.includes(this.state.filter))
     .filter((_, index) =>
     (this.state.currentPage - 1) * 10 <= index &&
@@ -243,7 +248,7 @@ class StatefulSet extends React.Component<StatefulSetProps, StatefulSetState> {
           icon="plus"
           onClick={() => history.push('/createWorkLoad')}
         >
-          StatefulSet
+          Pod
         </Button>
         <Button icon="reload" onClick={this.reload} >刷新</Button>
         <Button
@@ -259,7 +264,7 @@ class StatefulSet extends React.Component<StatefulSetProps, StatefulSetState> {
           onChange={this.onSelect}
         />
         <Pagination
-          total={this.state.StatefulSetListState.length}
+          total={this.state.PodListState.length}
           showTotal={_total => `共计${_total}条`}
           pageSize={10}
           // defaultCurrent={t}
@@ -290,4 +295,4 @@ function mapStateToProps(state) {
   return { cluster, loading }
 }
 
-export default withRouter(connect(mapStateToProps)(StatefulSet))
+export default withRouter(connect(mapStateToProps)(Pod))
