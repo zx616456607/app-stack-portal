@@ -113,7 +113,7 @@ class NativeDetail extends React.PureComponent {
     if (type === 'Pod') {
       res.push({
         path: `/${type}/:id/process`,
-        component: require('./Event').default,
+        component: require('./Process').default,
         tabName: '进程',
         tabKey: 'process',
       })
