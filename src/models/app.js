@@ -108,6 +108,11 @@ export default {
         icon: <Icon type="bulb" />,
         key: 'Pod',
         to: '/Pod',
+      }, {
+        text: 'Service',
+        icon: <Icon type="bulb" />,
+        key: 'ServiceDiscovery',
+        to: '/ServiceDiscovery',
       },
       {
         text: 'test',
