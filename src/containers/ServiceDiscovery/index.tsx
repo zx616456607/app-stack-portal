@@ -175,7 +175,6 @@ class Service extends React.Component<ServiceProps, ServiceState> {
       })
       this.setState({ ServiceListState: ServiceList })
     } catch (e) {
-      throw e
       notification.error({ message: '获取Service列表失败', description: '' })
     }
   }
