@@ -51,8 +51,15 @@ class CreateWorkLoad extends React.Component<CreateWorkLoadProps, any> {
   }
   createOrEditNative = async () => {
     const payload = { cluster: this.props.cluster, yaml: this.state.value }
+    const { location: { search }  } = this.props
+    const config = queryString.parse(search)
     if (!this.state.editflag) { // 创建
       try {
+        if (config.type === 'PodSecurityPolicy') {
+          await this.props.dispatch({ type: 'createNative/createPSP', payload })
+          setTimeout( () => history.back(), 600)
+          return
+        }
         await this.props.dispatch({ type: 'createNative/createNativeResource', payload })
         notification.success({ message: '创建成功', description: '' })
         setTimeout( () => history.back(), 600)
@@ -70,6 +77,11 @@ class CreateWorkLoad extends React.Component<CreateWorkLoadProps, any> {
     }
     if (this.state.editflag) { // 编辑
       try {
+        if (config.type === 'PodSecurityPolicy') {
+          await this.props.dispatch({ type: 'createNative/updatePSP', payload })
+          setTimeout( () => history.back(), 600)
+          return
+        }
         await this.props.dispatch({ type: 'createNative/updateNativeResource', payload })
         notification.success({ message: '更新成功', description: '' })
         setTimeout( () => history.back(), 600)

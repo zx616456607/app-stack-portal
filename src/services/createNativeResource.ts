@@ -34,3 +34,21 @@ export const updateNativeResource = ({ cluster, yaml }: GetClusters) => request(
     body: yaml,
   },
 })
+
+// k8s PodSecurityPolicy 创建
+export const createPSP = ({ cluster, yaml }: GetClusters) => request({
+  url: `${paasApiUrl}/clusters/${cluster}/podsecuritypolicy`,
+  options: {
+    method: 'POST',
+    body: yaml,
+  },
+})
+
+// 更新 k8s 原生资源
+export const updatePSP = ({ cluster, yaml }: GetClusters) => request({
+  url: `${paasApiUrl}/clusters/${cluster}/podsecuritypolicy`,
+  options: {
+    method: 'PUT',
+    body: yaml,
+  },
+})

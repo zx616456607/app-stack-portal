@@ -111,8 +111,8 @@ export default {
       }, {
         text: 'Service',
         icon: <Icon type="bulb" />,
-        key: 'ServiceDiscovery',
-        to: '/ServiceDiscovery',
+        key: 'Service',
+        to: '/Service',
       },
       {
         text: 'test',
