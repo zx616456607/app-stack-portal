@@ -11,6 +11,8 @@
 import {
   createNativeResource,
   updateNativeResource,
+  createPSP,
+  updatePSP,
 } from '../services/createNativeResource'
 
 export default {
@@ -24,8 +26,16 @@ export default {
       const res = yield call(createNativeResource , payload)
       return res
     },
+    * createPSP({ payload }, { call }) {
+      const res = yield call(createPSP , payload)
+      return res
+    },
     * updateNativeResource({ payload }, { call }) {
       const res = yield call(updateNativeResource, payload)
+      return res
+    },
+    * updatePSP({ payload }, { call }) {
+      const res = yield call(updatePSP, payload)
       return res
     },
   },

@@ -87,10 +87,17 @@ function RouterConfig({ history, app }) {
       import('./models/nativeDetail'),
     ],
   }, {
-    path: '/serviceDiscovery',
+    path: '/Service',
     component: () => import('./containers/ServiceDiscovery'),
     models: () => [
       import('./models/nativeResourceList'),
+    ],
+  }, {
+    path: '/Service/:id',
+    exact: false,
+    component: () => import('./containers/Detail'),
+    models: () => [
+      import('./models/nativeDetail'),
     ],
   }, {
     path: '/test',
