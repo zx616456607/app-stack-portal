@@ -30,6 +30,7 @@ import * as modal from '@tenx-ui/modal'
 import '@tenx-ui/modal/assets/index.css'
 import queryString from 'query-string'
 import Ellipsis from '@tenx-ui/ellipsis'
+import styles from './styles/index.less';
 // import styles from './styles/index.less'
 const Search = Input.Search
 
@@ -39,12 +40,22 @@ function getColumns(self) {
     title: '名称',
     dataIndex: 'name',
     key: 'name',
-    render: (name) => {
-      return <Link to={`/Deployment/${name}`}>
+    render: (name, record) => {
+      return <div>
+      <Link to={`/Deployment/${name}`}>
       <Ellipsis length={8} title={name}>
       {name}
     </Ellipsis>
     </Link>
+    {
+      record.joinTenxPass === true &&
+      <div>
+        <Tooltip title={'已加入应用管理'}>
+        <span className={styles.icon}>管</span>
+        </Tooltip>
+      </div>
+    }
+    </div>
     },
   }, {
     title: '状态',
@@ -148,6 +159,7 @@ class Deployment extends React.Component<DeploymentProps, DeploymentState> {
     this.reload();
   }
   reload = async () => {
+    const filterString = [ 'tenxcloud.com/appName', 'tenxcloud.com/svcName' ]
     try {
       const payload = { cluster: this.props.cluster , type: 'Deployment' }
       const res =
@@ -156,6 +168,12 @@ class Deployment extends React.Component<DeploymentProps, DeploymentState> {
       const DeploymentList = data.map((DeploymentNode) => {
         const containerTemplateArray = getDeepValue(DeploymentNode,
           ['spec', 'template', 'spec', 'containers']) || [];
+        const tenxPaas = getDeepValue(DeploymentNode,
+          ['metadata', 'labels' ]) || {};
+        let joinTenxPass = false
+        if (tenxPaas[filterString[0]] !== undefined && tenxPaas[filterString[1]] !== undefined) {
+          joinTenxPass = true
+        }
         const imageArray = containerTemplateArray.map(({ image }) => image)
         return {
           key: DeploymentNode.metadata.name,
@@ -163,6 +181,7 @@ class Deployment extends React.Component<DeploymentProps, DeploymentState> {
           createTime: DeploymentNode.metadata.creationTimestamp,
           status: getDeploymentStatus(DeploymentNode),
           image: imageArray,
+          joinTenxPass,
         }
       })
       this.setState({ DeploymentListState: DeploymentList })

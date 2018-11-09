@@ -19,6 +19,7 @@ export interface Status {
 }
 
 export interface NativeStatusProps {
+  type?: string | undefined;
   phase: string;
   status: Status;
   hidePodInfo?: boolean;
@@ -54,9 +55,15 @@ function PodsStatus(status: Status) {
   return info
 }
 
+function JobPodsStatus(status: Status) {
+  const info = '已完成'
+  return info
+}
+
 export default class NativeStatus extends React.Component<NativeStatusProps, {}> {
   render() {
     const { phase, hidePodInfo = false, status: { availableReplicas = 0, replicas = 0 } = {} } = this.props
+    const { type } = this.props
     const phaseInfo = SwitchToStatus(phase)
     return(
       <div className="NativeStatus">
@@ -67,7 +74,13 @@ export default class NativeStatus extends React.Component<NativeStatusProps, {}>
           !hidePodInfo &&
           <div className={styles.podInfo}>
             <span>{`${availableReplicas}/${replicas}`}</span>
-            <span className={styles.podInfoText}>{PodsStatus(this.props.status)}</span>
+            <span className={styles.podInfoText}>
+              {
+                this.props.type === undefined && PodsStatus(this.props.status)
+              }{
+                this.props.type === 'Job' && JobPodsStatus(this.props.status)
+              }
+            </span>
           </div>
         }
       </div>
