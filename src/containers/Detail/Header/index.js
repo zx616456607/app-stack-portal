@@ -223,7 +223,11 @@ class DetailHeader extends React.PureComponent {
             {
               type === 'Pod' &&
               <React.Fragment>
-                <div className={styles.normal}>owner: TODO: metadata.ownerReferences是个数组呀
+                <div className={styles.normal}>owner: {
+                  (
+                    (getDeepValue(data, 'metadata.ownerReferences') || []).map(item => item.name)
+                  ).join(',')
+                }
                 </div>
                 <div className={styles.normal}>{
                   popoverItem(getDeepValue(data, 'metadata.annotations') || {}, '注释')
@@ -232,7 +236,7 @@ class DetailHeader extends React.PureComponent {
                   popoverItem(getDeepValue(data, 'metadata.labels'), '标签')
                 }</div>
                 <div className={styles.normal}>{
-                  popoverItem(getDeepValue(data, 'spec.template.spec.nodeSelector') || {}, 'node selector')
+                  popoverItem(getDeepValue(data, 'spec.nodeSelector') || {}, 'node selector')
                 }</div>
 
               </React.Fragment>

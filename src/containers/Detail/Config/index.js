@@ -18,7 +18,7 @@ import { Divider, Tooltip, Select } from 'antd'
 import { cpuFormat, getDeepValue, memoryFormat } from '../../../utils/helper'
 import { connect } from 'dva'
 import { Authority as SecretIcon } from '@tenx-ui/icon'
-
+import find from 'lodash/find'
 const Option = Select.Option
 const mapState = ({ nativeDetail: { podDetail } }) => ({ data: podDetail })
 
@@ -27,11 +27,90 @@ class Config extends React.PureComponent {
   state = {
     containerIndex: 0,
   }
-  componentDidMount() {
+  async componentDidMount() {
     const { dispatch } = this.props
-    dispatch({
+    const res = await dispatch({
       type: 'nativeDetail/fetchPodDetail',
     })
+    if (!res.data) return
+    this.getMount(res.data, this.state.containerIndex)
+  }
+
+  getMount(container, i) {
+    const res = {
+      mountPath: [],
+      name: [],
+      typeText: [],
+    }
+    const volumes = container.spec.volumes || []
+    const volumeMounts = container.spec.containers[i].volumeMounts || []
+    volumes.map(item => {
+      let type = '--'
+      let name = '--'
+      const volumeIndex = item.name
+      let mountPath = '--'
+      if (item.hostPath || item.persistentVolumeClaim || item.rbd) {
+        // 确定存储类型和存储名称
+        if (item.hostPath) {
+          type = '本地存储'
+          name = '-'
+        } else if (item.persistentVolumeClaim) {
+          name = item.persistentVolumeClaim.claimName
+          const annotations = container.metadata.annotations
+          for (const key in annotations) {
+            const index = volumeIndex.replace('-', '')
+            if (key === index) {
+              if (annotations[key] === 'private') {
+                type = '独享型（rbd）'
+              } else if (annotations[key] === 'share') {
+                type = '共享型（nfs）'
+              } else {
+                type = '-'
+              }
+              break
+            }
+          }
+        } else if (item.rbd) {
+          type = '独享型（rbd）'
+          const imageArray = item.rbd.image.split('.')
+          name = imageArray[imageArray.length - 1]
+        }
+        // 确定容器目录
+        for (let j = 0; j < volumeMounts.length; j++) {
+          if (volumeMounts[j].name === volumeIndex) {
+            mountPath = volumeMounts[j].mountPath
+            break
+          }
+        }
+        if ((type === '本地存储' && mountPath === '/etc/localtime') || (type === '本地存储' && mountPath === '/etc/timezone')) {
+          return null
+        }
+        let typeText
+        switch (type) {
+          case '本地存储':
+            typeText = '本地存储'
+            break
+          case '独享型（rbd）':
+            typeText = '独享型（rbd）'
+            break
+          case '共享型（nfs）':
+            typeText = '共享型（rbd）'
+            break
+          default:
+            typeText = '-'
+            break
+        }
+        return { typeText, name, mountPath }
+      }
+      return null
+
+    }).filter(l => !!l).map(l => {
+      res.mountPath.push(l.mountPath)
+      res.name.push(l.name)
+      res.typeText.push(l.typeText)
+      return null
+    })
+    return res
   }
   getConfigMap = (container, containerIndex) => {
     const volumes = container.spec.volumes
@@ -77,14 +156,29 @@ class Config extends React.PureComponent {
       </div>
     )
   ) || []
+  getMounts = (data, i) => {
+    const volumes = (getDeepValue(data, 'spec.volumes') || []).filter(v => v.persistentVolumeClaim)
+    if (!volumes.length) return {}
+    const { name, persistentVolumeClaim: { claimName } } = volumes[0]
+    const Mounts = getDeepValue(data, `spec.containers.${i}.volumeMounts`) || []
+    const mount = find(Mounts, { name }) || {}
+    return {
+      path: mount.mountPath,
+      name: claimName,
+      type: getDeepValue(data, 'spec.storageClassName'),
+    }
+  }
   getDataSource = data => {
     const { containerIndex } = this.state
     const serverConfig = this.getConfigMap(data, containerIndex)
+    const mounts = this.getMount(data, containerIndex)
     const res = [{
       header: '基本信息',
       content: [{
         title: '镜像',
-        value: getDeepValue(data, 'images') || '--',
+        value: (
+          getDeepValue(data, `spec.containers.${containerIndex}.image`)
+        ) || '--',
       }, {
         title: '所属节点',
         value: getDeepValue(data, 'status.hostIP') || '--',
@@ -117,13 +211,13 @@ class Config extends React.PureComponent {
       header: '存储',
       content: [{
         title: '存储类型',
-        value: undefined,
+        value: mounts.typeText || '--',
       }, {
         title: '存储',
-        value: undefined,
+        value: mounts.name || '--',
       }, {
         title: '容器目录',
-        value: '333322',
+        value: mounts.mountPath || '--',
       }],
     }, {
       header: '服务配置',
