@@ -206,7 +206,7 @@ class ProcessContainer extends React.PureComponent {
     return items
   }
   render() {
-    const { data } = this.props
+    const { data, loading } = this.props
     return (
       <Page>
         <Queue>
@@ -216,6 +216,7 @@ class ProcessContainer extends React.PureComponent {
             dataSource={this.getDataSource(data)}
             columns={this._renderColumn()}
             pagination={false}
+            loading={loading.effects['nativeDetail/fetchPodDetail']}
           />
         </Queue>
       </Page>
@@ -223,10 +224,11 @@ class ProcessContainer extends React.PureComponent {
   }
 }
 
-const mapStateToProps = ({ nativeDetail: { type, process } }) => {
+const mapStateToProps = ({ nativeDetail: { type, process }, loading }) => {
   return {
     data: process || [],
     cron: type === 'CronJob',
+    loading,
   }
 }
 

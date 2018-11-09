@@ -13,10 +13,15 @@
 */
 
 import React from 'react'
+import PodLogWebsocket from './PodLogWebsocket'
 
 class PodLog extends React.PureComponent {
+  socketCb = () => {
+  }
   render() {
-    return <div>podLog</div>
+    return <div>
+      <PodLogWebsocket callback={this.socketCb}/>
+    </div>
   }
 }
 export default PodLog

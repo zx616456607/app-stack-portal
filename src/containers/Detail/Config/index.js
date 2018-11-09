@@ -18,7 +18,6 @@ import { Divider, Tooltip, Select } from 'antd'
 import { cpuFormat, getDeepValue, memoryFormat } from '../../../utils/helper'
 import { connect } from 'dva'
 import { Authority as SecretIcon } from '@tenx-ui/icon'
-import find from 'lodash/find'
 const Option = Select.Option
 const mapState = ({ nativeDetail: { podDetail } }) => ({ data: podDetail })
 
@@ -157,21 +156,32 @@ class Config extends React.PureComponent {
     )
   ) || []
   getMounts = (data, i) => {
-    const volumes = (getDeepValue(data, 'spec.volumes') || []).filter(v => v.persistentVolumeClaim)
-    if (!volumes.length) return {}
-    const { name, persistentVolumeClaim: { claimName } } = volumes[0]
-    const Mounts = getDeepValue(data, `spec.containers.${i}.volumeMounts`) || []
-    const mount = find(Mounts, { name }) || {}
-    return {
-      path: mount.mountPath,
-      name: claimName,
-      type: getDeepValue(data, 'spec.storageClassName'),
+    const res = { name: [], path: [], type: [] }
+    const vObj = {}
+    ;(getDeepValue(data, 'spec.volumes') || []).filter(v => v.persistentVolumeClaim).map(
+      v => (vObj[v.name] = v.persistentVolumeClaim.claimName)
+    )
+    const ann = getDeepValue(data, 'metadata.annotations')
+    if (!Object.keys(vObj).length) return {}
+    ;(getDeepValue(data, `spec.containers.${i}.volumeMounts`) || []).map(mount => {
+      if (vObj[mount.name]) {
+        res.name.push(vObj[mount.name] || '--')
+        res.path.push(mount.mountPath || '--')
+        res.type.push(ann[mount.name] || '--')
+      }
+      return null
+    })
+    if (!res.name.length) {
+      res.name.push('--')
+      res.path.push('--')
+      res.type.push('--')
     }
+    return res
   }
   getDataSource = data => {
     const { containerIndex } = this.state
     const serverConfig = this.getConfigMap(data, containerIndex)
-    const mounts = this.getMount(data, containerIndex)
+    const mount = this.getMounts(data, containerIndex)
     const res = [{
       header: '基本信息',
       content: [{
@@ -211,13 +221,13 @@ class Config extends React.PureComponent {
       header: '存储',
       content: [{
         title: '存储类型',
-        value: mounts.typeText || '--',
+        value: mount.type || '--',
       }, {
         title: '存储',
-        value: mounts.name || '--',
+        value: mount.name || '--',
       }, {
         title: '容器目录',
-        value: mounts.mountPath || '--',
+        value: mount.path || '--',
       }],
     }, {
       header: '服务配置',

@@ -17,7 +17,6 @@ import { connect } from 'dva'
 import { Switch, Route, routerRedux } from 'dva/router'
 import { Tabs, notification } from 'antd'
 import Page from '@tenx-ui/page'
-import ReturnButton from '@tenx-ui/return-button'
 import DetailHeader from './Header/index'
 import styles from './style/index.less'
 
@@ -131,13 +130,10 @@ class NativeDetail extends React.PureComponent {
   }
 
   render() {
-    const { dispatch, children, location: { pathname }, history, type, name } = this.props
+    const { dispatch, children, location: { pathname }, type, name } = this.props
     const routes = this.getRoutes(type)
     return (
       <div>
-        <div className={styles.rtnBtn}>
-          <ReturnButton onClick={history.goBack}>返回</ReturnButton>
-        </div>
         <DetailHeader/>
         <Page inner className={styles.page}>
           <div>
