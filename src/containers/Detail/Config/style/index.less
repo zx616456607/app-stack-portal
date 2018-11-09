@@ -15,6 +15,18 @@
 .container {
   display: flex;
   flex-direction: column;
+  .changeContainer {
+    display: flex;
+    align-items: center;
+    margin-bottom: @padding-base;
+    .label {
+      font-size: 14px;
+    }
+    .slc {
+      width: 150px;
+      margin-left: @padding-small;
+    }
+  }
   .row {
     display: flex;
     flex-direction: column;
@@ -37,5 +49,9 @@
         }
       }
     }
+  }
+  .secretEnvIcon {
+    cursor: pointer;
+    color: @primary-color;
   }
 }

@@ -1,0 +1,22 @@
+/**
+ * Licensed Materials - Property of tenxcloud.com
+ * (C) Copyright 2018 TenxCloud. All Rights Reserved.
+*/
+
+/**
+ *
+ *
+ *
+ * @author Songsz
+ * @date 2018-11-08
+ *
+*/
+
+import React from 'react'
+
+class PodLog extends React.PureComponent {
+  render() {
+    return <div>podLog</div>
+  }
+}
+export default PodLog

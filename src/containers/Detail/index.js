@@ -89,6 +89,14 @@ class NativeDetail extends React.PureComponent {
       tabKey: 'monitor',
       tabDisabled: type === 'CronJob',
     })
+    if (type === 'Pod') {
+      res.push({
+        path: `/${type}/:id/log`,
+        component: require('./PodLog').default,
+        tabName: '日志',
+        tabKey: 'log',
+      })
+    }
     if (type !== 'Pod') {
       res.push({
         path: `/${type}/:id/alarm`,
@@ -96,24 +104,25 @@ class NativeDetail extends React.PureComponent {
         tabName: '告警',
         tabKey: 'alarm',
         tabDisabled: true,
+      }, {
+        path: `/${type}/:id/log`,
+        component: require('./Log').default,
+        tabName: '日志',
+        tabKey: 'log',
       })
     }
-    res.push({
-      path: `/${type}/:id/log`,
-      component: require('./Log').default,
-      tabName: '日志',
-      tabKey: 'log',
-    },
-    {
-      path: `/${type}/:id/event`,
-      component: require('./Event').default,
-      tabName: '事件',
-      tabKey: 'event',
-    })
+
+    res.push(
+      {
+        path: `/${type}/:id/event`,
+        component: require('./Event').default,
+        tabName: '事件',
+        tabKey: 'event',
+      })
     if (type === 'Pod') {
       res.push({
         path: `/${type}/:id/process`,
-        component: require('./Event').default,
+        component: require('./Process').default,
         tabName: '进程',
         tabKey: 'process',
       })

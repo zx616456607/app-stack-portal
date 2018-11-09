@@ -17,7 +17,7 @@
   width: 100%;
   background-color: @component-background;
   border-radius: @border-radius-base;
-  margin-bottom: @padding-base;
+  margin-bottom: 20px;
   box-sizing: border-box;
   display: flex;
   align-items: center;
@@ -79,4 +79,8 @@
 
 .longLabel {
   max-width: 250px;
+  &:hover {
+    color: @primary-color;
+    cursor: pointer;
+  }
 }
