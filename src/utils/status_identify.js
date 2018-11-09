@@ -227,8 +227,8 @@ export function getJobStatus(_service) {
     active === 0 && failed > 0 && succeeded < completions) {
     status.phase = 'Failure'
   }
-  if (succeeded !== undefined && failed !== undefined) {
-    status.availableReplicas = succeeded + failed
+  if (succeeded !== undefined) {
+    status.availableReplicas = succeeded
   }
   if (completions !== undefined) {
     status.replicas = completions
