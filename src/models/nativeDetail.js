@@ -16,6 +16,8 @@ import {
   getNativeLogs,
   getPodEvent,
   getServiceMonitor,
+  getProcessList,
+  getPodDetail,
 } from '../services/nativeDetail'
 import {
   formatInstanceMonitor,
@@ -31,6 +33,8 @@ export default {
     pods: [],
     logs: {},
     events: [],
+    podDetail: {},
+    process: [],
   },
 
   reducers: {
@@ -147,6 +151,44 @@ export default {
           },
         },
       })
+    },
+    * fetchProcessList({ payload: { query } }, { call, select, put }) {
+      yield put({
+        type: 'updateState',
+        payload: {
+          process: [],
+        },
+      })
+      const { app: { cluster }, nativeDetail: { name } } = yield select(state => state)
+      const res = yield call(getProcessList, { cluster, name, query })
+      if (res.data) {
+        yield put({
+          type: 'updateState',
+          payload: {
+            process: res.data || [],
+          },
+        })
+      }
+      return res
+    },
+    * fetchPodDetail(_, { call, select, put }) {
+      yield put({
+        type: 'updateState',
+        payload: {
+          podDetail: {},
+        },
+      })
+      const { app: { cluster }, nativeDetail: { name } } = yield select(state => state)
+      const res = yield call(getPodDetail, { cluster, instance: name })
+      if (res.data) {
+        yield put({
+          type: 'updateState',
+          payload: {
+            podDetail: res.data,
+          },
+        })
+      }
+      return res
     },
   },
 }

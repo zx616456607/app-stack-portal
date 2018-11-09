@@ -194,6 +194,7 @@ function toDate(date) {
  * @param {object | array} target the obj or array you need to read value from
  * @param {array | string} propsList the propsList you read
  * @return {any} if read error, return null
+ * @example getDeepValue(userList, 'group.o.name') // make sure your property name doesn't contain dot (.)
  * @example getDeepValue(userList, ['group', 0, 'name'])
  */
 const getDeepValue = (target, propsList) => {
@@ -401,6 +402,79 @@ const formatInstanceMonitor = data => {
   return data
 }
 
+/**
+ * Format cpu
+ * @param {any} memory memory
+ * @param {any} resources resources
+ * @return {any} return data
+ */
+function cpuFormat(memory, resources) {
+  const enterpriseFlag = true
+  const parseCpuToNumber = cpu => {
+    if (!cpu) {
+      return
+    }
+    if (cpu.indexOf('m') < 0) {
+      cpu *= 1000
+    } else {
+      cpu = parseInt(cpu)
+    }
+    return Math.ceil((cpu / 1000) * 10) / 10
+  }
+  const cpuLimits = parseCpuToNumber(resources && resources.limits ? resources.limits.cpu : null)
+  const cpuRequests = parseCpuToNumber(
+    resources && resources.requests ? resources.requests.cpu : null
+  )
+  if (enterpriseFlag) {
+    if (cpuLimits && cpuRequests && cpuLimits !== cpuRequests) {
+      return `${cpuRequests}~${cpuLimits} CPU`
+    }
+    if (cpuLimits && cpuRequests && cpuLimits === cpuRequests) {
+      return `${cpuRequests} CPU`
+    }
+  }
+  if (!memory) {
+    return '-'
+  }
+  const newMemory = parseInt(memory.replace('Mi', '').replace('Gi'))
+  switch (newMemory) {
+    case 1:
+      return '1 CPU（共享）'
+    case 2:
+      return '1 CPU（共享）'
+    case 4:
+      return '1 CPU'
+    case 8:
+      return '2 CPU'
+    case 16:
+      return '2 CPU'
+    case 32:
+      return '2 CPU'
+    case 256:
+      return '1 CPU（共享）'
+    case 512:
+      return '1 CPU（共享）'
+    default:
+      return '1 CPU'
+  }
+}
+function memoryFormat(resources) {
+  const enterpriseFlag = true
+  let memoryLimits = resources && resources.limits ? resources.limits.memory : null
+  let memoryRequests = resources && resources.requests ? resources.requests.memory : null
+  if (!memoryLimits || !memoryRequests) {
+    return '-'
+  }
+  memoryLimits = memoryLimits.replace('i', '')
+  if (enterpriseFlag && memoryLimits && memoryRequests) {
+    memoryRequests = memoryRequests.replace('i', '')
+    if (memoryLimits === memoryRequests) {
+      return memoryLimits
+    }
+    return `${memoryRequests}~${memoryLimits}`
+  }
+  return memoryLimits
+}
 export {
   delay,
   getType,
@@ -413,5 +487,7 @@ export {
   getBuildStatusTextAndClass,
   getServiceStatus,
   formatInstanceMonitor,
+  cpuFormat,
+  memoryFormat,
 }
 

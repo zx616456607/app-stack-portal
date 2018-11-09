@@ -140,9 +140,13 @@ class DetailHeader extends React.PureComponent {
                 <div className={styles.normal}>状态:&nbsp;&nbsp; {
                   nativeStatus(getStatefulSetStatus(data))
                 }</div>
-                <div className={styles.normal}>重启策略: TODO
+                <div className={styles.normal}>重启策略: {
+                  getDeepValue(data, 'spec.restartPolicy') || '--'
+                }
                 </div>
-                <div className={styles.normal}>地址: TODO</div>
+                <div className={styles.normal}>地址: {
+                  getDeepValue(data, 'status.podIP') || '--'
+                }</div>
                 <div className={styles.normal}>创建时间: {
                   moment(getDeepValue(data, 'metadata.creationTimestamp')).format(DEFAULT_TIME_FORMAT)
                 }</div>
@@ -219,7 +223,11 @@ class DetailHeader extends React.PureComponent {
             {
               type === 'Pod' &&
               <React.Fragment>
-                <div className={styles.normal}>owner: TODO
+                <div className={styles.normal}>owner: {
+                  (
+                    (getDeepValue(data, 'metadata.ownerReferences') || []).map(item => item.name)
+                  ).join(',')
+                }
                 </div>
                 <div className={styles.normal}>{
                   popoverItem(getDeepValue(data, 'metadata.annotations') || {}, '注释')
@@ -228,7 +236,7 @@ class DetailHeader extends React.PureComponent {
                   popoverItem(getDeepValue(data, 'metadata.labels'), '标签')
                 }</div>
                 <div className={styles.normal}>{
-                  popoverItem(getDeepValue(data, 'spec.template.spec.nodeSelector') || {}, 'node selector')
+                  popoverItem(getDeepValue(data, 'spec.nodeSelector') || {}, 'node selector')
                 }</div>
 
               </React.Fragment>
