@@ -204,7 +204,7 @@ class CronJob extends React.Component<CronJobProps, CronJobState> {
     const self = this
     const options =
     `spec:
-      suspend: true`
+      suspend: false`
     const payload = { cluster: this.props.cluster, type: 'CronJob', name, options }
     modal.confirm({
       modalTitle: '启动操作',
@@ -223,7 +223,7 @@ class CronJob extends React.Component<CronJobProps, CronJobState> {
     const self = this
     const options =
     `spec:
-      suspend: false`
+      suspend: true`
     const payload = { cluster: this.props.cluster, type: 'CronJob', name, options }
     modal.confirm({
       modalTitle: '停止操作',
