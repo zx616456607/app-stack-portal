@@ -241,10 +241,10 @@ export function getCronJobStatue(_service) {
   const service = cloneDeep(_service)
   const { spec: { suspend } } = service
   const status = { phase: 'null' }
-  if (suspend !== undefined && suspend === true) {
+  if (suspend !== undefined && suspend === false) {
     status.phase = 'Running'
   }
-  if (suspend !== undefined && suspend === false) {
+  if (suspend !== undefined && suspend === true) {
     status.phase = 'Stopped'
   }
   return status
