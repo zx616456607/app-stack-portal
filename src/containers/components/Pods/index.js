@@ -19,13 +19,18 @@ import Queue from 'rc-queue-anim'
 import { Link } from 'dva/router'
 import moment from 'moment'
 import Ellipsis from '@tenx-ui/ellipsis'
-import { getPodStatus, getJobStatus } from '../../../utils/status_identify'
+import { getStatus } from '../../../utils/status_identify'
 import NativeStatus from '../../../components/NativeStatus'
 
 export default class Pods extends React.PureComponent {
   state = {
     current: 1,
     size: 10,
+  }
+  componentDidMount() {
+    if (window.parent.appStackIframeCallBack) {
+      this.iframeCallback = window.parent.appStackIframeCallBack
+    }
   }
   getImages(item) {
     const images = []
@@ -37,14 +42,15 @@ export default class Pods extends React.PureComponent {
       current: pageNum,
     })
   }
-  _renderColumn = (history, cron) => {
+  _renderColumn = (history, cron, cb) => {
     const res = [{
       title: cron ? '普通任务名称' : '容器名称',
       width: '15%',
       key: 'name',
       render: data => (
         <Link
-          to={cron ? '/Job/3' : `/Pod/${data.metadata.name}`}
+          onClick={() => cb(`/app-stack/${cron ? 'Job' : 'Pod'}`)}
+          to={`/${cron ? 'Job' : 'Pod'}/${data.metadata.name}`}
           style={{ whiteSpace: 'pre' }}>
           <Ellipsis>{data.metadata.name}</Ellipsis>
         </Link>
@@ -54,16 +60,8 @@ export default class Pods extends React.PureComponent {
       width: '10%',
       key: 'status',
       render: data => {
-        if (cron) {
-          const { phase, availableReplicas, replicas } = getJobStatus(data)
-          return <NativeStatus
-            status={{ availableReplicas, replicas }}
-            phase={phase}
-            // hidePodInfo
-          />
-        }
-        const { phase, availableReplicas, replicas } = getPodStatus(data)
-        return <NativeStatus phase={phase} status={{ availableReplicas, replicas }} hidePodInfo />
+        const { phase, availableReplicas, replicas } = getStatus(data, 'Pod')
+        return <NativeStatus type={'Pod'} phase={phase} status={{ availableReplicas, replicas }} hidePodInfo />
       },
     }]
     ;!cron && res.push({
@@ -110,6 +108,9 @@ export default class Pods extends React.PureComponent {
     })
     return res
   }
+  iframeCb = pathname => {
+    this.iframeCallback && this.iframeCallback('redirect', { pathname })
+  }
   render() {
     const { data = [], history, cron } = this.props
     const { current, size } = this.state
@@ -142,7 +143,7 @@ export default class Pods extends React.PureComponent {
             dataSource={data.filter(
               (item, index) => index < (current * size) && index >= ((current - 1) * size)
             )}
-            columns={this._renderColumn(history, cron)}
+            columns={this._renderColumn(history, cron, this.iframeCb)}
             pagination={false}
           />
         </Queue>

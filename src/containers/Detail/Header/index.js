@@ -21,22 +21,13 @@ import { getDeepValue } from '../../../utils/helper'
 import moment from 'moment'
 import { DEFAULT_TIME_FORMAT } from '../../../utils/constants'
 import queryString from 'query-string'
-import { getStatefulSetStatus } from '../../../utils/status_identify'
+import { getStatus } from '../../../utils/status_identify'
 import NativeStatus from '../../../components/NativeStatus'
 import classnames from 'classnames'
 import Ellipsis from '@tenx-ui/ellipsis'
 import CronJobIcon from '../../../assets/img/detailHeaderIcon/CronJob.png'
 import JobIcon from '../../../assets/img/detailHeaderIcon/Job.png'
 import StatefulSetIcon from '../../../assets/img/detailHeaderIcon/StatefulSet.png'
-
-const nativeStatus = status => {
-  const { phase, availableReplicas, replicas } = status
-  return <NativeStatus
-    status={{ availableReplicas, replicas }}
-    phase={phase}
-    hidePodInfo
-  />
-}
 
 const toYamlEditor = (dispatch, name, type) => {
   dispatch(routerRedux.push({
@@ -88,6 +79,20 @@ const getLeftIcon = type => {
 }
 
 class DetailHeader extends React.PureComponent {
+  nativeStatus = () => {
+    const { data, type } = this.props
+    const { phase, availableReplicas, replicas } = getStatus(data, type)
+    return <NativeStatus
+      status={{ availableReplicas, replicas }}
+      phase={phase}
+      type={type}
+      hidePodInfo
+    />
+  }
+  renderJobActive = data => { // 可能取出 object, 防止页面崩溃
+    const act = getDeepValue(data, 'status.active') || 0
+    return typeof act === 'object' ? '--' : act
+  }
   render() {
     const { data, dispatch, name, type } = this.props
     if (!data.metadata) return <div/>
@@ -104,7 +109,7 @@ class DetailHeader extends React.PureComponent {
               type === 'StatefulSet' &&
               <React.Fragment>
                 <div className={styles.normal}>状态:&nbsp;&nbsp; {
-                  nativeStatus(getStatefulSetStatus(data))
+                  this.nativeStatus()
                 }</div>
                 <div className={styles.normal}>更新策略: {
                   getDeepValue(data, 'spec.updateStrategy.type') === 'RollingUpdate' ? '滚动升级' : '普通升级'
@@ -121,7 +126,7 @@ class DetailHeader extends React.PureComponent {
               type === 'Deployment' &&
               <React.Fragment>
                 <div className={styles.normal}>状态:&nbsp;&nbsp; {
-                  nativeStatus(getStatefulSetStatus(data))
+                  this.nativeStatus()
                 }</div>
                 <div className={styles.normal}>更新策略: {
                   getDeepValue(data, 'spec.updateStrategy.type') === 'RollingUpdate' ? '滚动升级' : '普通升级'
@@ -138,7 +143,7 @@ class DetailHeader extends React.PureComponent {
               type === 'Pod' &&
               <React.Fragment>
                 <div className={styles.normal}>状态:&nbsp;&nbsp; {
-                  nativeStatus(getStatefulSetStatus(data))
+                  this.nativeStatus()
                 }</div>
                 <div className={styles.normal}>重启策略: {
                   getDeepValue(data, 'spec.restartPolicy') || '--'
@@ -162,7 +167,7 @@ class DetailHeader extends React.PureComponent {
                   popoverItem(getDeepValue(data, 'metadata.annotations') || {}, '注释')
                 }</div>
                 <div className={styles.normal}>{
-                  popoverItem(getDeepValue(data, 'metadata.labels'), '标签')
+                  popoverItem(getDeepValue(data, 'metadata.labels') || {}, '标签')
                 }</div>
                 <div className={styles.normal}>创建时间: {
                   moment(getDeepValue(data, 'metadata.creationTimestamp')).format(DEFAULT_TIME_FORMAT)
@@ -183,6 +188,18 @@ class DetailHeader extends React.PureComponent {
                 }</div>
               </React.Fragment>
             }
+            {
+              type === 'Service' &&
+              <React.Fragment>
+                <div className={classnames(styles.normal, styles.placehold)}>--</div>
+                <div className={styles.normal}>集群IP: {
+                  getDeepValue(data, 'spec.clusterIP') || '--'
+                }</div>
+                <div className={styles.normal}>{
+                  popoverItem(getDeepValue(data, 'metadata.annotations') || {}, '注释')
+                }</div>
+              </React.Fragment>
+            }
           </span>
           <span className={styles.secondColumn}>
             {
@@ -192,7 +209,7 @@ class DetailHeader extends React.PureComponent {
                 popoverItem(getDeepValue(data, 'metadata.annotations') || {}, '注释')
               }</div>
               <div className={styles.normal}>{
-                popoverItem(getDeepValue(data, 'metadata.labels'), '标签')
+                popoverItem(getDeepValue(data, 'metadata.labels') || {}, '标签')
               }</div>
               <div className={styles.normal}>{
                 popoverItem(getDeepValue(data, 'spec.selector.matchLabels') || {}, 'pod selector')
@@ -209,7 +226,7 @@ class DetailHeader extends React.PureComponent {
                   popoverItem(getDeepValue(data, 'metadata.annotations') || {}, '注释')
                 }</div>
                 <div className={styles.normal}>{
-                  popoverItem(getDeepValue(data, 'metadata.labels'), '标签')
+                  popoverItem(getDeepValue(data, 'metadata.labels') || {}, '标签')
                 }</div>
                 <div className={styles.normal}>{
                   popoverItem(getDeepValue(data, 'spec.selector.matchLabels') || {}, 'pod selector')
@@ -233,7 +250,7 @@ class DetailHeader extends React.PureComponent {
                   popoverItem(getDeepValue(data, 'metadata.annotations') || {}, '注释')
                 }</div>
                 <div className={styles.normal}>{
-                  popoverItem(getDeepValue(data, 'metadata.labels'), '标签')
+                  popoverItem(getDeepValue(data, 'metadata.labels') || {}, '标签')
                 }</div>
                 <div className={styles.normal}>{
                   popoverItem(getDeepValue(data, 'spec.nodeSelector') || {}, 'node selector')
@@ -245,7 +262,7 @@ class DetailHeader extends React.PureComponent {
               type === 'Job' &&
               <React.Fragment>
                 <div className={styles.normal}>运行: {
-                  getDeepValue(data, 'status.active') || 0
+                  this.renderJobActive(data)
                 }</div>
                 <div className={styles.normal}>并行: {getDeepValue(data, 'spec.parallelism') || 0}</div>
                 <div className={styles.normal}>完成: {getDeepValue(data, 'status.succeeded') || 0}</div>
@@ -256,6 +273,19 @@ class DetailHeader extends React.PureComponent {
               type === 'CronJob' &&
               <React.Fragment>
                 <div className={styles.normal}>触发规则: {getDeepValue(data, 'spec.schedule') || '--'}</div>
+                <div className={styles.normal}>创建时间: {
+                  moment(getDeepValue(data, 'metadata.creationTimestamp')).format(DEFAULT_TIME_FORMAT)
+                }</div>
+              </React.Fragment>
+            }
+            {
+              type === 'Service' &&
+              <React.Fragment>
+                <div className={styles.normal}>{
+                  popoverItem(getDeepValue(data, 'metadata.labels') || {}, '标签')
+                }
+                </div>
+                <div className={styles.normal}>标签选择器: {getDeepValue(data, 'spec.schedule') || '--'}</div>
                 <div className={styles.normal}>创建时间: {
                   moment(getDeepValue(data, 'metadata.creationTimestamp')).format(DEFAULT_TIME_FORMAT)
                 }</div>

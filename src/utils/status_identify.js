@@ -10,6 +10,7 @@
  */
 import cloneDeep from 'lodash/cloneDeep'
 import { TENX_MARK } from './constants'
+import { getServiceStatus } from './helper'
 const CONTAINER_MAX_RESTART_COUNT = 5
 
 /*
@@ -253,4 +254,32 @@ export function getCronJobStatue(_service) {
     status.phase = 'Stopped'
   }
   return status
+}
+
+export function getStatus(_service, type) {
+  let func
+  switch (type) {
+    case 'StatefulSet':
+      func = getStatefulSetStatus
+      break
+    case 'CronJob':
+      func = getCronJobStatue
+      break
+    case 'Deployment':
+      func = getDeploymentStatus
+      break
+    case 'Pod':
+      func = getPodStatus
+      break
+    case 'Service':
+      func = getServiceStatus
+      break
+    case 'Job':
+      func = getJobStatus
+      break
+    default:
+      func = getStatefulSetStatus
+      break
+  }
+  return func(_service)
 }
