@@ -215,16 +215,20 @@ export function getStatefulSetStatus(_service) {
 export function getJobStatus(_service) {
   const service = cloneDeep(_service)
   const status = { phase: 'null' }
-  const { status: { succeeded, active = [], failed } = {} } = service
+  const { status: { succeeded, active, failed, conditions = [] } = {} } = service
   const { spec: { completions } = {} } = service
-  if (succeeded !== undefined && (succeeded === completions)) {
+  const FailureReason = (conditions[0] || {}).reason || '-'
+  if ((active === 0 || active === undefined) && failed !== undefined && succeeded !== undefined) {
+    status.phase = 'Pending'
+  }
+  if (succeeded !== undefined && completions !== undefined && (succeeded === completions)) {
     status.phase = 'Finish'
   }
-  if (active > 0) {
+  if (active !== undefined && active > 0) {
     status.phase = 'Doing'
   }
-  if (active !== undefined && failed !== undefined &&
-    active === 0 && failed > 0 && succeeded < completions) {
+  if ((active === undefined || active === 0) && failed > 0 &&
+  (succeeded === undefined || (succeeded < completions))) {
     status.phase = 'Failure'
   }
   if (succeeded !== undefined) {
@@ -233,6 +237,7 @@ export function getJobStatus(_service) {
   if (completions !== undefined) {
     status.replicas = completions
   }
+  status.failureReason = FailureReason
   return status
 }
 

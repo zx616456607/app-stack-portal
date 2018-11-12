@@ -41,7 +41,7 @@ function getColumns(self) {
     key: 'name',
     render: (name) => {
       return <Link to={`/StatefulSet/${name}`}>
-      <Ellipsis length={8} title={name}>
+      <Ellipsis length={18} title={name}>
       {name}
     </Ellipsis>
     </Link>
