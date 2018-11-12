@@ -36,6 +36,7 @@ const mapStateToProps = ({ nativeDetail: { pods, type } }) => {
   return {
     data: pods || [],
     cron: type === 'CronJob',
+    type,
   }
 }
 
