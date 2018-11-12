@@ -12,10 +12,13 @@
 import * as React from 'react'
 import { Circle as CircleIcon } from '@tenx-ui/icon'
 import styles from './styles/NativeStatus.less'
+import { Progress } from 'antd'
+import Ellipsis from '@tenx-ui/ellipsis'
 
 export interface Status {
   availableReplicas: number
   replicas: number
+  failureReason?: string | undefined
 }
 
 export interface NativeStatusProps {
@@ -40,50 +43,106 @@ function SwitchToStatus(phase: string) {
   return status
 }
 
-function PodsStatus(status: Status) {
-  const { availableReplicas = 0, replicas = 0 } = status
-  let info = '-'
-  if (availableReplicas === 0) {
-    info = '全部停止'
-  }
-  if (availableReplicas !== 0 && availableReplicas !== replicas) {
-    info = '部分运行'
-  }
-  if (availableReplicas !== 0 && availableReplicas === replicas) {
-    info = '全部运行'
-  }
-  return info
-}
-
-function JobPodsStatus(status: Status) {
-  const info = '已完成'
-  return info
-}
-
+const IconHidden = [ 'Pending' ] // 当处于这些状态的时候, 不显示最前面的icon
 export default class NativeStatus extends React.Component<NativeStatusProps, {}> {
   render() {
-    const { phase, hidePodInfo = false, status: { availableReplicas = 0, replicas = 0 } = {} } = this.props
-    const { type } = this.props
+    const { phase, hidePodInfo = false } = this.props
     const phaseInfo = SwitchToStatus(phase)
     return(
       <div className="NativeStatus">
         <div className={phaseInfo.color}>
-          <CircleIcon/><span className={styles.phaseInfoText}>{phaseInfo.text}</span>
+        {
+          !IconHidden.includes(phase) && <CircleIcon/>
+        }
+          <span className={styles.phaseInfoText}>{phaseInfo.text}</span>
         </div>
         {
-          !hidePodInfo &&
-          <div className={styles.podInfo}>
-            <span>{`${availableReplicas}/${replicas}`}</span>
-            <span className={styles.podInfoText}>
-              {
-                this.props.type === undefined && PodsStatus(this.props.status)
-              }{
-                this.props.type === 'Job' && JobPodsStatus(this.props.status)
-              }
-            </span>
-          </div>
+          !hidePodInfo && this.props.type === undefined &&
+          <PodsStatus status={this.props.status}/>
+        }{
+          !hidePodInfo && this.props.type === 'Job' &&
+          <JobPodsStatus status={this.props.status} phase={phase}/>
         }
       </div>
     )
   }
  }
+
+function PodsStatus({
+  status = {} as Status,
+}) {
+  const { availableReplicas = 0, replicas = 0 } = status
+  let info = '-'
+  if (availableReplicas === 0) {
+      info = '全部停止'
+    }
+  if (availableReplicas !== 0 && availableReplicas !== replicas) {
+      info = '部分运行'
+    }
+  if (availableReplicas !== 0 && availableReplicas === replicas) {
+      info = '全部运行'
+    }
+  return (
+    <div className={styles.podInfo}>
+    <span>{`${availableReplicas}/${replicas}`}</span>
+    <span className={styles.podInfoText}>
+      {info}
+    </span>
+    </div>
+  )
+}
+
+interface JobPodsStatusProps {
+  status: Status;
+  phase: string;
+  failureReason?: string | undefined
+}
+
+interface JobPodsStatusState {
+  percent: number
+}
+class JobPodsStatus extends React.Component<JobPodsStatusProps, JobPodsStatusState> {
+  timer: any
+  state = {
+    percent: 0 as number,
+  }
+  componentDidMount() {
+    this.timer = setInterval(() => {
+      const { percent: innerPercent } = this.state
+      if (innerPercent < 85) {
+       return this.setState({ percent: (innerPercent + 5) })
+      }
+      clearInterval(this.timer)
+    }, 100)
+  }
+  componentWillUnmount() {
+    clearInterval(this.timer)
+  }
+  render () {
+    const { availableReplicas = 0, replicas = 0, failureReason } = this.props.status
+    if (this.props.phase === 'Pending') {
+      return <Progress
+        percent={this.state.percent}
+        strokeColor={'#2db7f5'}
+        strokeWidth={5}
+        showInfo={false}
+      />
+    }
+    if (this.props.phase === 'Failure') {
+      return  <div className={styles.gray}>
+        <Ellipsis length={20} title={failureReason}>
+          {failureReason}
+        </Ellipsis>
+      </div>
+    }
+    const info = '已完成 Pod'
+    return (
+      <div className={styles.podInfo}>
+      <span>{`${availableReplicas}/${replicas}`}</span>
+      <span className={styles.podInfoText}>
+        {info}
+      </span>
+      </div>
+    )
+  }
+}

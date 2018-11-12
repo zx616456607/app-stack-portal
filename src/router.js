@@ -53,6 +53,9 @@ function RouterConfig({ history, app }) {
     path: '/Job',
     exact: true,
     component: () => import('./containers/Job/List'),
+    models: () => [
+      import('./models/nativeResourceList'),
+    ],
   }, {
     path: '/Job/:id',
     exact: false,

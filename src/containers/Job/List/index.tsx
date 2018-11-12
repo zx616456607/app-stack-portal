@@ -41,7 +41,7 @@ function getColumns(self) {
     key: 'name',
     render: (name) => {
       return <Link to={`/Job/${name}`}>
-      <Ellipsis length={8} title={name}>
+      <Ellipsis length={18} title={name}>
       {name}
     </Ellipsis>
     </Link>
@@ -51,9 +51,9 @@ function getColumns(self) {
     dataIndex: 'status',
     key: 'status',
     render: (status) => {
-      const { phase, availableReplicas, replicas } = status
+      const { phase, availableReplicas, replicas, failureReason } = status
       return <NativeStatus
-        status={{ availableReplicas, replicas }}
+        status={{ availableReplicas, replicas, failureReason }}
         phase={phase}
         type={'Job'}
         // hidePodInfo
