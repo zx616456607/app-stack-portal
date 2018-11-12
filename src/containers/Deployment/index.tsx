@@ -43,7 +43,7 @@ function getColumns(self) {
     render: (name, record) => {
       return <div>
       <Link to={`/Deployment/${name}`}>
-      <Ellipsis length={8} title={name}>
+      <Ellipsis length={18} title={name}>
       {name}
     </Ellipsis>
     </Link>
