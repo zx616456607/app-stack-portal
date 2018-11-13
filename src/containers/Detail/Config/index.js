@@ -145,15 +145,35 @@ class Config extends React.PureComponent {
     }
   }
   renderEnvValue = (data, i) => (getDeepValue(data, `spec.containers.${i}.env`) || []).map(
-    item => item.value || (
-      <div>
-        <Tooltip title="加密变量">
-          <SecretIcon className={styles.secretEnvIcon}/>
-        </Tooltip>
-        {getDeepValue(item, 'valueFrom.secretKeyRef.name')}/
-        {getDeepValue(item, 'valueFrom.secretKeyRef.key')}
-      </div>
-    )
+    item => {
+      if (item.value) return item.value
+      // 加密变量secretKeyRef
+      if (getDeepValue(item, 'valueFrom.secretKeyRef')) {
+        return (
+          <div>
+            <Tooltip title="加密变量">
+              <SecretIcon className={styles.secretEnvIcon}/>
+            </Tooltip>
+            {getDeepValue(item, 'valueFrom.secretKeyRef.name')}/
+            {getDeepValue(item, 'valueFrom.secretKeyRef.key')}
+          </div>
+        )
+      }
+      // fieldRef
+      const path = getDeepValue(item, 'valueFrom.fieldRef')
+      if (path) return getDeepValue(data, path.fieldPath) || '--'
+      // resourceFieldRef
+      const resourceFieldRef = getDeepValue(item, 'valueFrom.resourceFieldRef')
+      if (resourceFieldRef) {
+        return getDeepValue(data, `spec.containers.${i}.resources.${resourceFieldRef.resource}`) || '--'
+      }
+      // configMapKeyRef
+      const config = getDeepValue(item, 'valueFrom.configMapKeyRef')
+      if (config) {
+        return `${config.name}/${config.key}`
+      }
+      return '--'
+    }
   ) || []
   getMounts = (data, i) => {
     const res = { name: [], path: [], type: [] }
