@@ -30,6 +30,7 @@ import * as modal from '@tenx-ui/modal'
 import '@tenx-ui/modal/assets/index.css'
 import queryString from 'query-string'
 import Ellipsis from '@tenx-ui/ellipsis'
+import classnames from 'classnames'
 // import styles from './styles/index.less'
 const Search = Input.Search
 
@@ -39,9 +40,10 @@ function getColumns(self) {
     title: '名称',
     dataIndex: 'name',
     key: 'name',
+    className: classnames('table-flex-column', 'ant-col-5'),
     render: (name) => {
       return <Link to={`/StatefulSet/${name}`}>
-      <Ellipsis length={18} title={name}>
+      <Ellipsis title={name}>
       {name}
     </Ellipsis>
     </Link>
@@ -50,6 +52,7 @@ function getColumns(self) {
     title: '状态',
     dataIndex: 'status',
     key: 'status',
+    className: classnames('table-flex-column', 'ant-col-5'),
     render: (status) => {
       const { phase, currentReplicas: availableReplicas, replicas } = status
       return <NativeStatus
@@ -61,6 +64,7 @@ function getColumns(self) {
     title: '镜像',
     dataIndex: 'image',
     key: 'image',
+    className: classnames('table-flex-column', 'ant-col-4'),
     render: (image) => {
       return <ImagePopCard addressList={image}/>
     },
@@ -68,6 +72,7 @@ function getColumns(self) {
     title: '创建时间',
     dataIndex: 'createTime',
     key: 'createTime',
+    className: classnames('table-flex-column', 'ant-col-4'),
     render: time => {
     if (!time) { return <div>-</div> }
     return (
@@ -82,6 +87,7 @@ function getColumns(self) {
     title: '操作',
     dataIndex: 'operation',
     key: 'operation',
+    className: classnames('table-flex-column', 'ant-col-6'),
     render: (_, record) => {
       const dropdown = (
         <Menu className="Moreoperations">
@@ -264,7 +270,9 @@ class StatefulSet extends React.Component<StatefulSetProps, StatefulSetState> {
           onChange={this.onSelect}
         />
         <Pagination
-          total={this.state.StatefulSetListState.length}
+          total={this.state.StatefulSetListState
+            .filter(({ name }) => name.includes(this.state.filter))
+            .length}
           showTotal={_total => `共计${_total}条`}
           pageSize={10}
           // defaultCurrent={t}

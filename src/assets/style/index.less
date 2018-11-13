@@ -165,4 +165,23 @@ body {
       min-height: 200px;
     }
   }
+
+  .table-flex-column {
+    display: block;
+    float: left;
+    height: 66px;
+    & > * {
+      display: flex;
+      align-items: center;
+      height: 100%;
+    }
+    :global {
+      .ant-table-row-indent.indent-level-0 {
+        display: none;
+      }
+    }
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }
 }

@@ -31,6 +31,7 @@ import '@tenx-ui/modal/assets/index.css'
 import queryString from 'query-string'
 import Ellipsis from '@tenx-ui/ellipsis'
 import styles from './styles/index.less';
+import classnames from 'classnames'
 // import styles from './styles/index.less'
 const Search = Input.Search
 
@@ -40,10 +41,11 @@ function getColumns(self) {
     title: '名称',
     dataIndex: 'name',
     key: 'name',
+    className: classnames('table-flex-column', 'ant-col-5'),
     render: (name, record) => {
-      return <div>
+      return <div className={styles.nameWrap}>
       <Link to={`/Deployment/${name}`}>
-      <Ellipsis length={18} title={name}>
+      <Ellipsis title={name}>
       {name}
     </Ellipsis>
     </Link>
@@ -51,7 +53,9 @@ function getColumns(self) {
       record.joinTenxPass === true &&
       <div>
         <Tooltip title={'已加入应用管理'}>
-        <span className={styles.icon}>管</span>
+        <div className={styles.icon}>
+        <div>管</div>
+        </div>
         </Tooltip>
       </div>
     }
@@ -61,6 +65,7 @@ function getColumns(self) {
     title: '状态',
     dataIndex: 'status',
     key: 'status',
+    className: classnames('table-flex-column', 'ant-col-4'),
     render: (status) => {
       const { phase, currentReplicas: availableReplicas, replicas } = status
       return <NativeStatus
@@ -72,6 +77,7 @@ function getColumns(self) {
     title: '镜像',
     dataIndex: 'image',
     key: 'image',
+    className: classnames('table-flex-column', 'ant-col-5'),
     render: (image) => {
       return <ImagePopCard addressList={image}/>
     },
@@ -79,6 +85,7 @@ function getColumns(self) {
     title: '创建时间',
     dataIndex: 'createTime',
     key: 'createTime',
+    className: classnames('table-flex-column', 'ant-col-5'),
     render: time => {
     if (!time) { return <div>-</div> }
     return (
@@ -93,6 +100,7 @@ function getColumns(self) {
     title: '操作',
     dataIndex: 'operation',
     key: 'operation',
+    className: classnames('table-flex-column', 'ant-col-5'),
     render: (_, record) => {
       const dropdown = (
         <Menu className="Moreoperations">
@@ -284,7 +292,9 @@ class Deployment extends React.Component<DeploymentProps, DeploymentState> {
           onChange={this.onSelect}
         />
         <Pagination
-          total={this.state.DeploymentListState.length}
+          total={this.state.DeploymentListState
+            .filter(({ name }) => name.includes(this.state.filter))
+            .length}
           showTotal={_total => `共计${_total}条`}
           pageSize={10}
           // defaultCurrent={t}
