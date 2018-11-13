@@ -45,7 +45,7 @@ function getColumns(self) {
     render: (name, record) => {
       return <div className={styles.nameWrap}>
       <Link to={`/Deployment/${name}`}>
-      <Ellipsis length={18} title={name}>
+      <Ellipsis title={name}>
       {name}
     </Ellipsis>
     </Link>
