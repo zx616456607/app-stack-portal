@@ -27,6 +27,7 @@ import '@tenx-ui/modal/assets/index.css'
 import queryString from 'query-string'
 import Ellipsis from '@tenx-ui/ellipsis'
 import AddressPopCard from '../../../src/components/AddressPopCard'
+import classnames from 'classnames'
 // import styles from './styles/index.less'
 const Search = Input.Search
 
@@ -36,9 +37,10 @@ function getColumns(self) {
     title: '服务名称',
     dataIndex: 'name',
     key: 'name',
+    className: classnames('table-flex-column', 'ant-col-4'),
     render: (name) => {
       return <Link to={`/Service/${name}`}>
-      <Ellipsis length={18} title={name}>
+      <Ellipsis title={name}>
       {name}
     </Ellipsis>
     </Link>
@@ -47,10 +49,12 @@ function getColumns(self) {
     title: '集群 IP',
     dataIndex: 'IP',
     key: 'IP',
+    className: classnames('table-flex-column', 'ant-col-4'),
   }, {
     title: '集群内地址',
     dataIndex: 'CAddress',
     key: 'CAddress',
+    className: classnames('table-flex-column', 'ant-col-4'),
     render: (CAddress) => {
       return <AddressPopCard addressList={CAddress}/>
     },
@@ -58,6 +62,7 @@ function getColumns(self) {
     title: '外部地址',
     dataIndex: 'Address',
     key: 'Address',
+    className: classnames('table-flex-column', 'ant-col-4'),
     render: (Address) => {
       return <AddressPopCard addressList={Address}/>
     },
@@ -65,6 +70,7 @@ function getColumns(self) {
     title: '创建时间',
     dataIndex: 'createTime',
     key: 'createTime',
+    className: classnames('table-flex-column', 'ant-col-4'),
     render: time => {
     if (!time) { return <div>-</div> }
     return (
@@ -79,6 +85,7 @@ function getColumns(self) {
     title: '操作',
     dataIndex: 'operation',
     key: 'operation',
+    className: classnames('table-flex-column', 'ant-col-4'),
     render: (_, record) => {
       const dropdown = (
         <Menu className="Moreoperations">
@@ -272,7 +279,9 @@ class Service extends React.Component<ServiceProps, ServiceState> {
           onChange={this.onSelect}
         />
         <Pagination
-          total={this.state.ServiceListState.length}
+          total={this.state.ServiceListState
+            .filter(({ name }) => name.includes(this.state.filter))
+            .length}
           showTotal={_total => `共计${_total}条`}
           pageSize={10}
           // defaultCurrent={t}
