@@ -17,6 +17,42 @@
 .red {
   color: @error-color;
 }
+.black {
+  color: black;
+}
+.Running, .Doing {
+  color: #65bc2c;
+}
+.Waiting {
+  color: #ffa000;
+}
+.Pending {
+  color: #0b9eeb;
+}
+.Stopped, .Stopping {
+  color: #df582c;
+}
+.Failed {
+  color: #df582c;
+}
+.Initialization {
+  color: #0b9eeb;
+}
+.Terminating, .RollingUpdate, .ScrollRelease {
+  color: #ffa000;
+}
+.Abnormal {
+  color: #65bc2c;
+}
+.Normal {
+  color: #5cb85c;
+}
+.Warning {
+  color: #f85a5a;
+}
+.Succeeded {
+  color: #33b867;
+}
 .phaseInfoText {
   padding-left: @padding-base;
 }
@@ -31,8 +67,11 @@
   color: @font-color-3;
 }
 .NativeStatus {
-  display: block;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
 }
 .middle {
-  margin-top: 6px;
+  margin-top: 8px;
 }

@@ -50,11 +50,17 @@ function getColumns(self) {
     </Ellipsis>
     </Link>
     {
-      record.joinTenxPass === true &&
+      record.joinTenxPass === true ?
       <div>
         <Tooltip title={'已加入应用管理'}>
         <div className={styles.icon}>
         <div>管</div>
+        </div>
+        </Tooltip>
+      </div> : <div>
+        <Tooltip title={'原生创建, 未加入应用管理'}>
+        <div className={styles.NativeIcon}>
+        <div>原</div>
         </div>
         </Tooltip>
       </div>

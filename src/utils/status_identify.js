@@ -17,44 +17,51 @@ const CONTAINER_MAX_RESTART_COUNT = 5
  * Get container status
  * one of [Pending, Running, Terminating, Failed, Unknown, Abnormal]
  */
-export function getPodStatus(container) {
-  const { metadata } = container
-  const { deletionTimestamp } = metadata
-  const status = container.status || { phase: 'Pending' }
-  if (deletionTimestamp) {
-    status.phase = 'Terminating'
+export function getPodStatus(podYaml) {
+  const { status: { phase, startTime, containerStatuses, conditions } = {},
+    metadata: { deletionTimestamp } = {},
+  } = podYaml
+  let restartCountTotal = 0
+  if (containerStatuses !== undefined) {
+    restartCountTotal = containerStatuses
+      .map(({ restartCount }) => restartCount)
+      .reduce((current, total) => current + total, 0)
   }
-  const { conditions, containerStatuses } = status
-  let restartCount = 0
-  let phase = status.phase
-  if (conditions) {
-    conditions.every(condition => {
-      if (condition.type !== 'Ready' && condition.status !== 'True') {
-        phase = 'Pending'
-        return false
+  if (restartCountTotal >= CONTAINER_MAX_RESTART_COUNT) {
+    const flag = containerStatuses.every(({ state }) => state === undefined) ||
+    containerStatuses.every(({ state: { running } = {} }) => running === undefined)
+    if (flag) {
+      return {
+        phase: 'Abnormal',
+        startTime,
       }
-      return true
-    })
-  }
-  if (containerStatuses) {
-    containerStatuses.map(containerStatus => {
-      // const { ready } = containerStatus
-      const containerRestartCount = containerStatus.restartCount
-      if (containerRestartCount > restartCount) {
-        restartCount = containerRestartCount
-        if (!containerStatus.state || !containerStatus.state.running) {
-          // state 不存在或 state 不为 running
-          phase = 'Abnormal'
-        }
-      }
-      return null
-    })
-    if (restartCount >= CONTAINER_MAX_RESTART_COUNT) {
-      status.phase = phase
-      status.restartCount = restartCount
     }
   }
-  return status
+  if (conditions !== undefined) {
+    const flag = conditions.every(({ type }) => type !== 'Ready') &&
+    conditions.every(({ status }) => status !== 'True')
+    if (flag) {
+      return {
+        phase: 'Pending',
+        startTime,
+      }
+    }
+  }
+  if (deletionTimestamp !== undefined) {
+    return {
+      phase: 'Terminating', startTime,
+    }
+  }
+  if (phase !== undefined) {
+    return {
+      phase, startTime,
+    }
+  }
+  if (phase === undefined) {
+    return {
+      phase: 'Pending', startTime,
+    }
+  }
 }
 
 /*
