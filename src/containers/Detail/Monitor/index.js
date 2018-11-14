@@ -31,14 +31,14 @@ const sourceTypeArray = [
 ]
 
 const mapStateToProps = ({
-  app: { cluster, project },
-  nativeDetail: { monitor, realTimeMonitor },
+  app: { cluster },
+  nativeDetail: { monitor, realTimeMonitor, type },
 }) => {
   return {
     cluster,
-    project,
     monitor,
     realTimeMonitor,
+    type,
   }
 }
 
@@ -83,7 +83,7 @@ class Monitor extends React.PureComponent {
   }
 
   getInstanceMetricsByType = type => {
-    const { dispatch, cluster, project, match } = this.props
+    const { dispatch, cluster, match, type: monitorType } = this.props
     const { currentValue } = this.state
     const { id } = match.params
     const query = {
@@ -96,7 +96,7 @@ class Monitor extends React.PureComponent {
         cluster,
         name: id,
         query,
-        namespace: project,
+        type: monitorType,
       },
     })
   }
@@ -119,7 +119,7 @@ class Monitor extends React.PureComponent {
   }
 
   realTimeMonitorFunc = async query => {
-    const { dispatch, cluster, match, project } = this.props
+    const { dispatch, cluster, match, type: monitorType } = this.props
     const { id } = match.params
     return dispatch({
       type: 'nativeDetail/fetchRealTimeMonitor',
@@ -127,7 +127,7 @@ class Monitor extends React.PureComponent {
         cluster,
         name: id,
         query,
-        namespace: project,
+        type: monitorType,
       },
     })
   }
