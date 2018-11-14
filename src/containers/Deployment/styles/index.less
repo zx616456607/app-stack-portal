@@ -9,12 +9,21 @@
  */
  @import '../../../assets/style/core/index.less';
 .icon {
-  display: inline-block;
+  display: flex;
   height: 16px;
   width: 16px;
+  font-size: 10px;
   border-radius: 8px;
   border: 1px solid @success-color;
-  vertical-align: middle;
-  text-align: center;
   color: @success-color;
+  justify-content: center;
+  align-items: center;
+  > div {
+    height: 10px;
+    font-size: 10px;
+    line-height: 10px;
+  }
+}
+.nameWrap {
+  display: block;
 }

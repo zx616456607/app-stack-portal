@@ -14,6 +14,7 @@ import { Circle as CircleIcon } from '@tenx-ui/icon'
 import styles from './styles/NativeStatus.less'
 import { Progress } from 'antd'
 import Ellipsis from '@tenx-ui/ellipsis'
+import classnames from 'classnames'
 
 export interface Status {
   availableReplicas: number
@@ -49,8 +50,8 @@ export default class NativeStatus extends React.Component<NativeStatusProps, {}>
     const { phase, hidePodInfo = false } = this.props
     const phaseInfo = SwitchToStatus(phase)
     return(
-      <div className="NativeStatus">
-        <div className={phaseInfo.color}>
+      <div className={styles.NativeStatus}>
+        <div className={classnames(phaseInfo.color, { [styles.middle]: hidePodInfo })}>
         {
           !IconHidden.includes(phase) && <CircleIcon/>
         }

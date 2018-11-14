@@ -116,6 +116,12 @@ export default {
         to: '/Service',
       },
       {
+        text: 'AppStack',
+        icon: <Icon type="smile" />,
+        key: 'app-stack',
+        to: '/app-stack',
+      },
+      {
         text: 'test',
         icon: <Icon type="bulb" />,
         key: 'test',
