@@ -35,13 +35,26 @@ const getNativeLogs = ({ cluster, body, instances }) => request({
 const getPodEvent = ({ cluster, name }) => request({
   url: `${paasApiUrl}${CLUSTERS}/${cluster}/events/services/${name}/pods/events`,
 })
-const getServiceMonitor = ({ cluster, name, query, namespace }) => {
+const getServiceMonitor = ({ cluster, name, query, project, type }) => {
   query.source = METRICS_DEFAULT_SOURCE
+  let monitorType = 'services'
+  switch (type) {
+    case 'Deployment':
+    case 'StatefulSet':
+      monitorType = 'services'
+      break
+    case 'Job':
+    case 'Pod':
+      monitorType = 'instances'
+      break
+    default:
+      break
+  }
   return request({
-    url: `${paasApiUrl}${CLUSTERS}/${cluster}/metric/services/${name}/metrics?${queryString.stringify(query)}`,
+    url: `${paasApiUrl}${CLUSTERS}/${cluster}/metric/${monitorType}/${name}/metrics?${queryString.stringify(query)}`,
     options: {
       headers: {
-        project: namespace,
+        project,
       },
     },
   })

@@ -385,7 +385,7 @@ const getServiceStatus = _service => {
  * @param {object} data 数据源
  * @return {object} 修改数据中的时间
  */
-const formatInstanceMonitor = data => {
+const formatMonitorName = data => {
   if (isEmpty(data)) {
     return data
   }
@@ -400,6 +400,26 @@ const formatInstanceMonitor = data => {
     })
   })
   return data
+}
+
+/**
+ * 统一 pod 和 service 监控数据格式
+ * @param {object} res 数据源
+ * @param {string} name 服务/pod 名称
+ * @return {object} result data
+ */
+const formatPodMonitor = (res, name) => {
+  const result = {}
+  const metrics = res.metrics || []
+  metrics.forEach(metric => {
+    metric.value && (metric.value = Math.ceil(metric.value * 100) / 100)
+    metric.floatValue && (metric.floatValue = Math.ceil(metric.floatValue * 100) / 100)
+  })
+  res.container_name = name
+  res.metrics = metrics
+  result.data = result.data || []
+  result.data.push(res)
+  return result
 }
 
 /**
@@ -486,7 +506,8 @@ export {
   parseK8sSize,
   getBuildStatusTextAndClass,
   getServiceStatus,
-  formatInstanceMonitor,
+  formatMonitorName,
+  formatPodMonitor,
   cpuFormat,
   memoryFormat,
 }
