@@ -82,12 +82,12 @@ class DetailHeader extends React.PureComponent {
   nativeStatus = () => {
     const { data, type } = this.props
     const { phase, availableReplicas, replicas } = getStatus(data, type)
-    return <NativeStatus
+    return <span className={styles.NativeStatuWrap} ><NativeStatus
       status={{ availableReplicas, replicas }}
       phase={phase}
       type={type}
       hidePodInfo
-    />
+    /></span>
   }
   renderJobActive = data => { // 可能取出 object, 防止页面崩溃
     const act = getDeepValue(data, 'status.active') || 0
