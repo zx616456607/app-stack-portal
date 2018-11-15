@@ -30,6 +30,7 @@ import '@tenx-ui/modal/assets/index.css'
 import queryString from 'query-string'
 import Ellipsis from '@tenx-ui/ellipsis'
 import classnames from 'classnames'
+import compact from 'lodash/compact'
 // import styles from './styles/index.less'
 const Search = Input.Search
 
@@ -201,7 +202,7 @@ class CronJob extends React.Component<CronJobProps, CronJobState> {
         self.props.dispatch({ type: 'NativeResourceList/deleteNativeResourceList', payload })
           .then(() => self.reload())
           .then(() => {
-            notification.success({ message: '删除成功', description: '' })
+            notification.success({ message: '删除操作成功', description: '' })
             self.setState({ selectedRowKeys: [] as string[] })
           })
         .catch(() => notification.error({ message: '删除操作失败', description: '' }))
@@ -223,7 +224,7 @@ class CronJob extends React.Component<CronJobProps, CronJobState> {
         self.props.dispatch({ type: 'NativeResourceList/operationNativeResource', payload })
           .then(() => self.reload())
           .then(() => notification.success({ message: '启动操作成功', description: '' }))
-        .catch(() => notification.error({ message: '启动操作操作失败', description: '' }))
+        .catch(() => notification.error({ message: '启动操作失败', description: '' }))
       },
       onCancel() {},
     })
@@ -241,8 +242,8 @@ class CronJob extends React.Component<CronJobProps, CronJobState> {
       onOk() {
         self.props.dispatch({ type: 'NativeResourceList/operationNativeResource', payload })
           .then(() => self.reload())
-          .then(() => notification.success({ message: '删除操作成功', description: '' }))
-        .catch(() => notification.error({ message: '删除操作操作失败', description: '' }))
+          .then(() => notification.success({ message: '停止操作成功', description: '' }))
+        .catch(() => notification.error({ message: '停止操作失败', description: '' }))
       },
       onCancel() {},
     })
@@ -260,6 +261,15 @@ class CronJob extends React.Component<CronJobProps, CronJobState> {
   onSelect = (e) => {
     if (this.state.currentPage !== 1) { this.setState({ currentPage: 1 }) }
     this.setState({ filter: e.target.value })
+  }
+  onRowClick = (record) => {
+    const currentRowKeys = [...this.state.selectedRowKeys]
+    const index = currentRowKeys.findIndex((keys) => keys === record.name)
+    if (index > -1) {
+      delete currentRowKeys[index]
+      return this.setState({ selectedRowKeys: compact(currentRowKeys) })
+    }
+    this.setState({ selectedRowKeys: [...currentRowKeys, record.name] })
   }
 render() {
   const { history } = this.props
@@ -283,6 +293,7 @@ render() {
         <Button
           onClick={this.delete}
           disabled={this.state.selectedRowKeys.length === 0}
+          icon="delete"
         >
           删除
         </Button>
@@ -311,6 +322,11 @@ render() {
             dataSource={this.selectData()}
             columns={getColumns(self)}
             rowSelection={rowSelection}
+            onRow={(record, index) => {
+              return {
+                onClick: () => this.onRowClick(record),     // 点击行
+              };
+            }}
           />
         </Card>
       </QueueAnim>

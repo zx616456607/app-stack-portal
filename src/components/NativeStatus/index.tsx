@@ -100,7 +100,7 @@ class PodsStatus extends React.Component<NativeStatusProps, JobPodsStatusState> 
     clearInterval(this.timer)
   }
   render() {
-  const { availableReplicas = 0, replicas = 0 } = status
+  const { availableReplicas = 0, replicas = 0 } = this.props.status
   let info = '-'
   if (availableReplicas === 0) {
       info = '全部停止'
