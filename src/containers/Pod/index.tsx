@@ -54,10 +54,11 @@ function getColumns(self) {
     key: 'status',
     className: classnames('table-flex-column', 'ant-col-5'),
     render: (status) => {
-      const { phase, currentReplicas: availableReplicas, replicas } = status
+      const { phase, startTime } = status
       return <NativeStatus
-        status={{ availableReplicas, replicas }}
+        status={{ startTime }}
         phase={phase}
+        type={'Pod'}
       />
     },
   }, {

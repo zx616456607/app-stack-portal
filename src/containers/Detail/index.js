@@ -15,7 +15,7 @@
 import React from 'react'
 import { connect } from 'dva'
 import { Switch, Route, routerRedux } from 'dva/router'
-import { Tabs, notification } from 'antd'
+import { Tabs, notification, Spin } from 'antd'
 import Page from '@tenx-ui/page'
 import DetailHeader from './Header/index'
 import styles from './style/index.less'
@@ -28,6 +28,13 @@ const mapStateToProps = ({ nativeDetail: { type, name } }) => ({ type, name })
 class NativeDetail extends React.PureComponent {
   async componentDidMount() {
     const { match: { params, path }, dispatch } = this.props
+    await dispatch({
+      type: 'nativeDetail/updateState',
+      payload: {
+        type: '',
+        name: '',
+      },
+    })
     await dispatch({
       type: 'nativeDetail/updateState',
       payload: {
@@ -131,6 +138,7 @@ class NativeDetail extends React.PureComponent {
 
   render() {
     const { dispatch, children, location: { pathname }, type, name } = this.props
+    if (!type || !name) return <Spin/>
     const routes = this.getRoutes(type)
     return (
       <div>
