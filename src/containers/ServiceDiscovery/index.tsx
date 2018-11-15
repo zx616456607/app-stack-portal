@@ -28,6 +28,7 @@ import queryString from 'query-string'
 import Ellipsis from '@tenx-ui/ellipsis'
 import AddressPopCard from '../../../src/components/AddressPopCard'
 import classnames from 'classnames'
+import compact from 'lodash/compact'
 // import styles from './styles/index.less'
 const Search = Input.Search
 
@@ -247,6 +248,15 @@ class Service extends React.Component<ServiceProps, ServiceState> {
     if (this.state.currentPage !== 1) { this.setState({ currentPage: 1 }) }
     this.setState({ filter: e.target.value })
   }
+  onRowClick = (record) => {
+    const currentRowKeys = [...this.state.selectedRowKeys]
+    const index = currentRowKeys.findIndex((keys) => keys === record.name)
+    if (index > -1) {
+      delete currentRowKeys[index]
+      return this.setState({ selectedRowKeys: compact(currentRowKeys) })
+    }
+    this.setState({ selectedRowKeys: [...currentRowKeys, record.name] })
+  }
   render() {
     const { history } = this.props
     const rowSelection = {
@@ -269,6 +279,7 @@ class Service extends React.Component<ServiceProps, ServiceState> {
         <Button
           onClick={this.delete}
           disabled={this.state.selectedRowKeys.length === 0}
+          icon="delete"
         >
           删除
         </Button>
@@ -297,6 +308,11 @@ class Service extends React.Component<ServiceProps, ServiceState> {
             dataSource={this.selectData()}
             columns={getColumns(self)}
             rowSelection={rowSelection}
+            onRow={(record, index) => {
+              return {
+                onClick: () => this.onRowClick(record),     // 点击行
+              };
+            }}
           />
         </Card>
       </QueueAnim>

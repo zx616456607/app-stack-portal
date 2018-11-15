@@ -66,12 +66,12 @@ class CreateWorkLoad extends React.Component<CreateWorkLoadProps, any> {
       } catch (e) {
         const { code, reason } = e.response
         if (code === 409 && reason === 'AlreadyExists') {
-          return notification.warn({ message: '该资源已经存在', description: '' })
+          return notification.warn({ message: '该资源已经存在', description: reason })
         }
         if (code === 500) {
-          return notification.warn({ message: 'yaml格式错误', description: '' })
+          return notification.warn({ message: 'yaml格式错误', description: reason })
         }
-        notification.error({ message: '创建失败', description: '' })
+        notification.error({ message: '创建失败', description: reason })
       }
       return
     }
@@ -86,11 +86,11 @@ class CreateWorkLoad extends React.Component<CreateWorkLoadProps, any> {
         notification.success({ message: '更新成功', description: '' })
         setTimeout( () => history.back(), 600)
       } catch (e) {
-        const { code } = e.response
+        const { code, reason } = e.response
         if (code === 500) {
           return notification.warn({ message: 'yaml格式错误', description: '' })
         }
-        notification.success({ message: '更新失败', description: '' })
+        notification.success({ message: '更新失败', description: reason })
       }
     }
   }
