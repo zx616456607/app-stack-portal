@@ -28,6 +28,8 @@ export const METRICS_DISK_READ = 'disk/readio'
 export const METRICS_DISK_WRITE = 'disk/writeio'
 export const UPDATE_INTERVAL = 1000 * 60
 export const REALTIME_INTERVAL = 1000 * 10 // 实时监控
+export const DOCK_DEFAULT_SIZE = 300
+export const DOCK_DEFAULT_HEADER_SIZE = 32
 export const FRESH_FREQUENCY = {
   1: {
     freshInterval: '1分钟',

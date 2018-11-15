@@ -93,6 +93,14 @@ class DetailHeader extends React.PureComponent {
     const act = getDeepValue(data, 'status.active') || 0
     return typeof act === 'object' ? '--' : act
   }
+  loginTerminal = () => {
+    this.props.dispatch({
+      type: 'nativeDetail/updateState',
+      payload: {
+        dockVisible: true,
+      },
+    })
+  }
   render() {
     const { data, dispatch, name, type } = this.props
     if (!data.metadata) return <div/>
@@ -297,7 +305,7 @@ class DetailHeader extends React.PureComponent {
           {
             type === 'Pod' &&
             <Button
-              onClick={() => toYamlEditor(dispatch, name, type)}
+              onClick={() => this.loginTerminal(dispatch, name, type)}
               className={styles.loginTerminal}>登录终端</Button>
           }
           <Button onClick={() => toYamlEditor(dispatch, name, type)} type="primary"> 编辑 Yaml</Button>

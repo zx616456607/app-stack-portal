@@ -25,6 +25,7 @@ import {
 } from '../utils/helper'
 import { getDeepValue } from '../utils/helper'
 import cloneDeep from 'lodash/cloneDeep'
+import { DOCK_DEFAULT_SIZE } from '../utils/constants'
 
 export default {
   namespace: 'nativeDetail',
@@ -37,6 +38,8 @@ export default {
     events: [],
     podDetail: {},
     process: [],
+    dockSize: DOCK_DEFAULT_SIZE,
+    dockVisible: false,
   },
 
   reducers: {

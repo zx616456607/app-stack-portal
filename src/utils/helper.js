@@ -495,6 +495,22 @@ function memoryFormat(resources) {
   }
   return memoryLimits
 }
+
+function utf8_to_b64(str) {
+  return window.btoa(window.unescape(encodeURIComponent(str)));
+}
+
+function b64_to_utf8(str) {
+  // For k8s only
+  str = str.slice(1)
+  try {
+    str = decodeURIComponent(window.escape(window.atob(str)));
+  } catch (error) {
+    str = window.atob(str);
+  }
+  return str;
+}
+
 export {
   delay,
   getType,
@@ -510,5 +526,7 @@ export {
   formatPodMonitor,
   cpuFormat,
   memoryFormat,
+  utf8_to_b64,
+  b64_to_utf8,
 }
 
