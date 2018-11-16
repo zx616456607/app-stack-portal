@@ -19,10 +19,12 @@ import { Tabs, notification, Spin } from 'antd'
 import Page from '@tenx-ui/page'
 import DetailHeader from './Header/index'
 import styles from './style/index.less'
+import Terminal from './Terminal'
 
 const TabPane = Tabs.TabPane
 
-const mapStateToProps = ({ nativeDetail: { type, name } }) => ({ type, name })
+const mapStateToProps = (
+  { nativeDetail: { type, name, dockVisible } }) => ({ type, name, dockVisible })
 
 @connect(mapStateToProps)
 class NativeDetail extends React.PureComponent {
@@ -137,7 +139,7 @@ class NativeDetail extends React.PureComponent {
   }
 
   render() {
-    const { dispatch, children, location: { pathname }, type, name } = this.props
+    const { dispatch, children, location: { pathname }, type, name, dockVisible } = this.props
     if (!type || !name) return <Spin/>
     const routes = this.getRoutes(type)
     return (
@@ -166,6 +168,10 @@ class NativeDetail extends React.PureComponent {
               }
             </Switch>
           </div>
+          {
+            dockVisible &&
+            <Terminal headerContent={<div>终端</div>}/>
+          }
         </Page>
       </div>
     )
