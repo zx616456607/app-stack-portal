@@ -9,7 +9,7 @@
 
 import * as React from 'react'
 import { connect, SubscriptionAPI } from 'dva'
-import { notification, Icon } from 'antd'
+import { notification, Icon, Timeline } from 'antd'
 import styles from './style/index.less'
 import classnames from 'classnames'
 import Ellipsis from '@tenx-ui/ellipsis'
@@ -28,56 +28,54 @@ class Event extends React.Component<EventProps, {}> {
     await dispatch({ type: 'nativeDetail/fetchPodEvent', payload })
       .catch(() => notification.warn({ message: '获取事件出错' }))
   }
+  renderDot = success => (
+    <Icon
+      className={classnames(styles.eventIcon, {
+        [styles.successColor]: success,
+        [styles.errorColor]: !success,
+      })}
+      type={success ? 'check-circle' : 'close-circle'}
+      theme="filled"
+    />
+  )
   renderItem = events => {
     if (!events.length) { return <div>暂无事件</div> }
     return events.map((e, index) => {
       const success = e.type === 'Normal'
       return (
-        <div
-          key={index}
-          className={styles.item}
-        >
-          <div
-            className={classnames(styles.event, {
-              [styles.eventError]: !success,
-            })}
-          >
-            <Icon
-              className={styles.eventIcon}
-              type={success ? 'check-circle' : 'close-circle'}
-              theme="filled"
-            />
-            <div className={styles.reason}>
-              <Ellipsis>{e.reason}</Ellipsis>
+        <Timeline.Item key={index} dot={this.renderDot(success)}>
+          <div className={styles.row}>
+            <div
+              key={index}
+              className={styles.item}
+            >
+              <div
+                className={classnames(styles.event, {
+                  [styles.eventError]: !success,
+                })}
+              >
+                <div className={styles.reason}>
+                  <Ellipsis>{e.reason}</Ellipsis>
+                </div>
+              </div>
+              <div className={styles.eventMsg}>
+                {e.message}
+              </div>
+              <div className={styles.eventTime}>
+                {moment(e.firstSeen).fromNow()}
+              </div>
             </div>
           </div>
-          <div className={styles.eventMsg}>
-            {e.message}
-          </div>
-          <div className={styles.eventTime}>
-            {moment(e.firstSeen).fromNow()}
-          </div>
-        </div>
+        </Timeline.Item>
       )
     })
   }
   render() {
     const { events } = this.props
-    return(
-      <div className={styles.container}>
-        {
-          !!events.length &&
-            <React.Fragment>
-              <div className={styles.leftLine} />
-              <Icon className={styles.leftCheckIcon} type="check-circle" theme="filled" />
-            </React.Fragment>
-        }
-        <div className={styles.right}>
-          {
-            this.renderItem(events)
-          }
-        </div>
-      </div>
+    return (
+      <Timeline>
+        {this.renderItem(events)}
+      </Timeline>
     )
   }
 }

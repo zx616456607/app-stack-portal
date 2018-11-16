@@ -40,7 +40,6 @@ function getColumns(self) {
     title: '名称',
     dataIndex: 'name',
     key: 'name',
-    className: classnames('table-flex-column', 'ant-col-5'),
     render: (name) => {
       return <Link to={`/CronJob/${name}`}>
       <Ellipsis title={name}>
@@ -52,7 +51,6 @@ function getColumns(self) {
     title: '状态',
     dataIndex: 'status',
     key: 'status',
-    className: classnames('table-flex-column', 'ant-col-3'),
     render: (status) => {
       const { phase, availableReplicas, replicas } = status
       return <NativeStatus
@@ -66,18 +64,15 @@ function getColumns(self) {
     dataIndex: 'rule',
     key: 'rule',
     render: (rule)　=> <span>{rule}</span>,
-    className: classnames('table-flex-column', 'ant-col-3'),
   }, {
     title: '正在运行任务数',
     dataIndex: 'podNumber',
     key: 'podNumber',
     render: (podNumber)　=> <span>{podNumber}</span>,
-    className: classnames('table-flex-column', 'ant-col-4'),
   }, {
     title: '创建时间',
     dataIndex: 'createTime',
     key: 'createTime',
-    className: classnames('table-flex-column', 'ant-col-4'),
     render: time => {
     if (!time) { return <div>-</div> }
     return (
@@ -92,7 +87,6 @@ function getColumns(self) {
     title: '操作',
     dataIndex: 'operation',
     key: 'operation',
-    className: classnames('table-flex-column', 'ant-col-5'),
     render: (_, record) => {
       const dropdown = (
         <Menu className="Moreoperations">
@@ -188,10 +182,10 @@ class CronJob extends React.Component<CronJobProps, CronJobState> {
   delete = (name) => {
     const deleteName = this.state.selectedRowKeys.join(',')
     const self = this
-    let info = `您是否确定删除这${this.state.selectedRowKeys.length}个可以删除的 CronJob`
+    let info = `您是否确定删除这${this.state.selectedRowKeys.length}个 CronJob`
     let payload = { cluster: this.props.cluster, type: 'CronJob', name: deleteName }
     if (typeof name === 'string') {
-      info = `您是否确定删除这1个可以删除的 CronJob`
+      info = `您是否确定删除这1个 CronJob`
       payload = { cluster: this.props.cluster, type: 'CronJob', name }
     }
     modal.confirm({
@@ -327,6 +321,7 @@ render() {
                 onClick: () => this.onRowClick(record),     // 点击行
               };
             }}
+            className="table-flex"
           />
         </Card>
       </QueueAnim>
