@@ -31,10 +31,15 @@ const getNativeLogs = ({ cluster, body, instances }) => request({
   },
 })
 
-// 获取 Pod的事件
-const getPodEvent = ({ cluster, name }) => request({
+// 获取 Service的事件
+const getServiceEvent = ({ cluster, name }) => request({
   url: `${paasApiUrl}${CLUSTERS}/${cluster}/events/services/${name}/pods/events`,
 })
+
+const getPodEvent = ({ cluster, name }) => request({
+  url: `${paasApiUrl}${CLUSTERS}/${cluster}/events/instances/${name}/events`,
+})
+
 const getServiceMonitor = ({ cluster, name, query, project, type }) => {
   query.source = METRICS_DEFAULT_SOURCE
   let monitorType = 'services'
@@ -80,9 +85,10 @@ export {
   getNativeDetail,
   getPodsList,
   getNativeLogs,
-  getPodEvent,
+  getServiceEvent,
   getServiceMonitor,
   getProcessList,
   getPodDetail,
   redistributionPod,
+  getPodEvent,
 }

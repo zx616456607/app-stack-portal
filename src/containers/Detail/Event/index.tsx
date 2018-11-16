@@ -18,14 +18,20 @@ import moment from 'moment'
 interface EventProps extends SubscriptionAPI {
   cluster: string;
   name: string;
+  type: string;
   events: any[];
 }
 
 class Event extends React.Component<EventProps, {}> {
   async componentDidMount() {
-    const { dispatch, name, cluster } = this.props
+    const { dispatch, name, cluster, type } = this.props
     const payload = { cluster, name }
-    await dispatch({ type: 'nativeDetail/fetchPodEvent', payload })
+    if (type === 'Pod')  {
+      await dispatch({ type: 'nativeDetail/fetchPodEvent', payload })
+        .catch(() => notification.warn({ message: '获取事件出错' }))
+      return
+    }
+    await dispatch({ type: 'nativeDetail/fetchServiceEvent', payload })
       .catch(() => notification.warn({ message: '获取事件出错' }))
   }
   renderDot = success => (
@@ -82,7 +88,7 @@ class Event extends React.Component<EventProps, {}> {
 
 function mapStateToProps(state) {
   const { app: { cluster = '' } = {} } = state
-  const { nativeDetail: { name = '', events = [] } = {} } = state
-  return { cluster, name, events }
+  const { nativeDetail: { name = '', events = [], type } = {} } = state
+  return { cluster, name, events, type }
 }
 export default connect(mapStateToProps)(Event)
