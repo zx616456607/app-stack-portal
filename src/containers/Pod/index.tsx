@@ -87,33 +87,17 @@ function getColumns(self) {
     },
   }, {
     title: '操作',
-    dataIndex: 'operation',
     key: 'operation',
     className: classnames('table-flex-column', 'ant-col-6'),
     render: (_, record) => {
-      const dropdown = (
-        <Menu className="Moreoperations">
-          {/* <Menu.Item key="0" >
-            <span ><i className="fa fa-refresh" /> 水平扩展</span>
-          </Menu.Item> */}
-          <Menu.Item key="1" >
-            <span onClick={() => self.delete(record.name)}>
-              <i className="fa fa-trash-o" />删除</span>
-          </Menu.Item>
-          {/* <Menu.Item key="2" >
-            <span onClick={() => self.start(record.name)} >
-              <i className="fa fa-trash-o" />启动</span>
-          </Menu.Item>
-          <Menu.Item key="3" >
-            <span onClick={() => self.stop(record.name)} >
-              <i className="fa fa-trash-o" />停止</span>
-          </Menu.Item> */}
-        </Menu>
-      );
       return (
         <div className="actionBox commonData">
         <Dropdown.Button
-          overlay={dropdown}
+          overlay={
+            <Menu onClick={e => self.onMenuChange(e.key, _.key}>
+              <Menu.Item key="delete"><div>&nbsp;&nbsp;强制删除&nbsp;&nbsp;</div></Menu.Item>
+              <Menu.Item key="re"><div>&nbsp;&nbsp;重新分配&nbsp;&nbsp;</div></Menu.Item>
+            </Menu>}
           type="ghost"
           onClick={() =>
             history.push(`/createWorkLoad?${queryString.stringify(
@@ -154,6 +138,39 @@ class Pod extends React.Component<PodProps, PodState> {
   }
   componentDidMount() {
     this.reload();
+  }
+  redistributionPod = (name, force) => {
+    const text = force ? '强制删除' : '重新分配'
+    const self = this
+    modal.confirm({
+      modalTitle: `${text}操作`,
+      title: `您是否确定要${text}容器 ${name}?`,
+      async onOk() {
+        const { dispatch } = self.props
+        const res = await dispatch({
+          type: 'NativeResourceList/redistributionPod',
+          payload: {
+            body: {
+              instances: [ name ],
+            },
+            force,
+          },
+        }).catch(() => notification.warn({ message: `${text}失败` }))
+        if (res && res.status === 'Success') {
+          notification.success({ message: `${text}成功` })
+        }
+        self.reload()
+      },
+      onCancel() {},
+    })
+  }
+  onMenuChange = async (key, name) => {
+    if (key === 'delete') {
+      this.redistributionPod(name, 'true')
+    }
+    if (key === 're') {
+      this.redistributionPod(name)
+    }
   }
   reload = async () => {
     try {

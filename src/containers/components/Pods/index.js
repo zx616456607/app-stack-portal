@@ -123,9 +123,8 @@ export default class Pods extends React.PureComponent {
         trigger={[ 'click' ]}
         overlay={
           <Menu onClick={ e => this.onMenuChange(e.key, data.metadata.name)}>
-            <Menu.Item key="export"><div>导出镜像</div></Menu.Item>
-            <Menu.Item key="delete"><div>强制删除</div></Menu.Item>
-            <Menu.Item key="re"><div>重新分配</div></Menu.Item>
+            <Menu.Item key="delete"><div>&nbsp;&nbsp;强制删除&nbsp;&nbsp;</div></Menu.Item>
+            <Menu.Item key="re"><div>&nbsp;&nbsp;重新分配&nbsp;&nbsp;</div></Menu.Item>
           </Menu>}
         onClick={() => {}}
       >
