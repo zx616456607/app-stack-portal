@@ -200,7 +200,7 @@ class Config extends React.PureComponent {
   }
   getDataSource = data => {
     const { containerIndex } = this.state
-    const serverConfig = this.getConfigMap(data, containerIndex)
+    const serverConfig = this.getConfigMap(data, containerIndex) || []
     const mount = this.getMounts(data, containerIndex)
     const res = [{
       header: '基本信息',

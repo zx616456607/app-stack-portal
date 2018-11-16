@@ -16,7 +16,7 @@ import React from 'react'
 import styles from './style/StatefulSetHeader.less'
 import { Button, Popover } from 'antd'
 import { connect } from 'dva'
-import { routerRedux } from 'dva/router'
+import { routerRedux, Link } from 'dva/router'
 import { getDeepValue } from '../../../utils/helper'
 import moment from 'moment'
 import { DEFAULT_TIME_FORMAT } from '../../../utils/constants'
@@ -79,6 +79,26 @@ const getLeftIcon = type => {
 }
 
 class DetailHeader extends React.PureComponent {
+  renderPodOwner = data => {
+    const replicaset = ((getDeepValue(data, 'metadata.ownerReferences') || []).map(item => item.name)).join(',')
+    const resourceOwner = getDeepValue(data, 'metadata.annotations.createController')
+    let type
+    let name
+    if (resourceOwner && typeof resourceOwner === 'string') {
+      const json = JSON.parse(resourceOwner)
+      type = json.kind
+      name = json.name
+    }
+    return (
+      <span>
+        <span>{replicaset}</span>
+        {
+          type && name &&
+          <span>, <Link to={`/${type}/${name}`}>{name}</Link></span>
+        }
+      </span>
+    )
+  }
   nativeStatus = () => {
     const { data, type } = this.props
     const { phase, availableReplicas, replicas } = getStatus(data, type)
@@ -248,11 +268,7 @@ class DetailHeader extends React.PureComponent {
             {
               type === 'Pod' &&
               <React.Fragment>
-                <div className={styles.normal}>owner: {
-                  (
-                    (getDeepValue(data, 'metadata.ownerReferences') || []).map(item => item.name)
-                  ).join(',')
-                }
+                <div className={styles.normal}>owner: { this.renderPodOwner(data) }
                 </div>
                 <div className={styles.normal}>{
                   popoverItem(getDeepValue(data, 'metadata.annotations') || {}, '注释')

@@ -12,65 +12,53 @@
 
 @import '~@/assets/style/core/index.less';
 
-.container {
+.successColor {
+  color: @success-color;
+}
+
+.errorColor {
+  color: @success-color;
+}
+.row {
   display: flex;
+  justify-content: flex-start;
   align-items: center;
-  width: 100%;
-  height: 80vh;
-  .leftLine {
-    height: 100%;
-    border-left: 2px solid @border-color-base;
-  }
-  .leftCheckIcon {
-    background-color: #fff;
-    color: @success-color;
-    font-size: 24px;
-    margin-left: -12px;
-  }
-  .right {
-    height: 100%;
-    width: 100%;
+  margin-bottom: -10px;
+  margin-left: @padding-base;
+  .item {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
     background-color: @background-color;
-    border-radius: @border-radius-base;
-    padding: @padding-large @padding-large * 2;
-    overflow: auto;
-    .item {
+    padding: @padding-base @padding-medium;
+    flex-grow: 2;
+    .event {
       display: flex;
+      align-items: center;
       justify-content: flex-start;
-      align-items: flex-start;
-      margin-bottom: @padding-medium;
-      .event {
-        display: flex;
-        align-items: center;
-        justify-content: flex-start;
-        color: @success-color;
-        .eventIcon {
-          margin-right: @padding-base;
-          margin-top: -@padding-base / 2;
-        }
-        .reason {
-          margin-top: -@padding-base / 2;
-          font-size: 18px;
-          width: 150px;
-          margin-right: @padding-small;
-        }
-      }
-      .eventError {
-        color: @error-color;
-      }
-      .eventMsg {
-        flex-grow: 2;
-        flex-shrink: 1;
-        flex-basis: unset;
+      color: @success-color;
+      .reason {
+        margin-top: -@padding-base / 2;
+        font-size: 18px;
+        width: 150px;
         margin-right: @padding-small;
       }
-      .eventTime {
-        align-self: center;
-        width: 100px;
-        flex-shrink: 0;
-        display: flex;
-        justify-content: flex-end;
-      }
+    }
+    .eventError {
+      color: @error-color;
+    }
+    .eventMsg {
+      flex-grow: 2;
+      flex-shrink: 1;
+      flex-basis: unset;
+      margin-right: @padding-small;
+    }
+    .eventTime {
+      align-self: center;
+      width: 100px;
+      flex-shrink: 0;
+      display: flex;
+      justify-content: flex-end;
     }
   }
 }
