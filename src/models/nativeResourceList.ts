@@ -13,7 +13,7 @@ import {
   getNativeResourceDetail,
   operationNativeResource,
 } from '../services/nativeResourceList'
-import {redistributionPod} from "../services/nativeDetail";
+import { redistributionPod } from '../services/nativeDetail'
 
 export default {
   namespace: 'NativeResourceList',
