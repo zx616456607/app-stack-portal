@@ -41,7 +41,6 @@ function getColumns(self) {
     title: '名称',
     dataIndex: 'name',
     key: 'name',
-    className: classnames('table-flex-column', 'ant-col-5'),
     render: (name) => {
       return <Link to={`/StatefulSet/${name}`}>
       <Ellipsis title={name}>
@@ -53,7 +52,6 @@ function getColumns(self) {
     title: '状态',
     dataIndex: 'status',
     key: 'status',
-    className: classnames('table-flex-column', 'ant-col-5'),
     render: (status) => {
       const { phase, currentReplicas: availableReplicas, replicas } = status
       return <NativeStatus
@@ -65,7 +63,6 @@ function getColumns(self) {
     title: '镜像',
     dataIndex: 'image',
     key: 'image',
-    className: classnames('table-flex-column', 'ant-col-4'),
     render: (image) => {
       return <ImagePopCard addressList={image}/>
     },
@@ -73,7 +70,6 @@ function getColumns(self) {
     title: '创建时间',
     dataIndex: 'createTime',
     key: 'createTime',
-    className: classnames('table-flex-column', 'ant-col-4'),
     render: time => {
     if (!time) { return <div>-</div> }
     return (
@@ -88,7 +84,6 @@ function getColumns(self) {
     title: '操作',
     dataIndex: 'operation',
     key: 'operation',
-    className: classnames('table-flex-column', 'ant-col-6'),
     render: (_, record) => {
       const dropdown = (
         <Menu className="Moreoperations">
@@ -183,10 +178,10 @@ class StatefulSet extends React.Component<StatefulSetProps, StatefulSetState> {
   delete = (name) => {
     const deleteName = this.state.selectedRowKeys.join(',')
     const self = this
-    let info = `您是否确定删除这${this.state.selectedRowKeys.length}个可以删除的 StatefulSet`
+    let info = `您是否确定删除这${this.state.selectedRowKeys.length}个 StatefulSet`
     let payload = { cluster: this.props.cluster, type: 'StatefulSet', name: deleteName }
     if (typeof name === 'string') {
-      info = `您是否确定删除这1个可以删除的 StatefulSet`
+      info = `您是否确定删除这1个 StatefulSet`
       payload = { cluster: this.props.cluster, type: 'StatefulSet', name }
     }
     modal.confirm({
@@ -304,6 +299,7 @@ class StatefulSet extends React.Component<StatefulSetProps, StatefulSetState> {
                 onClick: () => this.onRowClick(record),     // 点击行
               };
             }}
+            className="table-flex"
           />
         </Card>
       </QueueAnim>

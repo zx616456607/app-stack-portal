@@ -165,26 +165,31 @@ body {
       min-height: 200px;
     }
   }
+}
 
-  .table-flex-column {
-    display: block;
-    float: left;
-    height: 66px;
-    & > * {
+:global {
+  .table-flex {
+    tr {
       display: flex;
-      align-items: center;
-      height: 100%;
     }
-    :global {
+    th,td {
+      flex-basis: 30%;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      display: flex;
       .ant-table-row-indent.indent-level-0 {
         display: none;
       }
+      align-items: center;
+      > * {
+        width: 100%;
+      }
     }
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    overflow: hidden;
-    > span {
-      display: inline-block;
+    th[class="ant-table-selection-column"],
+    td[class="ant-table-selection-column"], {
+      // border: 1px solid red !important;
+      flex-basis: 62px;
     }
   }
 }
