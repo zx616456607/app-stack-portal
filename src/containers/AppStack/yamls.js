@@ -1,3 +1,14 @@
+/**
+ * Licensed Materials - Property of tenxcloud.com
+ * (C) Copyright 2018 TenxCloud. All Rights Reserved.
+ */
+
+/**
+ * yamls of appStack
+ *
+ * @author zhangpc
+ * @date 2018-11-16
+ */
 
 export const YAML_SEPARATOR = '---\n'
 /* export const Deployment = `
@@ -111,6 +122,7 @@ metadata:
     name: test
     tenxcloud.com/appName: test
     tenxcloud.com/svcName: test
+    system/appstack: test123
   annotations:
     sidecar.istio.io/inject: 'false'
 spec:
@@ -165,6 +177,7 @@ metadata:
     tenxcloud.com/appName: test
     tenxcloud.com/svcName: test
     name: test
+    system/appstack: test123
   annotations:
     system/lbgroup: none
 spec:

@@ -13,15 +13,16 @@
 import React from 'react'
 import '@tenx-ui/page/assets/index.css'
 import QueueAnim from 'rc-queue-anim'
+import { connect } from 'dva'
 import * as joint from 'jointjs'
 import 'jointjs/dist/joint.css'
 import graphlib from 'graphlib'
 import TenxEditor from '@tenx-ui/editor'
 import 'codemirror/mode/yaml/yaml'
 import '@tenx-ui/editor/assets/index.css'
-// import { Row, Col, List, Avatar } from 'antd'
+import { Button, notification } from 'antd'
 import styles from './style/index.less'
-// import * as yamls from './yamls'
+import * as yamls from './yamls'
 import './shapes'
 
 const RESOURCE_LIST = [
@@ -87,10 +88,16 @@ const RESOURCE_LIST = [
   },
 ]
 
+const mapStateToProps = state => {
+  const { app: { cluster = '' } = {} } = state
+  return { cluster }
+}
+@connect(mapStateToProps)
 export default class AppStack extends React.Component {
   state = {
     yamlStr: undefined,
     yamlObj: {},
+    createBtnLoading: false,
   }
 
   newEmbeds = []
@@ -366,8 +373,52 @@ export default class AppStack extends React.Component {
 
     const resource = new joint.shapes.devs[id](options)
     this.graph.addCells([ resource ])
+    // test only ---begin
+    const { yamlObj } = this.state
+    if (!yamlObj[id] && yamls[id]) {
+      yamlObj[id] = yamls[id]
+      const yamlStr = Object.keys(yamlObj).map(key => yamlObj[key]).join(yamls.YAML_SEPARATOR)
+      this.setState({ yamlObj, yamlStr })
+    }
+    // test only ---end
 
     // console.log('graph.toJSON()', JSON.stringify(this.graph.toJSON()))
+  }
+
+  deployTest = async () => {
+    const { yamlStr, yamlObj } = this.state
+    if (!yamlObj || Object.keys(yamlObj).length !== 3) {
+      return notification.info({
+        message: '请完成设计后再点击创建',
+      })
+    }
+    this.setState({ createBtnLoading: true })
+    const { cluster, dispatch } = this.props
+    try {
+      const name = `test-${Math.floor(Math.random() * 10000)}`
+      const res = await dispatch({
+        type: 'appStack/fetchDeployAppstack',
+        payload: {
+          name,
+          cluster,
+          body: {
+            conent: JSON.stringify(this.graph.toJSON()),
+            k8sManifest: yamlStr,
+          },
+        },
+      })
+      console.warn('res', res)
+      notification.success({
+        message: '创建成功',
+      })
+    } catch (error) {
+      console.warn('error', error)
+      notification.warn({
+        message: '创建失败',
+      })
+    } finally {
+      this.setState({ createBtnLoading: false })
+    }
   }
 
   render() {
@@ -421,6 +472,17 @@ export default class AppStack extends React.Component {
             value={this.state.yamlStr}
             onChange={yamlStr => this.setState({ yamlStr })}
           />
+          <div className={styles.yamlFooter}>
+            <Button
+              type="primary"
+              icon="rocket"
+              size="large"
+              loading={this.state.createBtnLoading}
+              onClick={this.deployTest}
+            >
+            创建 <sup>Beta</sup>
+            </Button>
+          </div>
         </div>
       </QueueAnim>
     )

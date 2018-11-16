@@ -130,6 +130,9 @@ function RouterConfig({ history, app }) {
     {
       path: '/app-stack',
       component: () => import('./containers/AppStack'),
+      models: () => [
+        import('./models/appStack'),
+      ],
     },
   ]
   return (
