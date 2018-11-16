@@ -38,7 +38,6 @@ function getColumns(self) {
     title: '服务名称',
     dataIndex: 'name',
     key: 'name',
-    className: classnames('table-flex-column', 'ant-col-4'),
     render: (name) => {
       return <Link to={`/Service/${name}`}>
       <Ellipsis title={name}>
@@ -50,12 +49,10 @@ function getColumns(self) {
     title: '集群 IP',
     dataIndex: 'IP',
     key: 'IP',
-    className: classnames('table-flex-column', 'ant-col-4'),
   }, {
     title: '集群内地址',
     dataIndex: 'CAddress',
     key: 'CAddress',
-    className: classnames('table-flex-column', 'ant-col-4'),
     render: (CAddress) => {
       return <AddressPopCard addressList={CAddress}/>
     },
@@ -63,7 +60,6 @@ function getColumns(self) {
     title: '外部地址',
     dataIndex: 'Address',
     key: 'Address',
-    className: classnames('table-flex-column', 'ant-col-4'),
     render: (Address) => {
       return <AddressPopCard addressList={Address}/>
     },
@@ -71,7 +67,6 @@ function getColumns(self) {
     title: '创建时间',
     dataIndex: 'createTime',
     key: 'createTime',
-    className: classnames('table-flex-column', 'ant-col-4'),
     render: time => {
     if (!time) { return <div>-</div> }
     return (
@@ -86,7 +81,6 @@ function getColumns(self) {
     title: '操作',
     dataIndex: 'operation',
     key: 'operation',
-    className: classnames('table-flex-column', 'ant-col-4'),
     render: (_, record) => {
       const dropdown = (
         <Menu className="Moreoperations">
@@ -192,10 +186,10 @@ class Service extends React.Component<ServiceProps, ServiceState> {
   delete = (name) => {
     const deleteName = this.state.selectedRowKeys.join(',')
     const self = this
-    let info = `您是否确定删除这${this.state.selectedRowKeys.length}个可以删除的 Service`
+    let info = `您是否确定删除这${this.state.selectedRowKeys.length}个 Service`
     let payload = { cluster: this.props.cluster, type: 'Service', name: deleteName }
     if (typeof name === 'string') {
-      info = `您是否确定删除这1个可以删除的 Service`
+      info = `您是否确定删除这1个 Service`
       payload = { cluster: this.props.cluster, type: 'Service', name }
     }
     modal.confirm({
@@ -313,6 +307,7 @@ class Service extends React.Component<ServiceProps, ServiceState> {
                 onClick: () => this.onRowClick(record),     // 点击行
               };
             }}
+            className="table-flex"
           />
         </Card>
       </QueueAnim>

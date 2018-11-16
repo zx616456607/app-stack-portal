@@ -41,7 +41,6 @@ function getColumns(self) {
     title: '名称',
     dataIndex: 'name',
     key: 'name',
-    className: classnames('table-flex-column', 'ant-col-5'),
     render: (name) => {
       return <Link to={`/Pod/${name}`}>
       <Ellipsis title={name}>
@@ -53,7 +52,6 @@ function getColumns(self) {
     title: '状态',
     dataIndex: 'status',
     key: 'status',
-    className: classnames('table-flex-column', 'ant-col-5'),
     render: (status) => {
       const { phase, startTime } = status
       return <NativeStatus
@@ -66,7 +64,6 @@ function getColumns(self) {
     title: '镜像',
     dataIndex: 'image',
     key: 'image',
-    className: classnames('table-flex-column', 'ant-col-3'),
     render: (image) => {
       return <ImagePopCard addressList={image}/>
     },
@@ -74,7 +71,6 @@ function getColumns(self) {
     title: '创建时间',
     dataIndex: 'createTime',
     key: 'createTime',
-    className: classnames('table-flex-column', 'ant-col-5'),
     render: time => {
     if (!time) { return <div>-</div> }
     return (
@@ -89,7 +85,6 @@ function getColumns(self) {
     title: '操作',
     dataIndex: 'operation',
     key: 'operation',
-    className: classnames('table-flex-column', 'ant-col-6'),
     render: (_, record) => {
       const dropdown = (
         <Menu className="Moreoperations">
@@ -184,10 +179,10 @@ class Pod extends React.Component<PodProps, PodState> {
   delete = (name) => {
     const deleteName = this.state.selectedRowKeys.join(',')
     const self = this
-    let info = `您是否确定删除这${this.state.selectedRowKeys.length}个可以删除的 Pod`
+    let info = `您是否确定删除这${this.state.selectedRowKeys.length}个 Pod`
     let payload = { cluster: this.props.cluster, type: 'Pod', name: deleteName }
     if (typeof name === 'string') {
-      info = `您是否确定删除这1个可以删除的 Pod`
+      info = `您是否确定删除这1个 Pod`
       payload = { cluster: this.props.cluster, type: 'Pod', name }
     }
     modal.confirm({
@@ -305,6 +300,7 @@ class Pod extends React.Component<PodProps, PodState> {
                 onClick: () => this.onRowClick(record),     // 点击行
               };
             }}
+            className="table-flex"
           />
         </Card>
       </QueueAnim>
