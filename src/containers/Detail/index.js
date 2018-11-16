@@ -33,13 +33,6 @@ class NativeDetail extends React.PureComponent {
     await dispatch({
       type: 'nativeDetail/updateState',
       payload: {
-        type: '',
-        name: '',
-      },
-    })
-    await dispatch({
-      type: 'nativeDetail/updateState',
-      payload: {
         type: path.split('/').filter(i => i !== '')[0],
         name: params.id,
       },
@@ -47,6 +40,16 @@ class NativeDetail extends React.PureComponent {
     dispatch({
       type: 'nativeDetail/fetchNativeDetail',
     }).catch(() => notification.warn({ message: '获取应用详情出错' }))
+  }
+  componentWillUnmount() {
+    const { dispatch } = this.props
+    dispatch({
+      type: 'nativeDetail/updateState',
+      payload: {
+        type: '',
+        name: '',
+      },
+    })
   }
   onTabChange = (key, id, dispatch, type) => {
     let _pathname = `/${type}/${id}/${key}`
