@@ -13,7 +13,7 @@
 */
 
 import React from 'react'
-import { Pagination, Table, Dropdown, Menu, Button } from 'antd'
+import { Pagination, Table, Dropdown, Menu, Button, notification } from 'antd'
 import Page from '@tenx-ui/page'
 import Queue from 'rc-queue-anim'
 import { Link } from 'dva/router'
@@ -21,6 +21,7 @@ import moment from 'moment'
 import Ellipsis from '@tenx-ui/ellipsis'
 import { getStatus } from '../../../utils/status_identify'
 import NativeStatus from '../../../components/NativeStatus'
+import { confirm } from '@tenx-ui/modal'
 
 export default class Pods extends React.PureComponent {
   state = {
@@ -30,6 +31,39 @@ export default class Pods extends React.PureComponent {
   componentDidMount() {
     if (window.parent.appStackIframeCallBack) {
       this.iframeCallback = window.parent.appStackIframeCallBack
+    }
+  }
+  redistributionPod = (name, force) => {
+    const text = force ? '强制删除' : '重新分配'
+    const self = this
+    confirm({
+      modalTitle: `${text}操作`,
+      title: `您是否确定要${text}容器 ${name}?`,
+      async onOk() {
+        const { dispatch, refreshPodList } = self.props
+        const res = await dispatch({
+          type: 'nativeDetail/redistributionPod',
+          payload: {
+            body: {
+              instances: [ name ],
+            },
+            force,
+          },
+        }).catch(() => notification.warn({ message: `${text}失败` }))
+        if (res && res.status === 'Success') {
+          notification.success({ message: `${text}成功` })
+        }
+        refreshPodList && refreshPodList()
+      },
+      onCancel() {},
+    })
+  }
+  onMenuChange = async (key, name) => {
+    if (key === 'delete') {
+      this.redistributionPod(name, 'true')
+    }
+    if (key === 're') {
+      this.redistributionPod(name)
     }
   }
   getImages(item) {
@@ -85,13 +119,13 @@ export default class Pods extends React.PureComponent {
       title: '操作',
       width: '15%',
       key: 'action',
-      render: () => <Dropdown.Button
+      render: data => <Dropdown.Button
         trigger={[ 'click' ]}
         overlay={
-          <Menu onClick={ () => {}}>
-            <Menu.Item key="delete"><div>导出镜像</div></Menu.Item>
+          <Menu onClick={ e => this.onMenuChange(e.key, data.metadata.name)}>
+            <Menu.Item key="export"><div>导出镜像</div></Menu.Item>
             <Menu.Item key="delete"><div>强制删除</div></Menu.Item>
-            <Menu.Item key="delete"><div>重新分配</div></Menu.Item>
+            <Menu.Item key="re"><div>重新分配</div></Menu.Item>
           </Menu>}
         onClick={() => {}}
       >

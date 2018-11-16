@@ -18,6 +18,7 @@ import {
   getServiceMonitor,
   getProcessList,
   getPodDetail,
+  redistributionPod,
 } from '../services/nativeDetail'
 import {
   formatMonitorName,
@@ -221,6 +222,15 @@ export default {
           },
         })
       }
+      return res
+    },
+    * redistributionPod({ payload: { body, force } }, { call, select }) {
+      const { app: { cluster } } = yield select(state => state)
+      const res = yield call(redistributionPod, {
+        cluster,
+        body,
+        force,
+      })
       return res
     },
   },

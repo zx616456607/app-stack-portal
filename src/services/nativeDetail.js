@@ -68,6 +68,14 @@ const getPodDetail = ({ cluster, instance }) => request({
   url: `${paasApiUrl}${CLUSTERS}/${cluster}/instances/${instance}/detail`,
 })
 
+const redistributionPod = ({ cluster, body, force }) => request({
+  url: `${paasApiUrl}${CLUSTERS}/${cluster}/instances/batch-delete${force ? '?force=true' : ''}`,
+  options: {
+    method: 'POST',
+    body,
+  },
+})
+
 export {
   getNativeDetail,
   getPodsList,
@@ -76,4 +84,5 @@ export {
   getServiceMonitor,
   getProcessList,
   getPodDetail,
+  redistributionPod,
 }
