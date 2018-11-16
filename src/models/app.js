@@ -33,7 +33,7 @@ const watcher = { type: 'watcher' }
 function* _authorize(_, { select, call, put }) {
   const { locationPathname, locationQuery } = yield select(__ => __.app)
   const {
-    username, token, jwt, project, cluster, onbehalfuser, onbehalfuserid, watchToken,
+    username, token, jwt, project, cluster, onbehalfuser, onbehalfuserid, watchToken, harbor,
     redirect, ...otherQuery
   } = locationQuery
   const { data: jwtToken } = yield call(authService, { username, token, jwt })
@@ -54,6 +54,7 @@ function* _authorize(_, { select, call, put }) {
     payload.cluster = cluster
   }
   if (watchToken) payload.watchToken = watchToken
+  if (harbor) payload.harbor = harbor
   setAuthData(payload)
   yield put({
     type: 'updateState',

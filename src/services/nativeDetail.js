@@ -63,9 +63,17 @@ const getServiceMonitor = ({ cluster, name, query, project, type }) => {
 const getProcessList = ({ cluster, name, query }) => request({
   url: `${paasApiUrl}${CLUSTERS}/${cluster}/instances/${name}/process?${queryString.stringify(query)}`,
 })
-// [GET] http://192.168.1.230:48000/api/v2/clusters/CID-88553dfba3c8/instances/pinpoint-service-f75cfb44b-jcbb6/process?container=pinpoint-hbase&_=I%40F%40lB
+
 const getPodDetail = ({ cluster, instance }) => request({
   url: `${paasApiUrl}${CLUSTERS}/${cluster}/instances/${instance}/detail`,
+})
+
+const redistributionPod = ({ cluster, body, force }) => request({
+  url: `${paasApiUrl}${CLUSTERS}/${cluster}/instances/batch-delete${force ? '?force=true' : ''}`,
+  options: {
+    method: 'POST',
+    body,
+  },
 })
 
 export {
@@ -76,4 +84,5 @@ export {
   getServiceMonitor,
   getProcessList,
   getPodDetail,
+  redistributionPod,
 }

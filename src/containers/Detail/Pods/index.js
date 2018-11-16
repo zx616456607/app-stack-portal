@@ -20,6 +20,9 @@ import { notification } from 'antd'
 
 class PodsContainer extends React.PureComponent {
   componentDidMount() {
+    this.refreshPodList()
+  }
+  refreshPodList = () => {
     const { dispatch } = this.props
     dispatch({
       type: 'nativeDetail/fetchPodsList',
@@ -27,7 +30,7 @@ class PodsContainer extends React.PureComponent {
   }
   render() {
     return (
-      <Pods { ...this.props } />
+      <Pods { ...this.props } refreshPodList={this.refreshPodList}/>
     )
   }
 }

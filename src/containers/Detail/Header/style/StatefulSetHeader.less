@@ -12,48 +12,59 @@
 
 @import '~@/assets/style/core/index.less';
 
-.container {
+.all {
   height: 174px;
   width: 100%;
   background-color: @component-background;
   border-radius: @border-radius-base;
   margin-bottom: 20px;
-  box-sizing: border-box;
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 40px;
-  .left {
-    display: flex;
-    align-items: flex-end;
-    .leftIcon {
-      font-size: 50px;
-      color: @primary-color;
-      align-self: center;
-      cursor: pointer;
-    }
-    .firstColumn {
-      margin-left: @padding-large;
-      .title {
-        font-size: 20px;
-        color: @font-color;
-      }
-      .normal {
-        margin-top: @padding-base;
-        display: flex;
-      }
-    }
-    .secondColumn {
-      margin-left: @padding-large;
-      .normal {
-        margin-top: @padding-base;
-      }
-    }
+  flex-direction: column;
+  justify-content: center;
+  .name {
+    font-size: 20px;
+    color: @font-color;
+    margin-left: 170px;
+    margin-bottom: @padding-base;
   }
-  .rightButtons {
+  .container {
+    box-sizing: border-box;
     display: flex;
-    .loginTerminal {
-      margin-right: @padding-base;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 40px;
+    .left {
+      display: flex;
+      align-items: flex-end;
+      .leftIcon {
+        font-size: 50px;
+        color: @primary-color;
+        align-self: center;
+        cursor: pointer;
+      }
+      .firstColumn {
+        margin-left: @padding-large;
+        .title {
+          font-size: 20px;
+          color: @font-color;
+        }
+        .normal {
+          margin-top: @padding-base;
+          display: flex;
+        }
+      }
+      .secondColumn {
+        margin-left: @padding-large;
+        .normal {
+          margin-top: @padding-base;
+        }
+      }
+    }
+    .rightButtons {
+      display: flex;
+      .loginTerminal {
+        margin-right: @padding-base;
+      }
     }
   }
 }
