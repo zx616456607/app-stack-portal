@@ -14,11 +14,12 @@ import {
   getNativeDetail,
   getPodsList,
   getNativeLogs,
-  getPodEvent,
+  getServiceEvent,
   getServiceMonitor,
   getProcessList,
   getPodDetail,
   redistributionPod,
+  getPodEvent,
 } from '../services/nativeDetail'
 import {
   formatMonitorName,
@@ -109,6 +110,21 @@ export default {
         })
       }
       return res
+    },
+    * fetchServiceEvent({ payload }, { call, put }) {
+      yield put({
+        type: 'updateState',
+        payload: {
+          events: [],
+        },
+      })
+      const resPod = yield call(getServiceEvent, payload)
+      yield put({
+        type: 'updateState',
+        payload: {
+          events: getDeepValue(resPod, 'data.events') || [],
+        },
+      })
     },
     * fetchPodEvent({ payload }, { call, put }) {
       yield put({
