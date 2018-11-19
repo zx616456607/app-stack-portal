@@ -31,6 +31,7 @@
     align-items: center;
     background-color: @background-color;
     padding: @padding-base @padding-medium;
+    border-radius: @border-radius-base;
     flex-grow: 2;
     .event {
       display: flex;
@@ -39,7 +40,7 @@
       color: @success-color;
       .reason {
         margin-top: -@padding-base / 2;
-        font-size: 18px;
+        font-size: 14px;
         width: 150px;
         margin-right: @padding-small;
       }
@@ -52,6 +53,7 @@
       flex-shrink: 1;
       flex-basis: unset;
       margin-right: @padding-small;
+      font-size: 14px;
     }
     .eventTime {
       align-self: center;
