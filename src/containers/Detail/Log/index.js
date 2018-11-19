@@ -66,13 +66,17 @@ class Log extends React.PureComponent {
         </div>
       )
     }
+    if (this.logRef) {
+      this.logRef.clearLogs()
+      this.logRef.writelns(res)
+    }
     return res
   }
   render() {
+    this.getColorLogs()
     return (
       <TenxLogs
         ref={ref => (this.logRef = ref)}
-        logs={this.getColorLogs()}
       />
     )
   }

@@ -145,21 +145,13 @@ export default class Pods extends React.PureComponent {
     this.iframeCallback && this.iframeCallback('redirect', { pathname })
   }
   render() {
-    const { data = [], history, cron } = this.props
+    const { data = [], history, cron, refreshPodList, loading } = this.props
     const { current, size } = this.state
     return (
       <Page>
         <Queue>
           <div className="layout-content-btns" key="btns">
-            {/* <Button type={'primary'} icon={'plus'} >Job</Button>
-            <Button icon={'reload'} >刷新</Button>
-            <Button>启动</Button>
-            <Button>停止</Button>
-            <Button >删除</Button>
-            <Search
-              className="search-style"
-              placeholder={'请输入名称搜索'}
-            /> */}
+            <Button type="primary" icon="reload" onClick={refreshPodList}>刷新</Button>
             <Pagination
               total={data.length}
               showTotal={_total => `共计${_total}条`}
@@ -178,6 +170,7 @@ export default class Pods extends React.PureComponent {
             )}
             columns={this._renderColumn(history, cron, this.iframeCb)}
             pagination={false}
+            loading={loading.effects['nativeDetail/fetchPodsList']}
           />
         </Queue>
       </Page>

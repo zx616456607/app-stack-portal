@@ -122,7 +122,7 @@ export default {
       yield put({
         type: 'updateState',
         payload: {
-          events: getDeepValue(resPod, 'data.events') || [],
+          events: getDeepValue(resPod, 'data.events'.split('.')) || [],
         },
       })
     },
@@ -137,7 +137,7 @@ export default {
       yield put({
         type: 'updateState',
         payload: {
-          events: getDeepValue(resPod, 'data.events') || [],
+          events: getDeepValue(resPod, 'data.events'.split('.')) || [],
         },
       })
     },

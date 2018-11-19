@@ -192,17 +192,12 @@ function toDate(date) {
 /**
  * safely get deep value in a Nested Object or Array
  * @param {object | array} target the obj or array you need to read value from
- * @param {array | string} propsList the propsList you read
+ * @param {array} propsList the propsList you read
  * @return {any} if read error, return null
- * @example getDeepValue(userList, 'group.o.name') // make sure your property name doesn't contain dot (.)
  * @example getDeepValue(userList, ['group', 0, 'name'])
  */
-const getDeepValue = (target, propsList) => {
-  let list = propsList
-  if (typeof propsList === 'string') list = propsList.split('.').filter(i => i !== '')
-  return list.reduce(
-    (result, prop) => ((result && result[prop]) ? result[prop] : null), target)
-}
+const getDeepValue = (target, propsList) => propsList.reduce(
+  (result, prop) => ((result && result[prop]) ? result[prop] : null), target)
 
 /**
  * parse k8s size string to object

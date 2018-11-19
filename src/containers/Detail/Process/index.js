@@ -36,7 +36,7 @@ class ProcessContainer extends React.PureComponent {
         type: 'nativeDetail/fetchProcessList',
         payload: {
           query: {
-            container: getDeepValue(podDetailRes.data, 'spec.containers.0.name'),
+            container: getDeepValue(podDetailRes.data, 'spec.containers.0.name'.split('.')),
           },
         },
       }).catch(() => notification.warn({ message: '获取进程失败' }))

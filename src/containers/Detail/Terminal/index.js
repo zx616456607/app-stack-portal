@@ -133,7 +133,7 @@ export default class Index extends React.Component {
 
   renderWS = () => {
     const { cluster, project, type, name, podDetail } = this.props
-    const container = getDeepValue(podDetail, 'spec.containers.0.name')
+    const container = getDeepValue(podDetail, 'spec.containers.0.name'.split('.'))
     if (type !== 'Pod' || !name || !container) return null
     const protocol = userPortalApi.protocol === 'http' ? 'ws' : 'wss'
     const wsUrl = `${protocol}://${userPortalApi.host}/api/v1/cluster/${
