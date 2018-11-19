@@ -35,8 +35,9 @@ import compact from 'lodash/compact'
 // import styles from './styles/index.less'
 const Search = Input.Search
 
-function getColumns(self) {
+function getColumns(self): Array<any> {
   const { history } = self.props
+  const sortedInfo = self.state.sortedInfo
   const columns = [{
     title: '名称',
     dataIndex: 'name',
@@ -71,6 +72,8 @@ function getColumns(self) {
     title: '创建时间',
     dataIndex: 'createTime',
     key: 'createTime',
+    sorter: () => {},
+    sortOrder: sortedInfo.columnKey === 'createTime' && sortedInfo.order,
     render: time => {
     if (!time) { return <div>-</div> }
     return (
@@ -118,11 +121,16 @@ interface PodListNode {
   status: any;
   imageArray: string[];
 }
+interface SortedInfo {
+  columnKey: string;
+  order: string;
+}
 interface PodState {
   PodListState: PodListNode[];
   selectedRowKeys: Array<string> ;
   filter: string;
   currentPage: number;
+  sortedInfo: SortedInfo;
 }
 class Pod extends React.Component<PodProps, PodState> {
   state = {
@@ -130,6 +138,10 @@ class Pod extends React.Component<PodProps, PodState> {
     selectedRowKeys: [] as Array<string>,
     filter: '',
     currentPage: 1,
+    sortedInfo: {
+      columnKey: 'createTime',
+      order: 'descend',
+    },
   }
   componentDidMount() {
     this.reload();
@@ -184,7 +196,9 @@ class Pod extends React.Component<PodProps, PodState> {
           status: getPodStatus(PodNode),
           image: imageArray,
         }
-      })
+      }).sort(( a, b ) => { return new Date(b.createTime).valueOf() - new Date(a.createTime).valueOf() })
+      this.setState({ PodListState: PodList, currentPage: 1,
+        sortedInfo: { columnKey: 'createTime', order: 'descend' } })
       this.setState({ PodListState: PodList })
     } catch (e) {
       notification.error({ message: '获取Pod列表失败', description: '' })
@@ -261,6 +275,23 @@ class Pod extends React.Component<PodProps, PodState> {
     }
     this.setState({ selectedRowKeys: [...currentRowKeys, record.name] })
   }
+  sort = (_, __, value) => {
+    const { order = 'descend' } = value
+    const sortedInfo = this.state.sortedInfo
+    const newSortedInfo = { ...sortedInfo }
+    newSortedInfo.order = order
+    const PodListState = this.state.PodListState
+    const newPodListState = [...PodListState]
+    if (order === 'descend') {
+      newPodListState.sort((a, b) => { return new Date(b.createTime).valueOf() - new Date(a.createTime).valueOf() })
+    }
+    if (order === 'ascend') {
+      newPodListState.sort((a, b) => { return new Date(a.createTime).valueOf() - new Date(b.createTime).valueOf() })
+    }
+    this.setState({ PodListState: newPodListState,
+                    currentPage: 1,
+                    sortedInfo: newSortedInfo as SortedInfo })
+  }
   render() {
     const { history } = this.props
     const rowSelection = {
@@ -318,6 +349,7 @@ class Pod extends React.Component<PodProps, PodState> {
               };
             }}
             className="table-flex"
+            onChange={this.sort}
           />
         </Card>
       </QueueAnim>

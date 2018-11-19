@@ -34,8 +34,9 @@ import compact from 'lodash/compact'
 // import styles from './styles/index.less'
 const Search = Input.Search
 
-function getColumns(self) {
+function getColumns(self): Array<any> {
   const { history } = self.props
+  const sortedInfo = self.state.sortedInfo
   const columns = [{
     title: '名称',
     dataIndex: 'name',
@@ -73,6 +74,8 @@ function getColumns(self) {
     title: '创建时间',
     dataIndex: 'createTime',
     key: 'createTime',
+    sorter: () => {},
+    sortOrder: sortedInfo.columnKey === 'createTime' && sortedInfo.order,
     render: time => {
     if (!time) { return <div>-</div> }
     return (
@@ -136,11 +139,16 @@ interface CronJobListNode {
   status: any;
   imageArray: string[];
 }
+interface SortedInfo {
+  columnKey: string;
+  order: string;
+}
 interface CronJobState {
   CronJobListState: CronJobListNode[];
   selectedRowKeys: string[];
   filter: string;
   currentPage: number;
+  sortedInfo: SortedInfo;
 }
 class CronJob extends React.Component<CronJobProps, CronJobState> {
   state = {
@@ -148,6 +156,10 @@ class CronJob extends React.Component<CronJobProps, CronJobState> {
     selectedRowKeys: [] as string[],
     filter: '',
     currentPage: 1,
+    sortedInfo: {
+      columnKey: 'createTime',
+      order: 'descend',
+    },
   }
   componentDidMount() {
     this.reload();
@@ -170,8 +182,9 @@ class CronJob extends React.Component<CronJobProps, CronJobState> {
           rule: CronJobNode.spec.schedule,
           podNumber: (getDeepValue(CronJobNode, [ 'status', 'active' ]) || []).length,
         }
-      })
-      this.setState({ CronJobListState: CronJobList })
+      }).sort(( a, b ) => { return new Date(b.createTime).valueOf() - new Date(a.createTime).valueOf() })
+      this.setState({ CronJobListState: CronJobList, currentPage: 1,
+        sortedInfo: { columnKey: 'createTime', order: 'descend' } })
     } catch (e) {
       notification.error({ message: '获取CronJob列表失败', description: '' })
     }
@@ -265,6 +278,23 @@ class CronJob extends React.Component<CronJobProps, CronJobState> {
     }
     this.setState({ selectedRowKeys: [...currentRowKeys, record.name] })
   }
+  sort = (_, __, value) => {
+    const { order = 'descend' } = value
+    const sortedInfo = this.state.sortedInfo
+    const newSortedInfo = { ...sortedInfo }
+    newSortedInfo.order = order
+    const CronJobListState = this.state.CronJobListState
+    const newCronJobListState = [...CronJobListState]
+    if (order === 'descend') {
+      newCronJobListState.sort((a, b) => { return new Date(b.createTime).valueOf() - new Date(a.createTime).valueOf() })
+    }
+    if (order === 'ascend') {
+      newCronJobListState.sort((a, b) => { return new Date(a.createTime).valueOf() - new Date(b.createTime).valueOf() })
+    }
+    this.setState({ CronJobListState: newCronJobListState,
+                    currentPage: 1,
+                    sortedInfo: newSortedInfo as SortedInfo })
+  }
 render() {
   const { history } = this.props
   const rowSelection = {
@@ -322,6 +352,7 @@ render() {
               };
             }}
             className="table-flex"
+            onChange={this.sort}
           />
         </Card>
       </QueueAnim>
