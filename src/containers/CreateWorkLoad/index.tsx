@@ -50,9 +50,11 @@ class CreateWorkLoad extends React.Component<CreateWorkLoadProps, any> {
     }
   }
   createOrEditNative = async () => {
-    const payload = { cluster: this.props.cluster, yaml: this.state.value }
     const { location: { search }  } = this.props
     const config = queryString.parse(search)
+    const urlCluster = config.cluster
+    const cluster = urlCluster === undefined ? this.props.cluster : urlCluster
+    const payload = { cluster, yaml: this.state.value }
     if (!this.state.editflag) { // 创建
       try {
         if (config.type === 'PodSecurityPolicy') {
