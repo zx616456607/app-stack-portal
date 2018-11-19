@@ -31,17 +31,35 @@ const getNativeLogs = ({ cluster, body, instances }) => request({
   },
 })
 
-// 获取 Pod的事件
-const getPodEvent = ({ cluster, name }) => request({
+// 获取 Service的事件
+const getServiceEvent = ({ cluster, name }) => request({
   url: `${paasApiUrl}${CLUSTERS}/${cluster}/events/services/${name}/pods/events`,
 })
-const getServiceMonitor = ({ cluster, name, query, namespace }) => {
+
+const getPodEvent = ({ cluster, name }) => request({
+  url: `${paasApiUrl}${CLUSTERS}/${cluster}/events/instances/${name}/events`,
+})
+
+const getServiceMonitor = ({ cluster, name, query, project, type }) => {
   query.source = METRICS_DEFAULT_SOURCE
+  let monitorType = 'services'
+  switch (type) {
+    case 'Deployment':
+    case 'StatefulSet':
+      monitorType = 'services'
+      break
+    case 'Job':
+    case 'Pod':
+      monitorType = 'instances'
+      break
+    default:
+      break
+  }
   return request({
-    url: `${paasApiUrl}${CLUSTERS}/${cluster}/metric/services/${name}/metrics?${queryString.stringify(query)}`,
+    url: `${paasApiUrl}${CLUSTERS}/${cluster}/metric/${monitorType}/${name}/metrics?${queryString.stringify(query)}`,
     options: {
       headers: {
-        project: namespace,
+        project,
       },
     },
   })
@@ -50,17 +68,27 @@ const getServiceMonitor = ({ cluster, name, query, namespace }) => {
 const getProcessList = ({ cluster, name, query }) => request({
   url: `${paasApiUrl}${CLUSTERS}/${cluster}/instances/${name}/process?${queryString.stringify(query)}`,
 })
-// [GET] http://192.168.1.230:48000/api/v2/clusters/CID-88553dfba3c8/instances/pinpoint-service-f75cfb44b-jcbb6/process?container=pinpoint-hbase&_=I%40F%40lB
+
 const getPodDetail = ({ cluster, instance }) => request({
   url: `${paasApiUrl}${CLUSTERS}/${cluster}/instances/${instance}/detail`,
+})
+
+const redistributionPod = ({ cluster, body, force }) => request({
+  url: `${paasApiUrl}${CLUSTERS}/${cluster}/instances/batch-delete${force ? '?force=true' : ''}`,
+  options: {
+    method: 'POST',
+    body,
+  },
 })
 
 export {
   getNativeDetail,
   getPodsList,
   getNativeLogs,
-  getPodEvent,
+  getServiceEvent,
   getServiceMonitor,
   getProcessList,
   getPodDetail,
+  redistributionPod,
+  getPodEvent,
 }

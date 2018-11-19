@@ -13,6 +13,7 @@ import {
   getNativeResourceDetail,
   operationNativeResource,
 } from '../services/nativeResourceList'
+import { redistributionPod } from '../services/nativeDetail'
 
 export default {
   namespace: 'NativeResourceList',
@@ -35,6 +36,15 @@ export default {
     },
     * operationNativeResource({ payload }, { call }) {
       const res = yield call(operationNativeResource, payload)
+      return res
+    },
+    * redistributionPod({ payload: { body, force } }, { call, select }) {
+      const { app: { cluster } } = yield select(state => state)
+      const res = yield call(redistributionPod, {
+        cluster,
+        body,
+        force,
+      })
       return res
     },
   },

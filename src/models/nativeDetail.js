@@ -14,15 +14,20 @@ import {
   getNativeDetail,
   getPodsList,
   getNativeLogs,
-  getPodEvent,
+  getServiceEvent,
   getServiceMonitor,
   getProcessList,
   getPodDetail,
+  redistributionPod,
+  getPodEvent,
 } from '../services/nativeDetail'
 import {
-  formatInstanceMonitor,
+  formatMonitorName,
+  formatPodMonitor,
 } from '../utils/helper'
 import { getDeepValue } from '../utils/helper'
+import cloneDeep from 'lodash/cloneDeep'
+import { DOCK_DEFAULT_SIZE } from '../utils/constants'
 
 export default {
   namespace: 'nativeDetail',
@@ -35,6 +40,8 @@ export default {
     events: [],
     podDetail: {},
     process: [],
+    dockSize: DOCK_DEFAULT_SIZE,
+    dockVisible: false,
   },
 
   reducers: {
@@ -104,6 +111,21 @@ export default {
       }
       return res
     },
+    * fetchServiceEvent({ payload }, { call, put }) {
+      yield put({
+        type: 'updateState',
+        payload: {
+          events: [],
+        },
+      })
+      const resPod = yield call(getServiceEvent, payload)
+      yield put({
+        type: 'updateState',
+        payload: {
+          events: getDeepValue(resPod, 'data.events') || [],
+        },
+      })
+    },
     * fetchPodEvent({ payload }, { call, put }) {
       yield put({
         type: 'updateState',
@@ -119,34 +141,62 @@ export default {
         },
       })
     },
-    * fetchMonitor({ payload: { cluster, name, query, namespace } }, { call, put, select }) {
-      const res = yield call(getServiceMonitor, { cluster, name, query, namespace })
-      const { nativeDetail: { monitor } } = yield select(state => state)
+    * fetchMonitor({ payload: { cluster, name, query, type } }, { call, put, select }) {
+      const {
+        app: { project },
+      } = yield select(state => state)
+      const res = yield call(getServiceMonitor, { cluster, name, query, project, type })
+      const {
+        nativeDetail: { monitor },
+      } = yield select(state => state)
+      let result = cloneDeep(res)
+      switch (type) {
+        case 'Job':
+        case 'Pod':
+          // Pod 监控信息需要处理数据格式
+          result = formatPodMonitor(res, name)
+          break
+        default:
+          break
+      }
       yield put({
         type: 'updateState',
         payload: {
           monitor: {
             ...monitor,
             [query.type]: {
-              data: formatInstanceMonitor(res.data),
+              data: formatMonitorName(result.data),
             },
           },
         },
       })
     },
     * fetchRealTimeMonitor(
-      { payload: { cluster, name, query, namespace } },
+      { payload: { cluster, name, query, type } },
       { call, put, select }
     ) {
-      const res = yield call(getServiceMonitor, { cluster, name, query, namespace })
+      const {
+        app: { project },
+      } = yield select(state => state)
+      const res = yield call(getServiceMonitor, { cluster, name, query, project, type })
       const { nativeDetail: { realTimeMonitor } } = yield select(state => state)
+      let result = cloneDeep(res)
+      switch (type) {
+        case 'Job':
+        case 'Pod':
+          // Pod 监控信息需要处理数据格式
+          result = formatPodMonitor(res, name)
+          break
+        default:
+          break
+      }
       yield put({
         type: 'updateState',
         payload: {
           realTimeMonitor: {
             ...realTimeMonitor,
             [query.type]: {
-              data: formatInstanceMonitor(res.data),
+              data: formatMonitorName(result.data),
             },
           },
         },
@@ -188,6 +238,15 @@ export default {
           },
         })
       }
+      return res
+    },
+    * redistributionPod({ payload: { body, force } }, { call, select }) {
+      const { app: { cluster } } = yield select(state => state)
+      const res = yield call(redistributionPod, {
+        cluster,
+        body,
+        force,
+      })
       return res
     },
   },

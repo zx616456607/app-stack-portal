@@ -23,96 +23,117 @@ function RouterConfig({ history, app }) {
     app,
     component: () => import('./containers/Error'),
   })
-  const routes = [{
-    path: '/Deployment',
-    component: () => import('./containers/Deployment'),
-    models: () => [
-      import('./models/nativeResourceList'),
-    ],
-  }, {
-    path: '/Deployment/:id',
-    exact: false,
-    component: () => import('./containers/Detail'),
-    models: () => [
-      import('./models/nativeDetail'),
-    ],
-  }, {
-    path: '/StatefulSet',
-    component: () => import('./containers/StatefulSet'),
-    models: () => [
-      import('./models/nativeResourceList'),
-    ],
-  }, {
-    path: '/StatefulSet/:id',
-    exact: false,
-    component: () => import('./containers/Detail'),
-    models: () => [
-      import('./models/nativeDetail'),
-    ],
-  }, {
-    path: '/Job',
-    exact: true,
-    component: () => import('./containers/Job/List'),
-    models: () => [
-      import('./models/nativeResourceList'),
-    ],
-  }, {
-    path: '/Job/:id',
-    exact: false,
-    component: () => import('./containers/Detail'),
-    models: () => [
-      import('./models/nativeDetail'),
-    ],
-  }, {
-    path: '/CronJob',
-    component: () => import('./containers/CronJob/index.tsx'),
-    models: () => [
-      import('./models/nativeResourceList'),
-    ],
-  }, {
-    path: '/CronJob/:id',
-    exact: false,
-    component: () => import('./containers/Detail'),
-    models: () => [
-      import('./models/nativeDetail'),
-    ],
-  }, {
-    path: '/Pod',
-    component: () => import('./containers/Pod/index.tsx'),
-    models: () => [
-      import('./models/nativeResourceList'),
-    ],
-  }, {
-    path: '/Pod/:id',
-    exact: false,
-    component: () => import('./containers/Detail'),
-    models: () => [
-      import('./models/nativeDetail'),
-    ],
-  }, {
-    path: '/Service',
-    component: () => import('./containers/ServiceDiscovery'),
-    models: () => [
-      import('./models/nativeResourceList'),
-    ],
-  }, {
-    path: '/Service/:id',
-    exact: false,
-    component: () => import('./containers/Detail'),
-    models: () => [
-      import('./models/nativeDetail'),
-    ],
-  }, {
-    path: '/test',
-    component: () => import('./containers/Test'),
-  }, {
-    path: '/createWorkLoad',
-    component: () => import('./containers/CreateWorkLoad'),
-    models: () => [
-      import('./models/createNativeResource'),
-      import('./models/nativeResourceList'),
-    ],
-  },
+  const routes = [
+    {
+      path: '/Deployment',
+      component: () => import('./containers/Deployment'),
+      models: () => [
+        import('./models/nativeResourceList'),
+      ],
+    },
+    {
+      path: '/Deployment/:id',
+      exact: false,
+      component: () => import('./containers/Detail'),
+      models: () => [
+        import('./models/nativeDetail'),
+      ],
+    },
+    {
+      path: '/StatefulSet',
+      component: () => import('./containers/StatefulSet'),
+      models: () => [
+        import('./models/nativeResourceList'),
+      ],
+    },
+    {
+      path: '/StatefulSet/:id',
+      exact: false,
+      component: () => import('./containers/Detail'),
+      models: () => [
+        import('./models/nativeDetail'),
+      ],
+    },
+    {
+      path: '/Job',
+      exact: true,
+      component: () => import('./containers/Job/List'),
+      models: () => [
+        import('./models/nativeResourceList'),
+      ],
+    },
+    {
+      path: '/Job/:id',
+      exact: false,
+      component: () => import('./containers/Detail'),
+      models: () => [
+        import('./models/nativeDetail'),
+      ],
+    },
+    {
+      path: '/CronJob',
+      component: () => import('./containers/CronJob/index.tsx'),
+      models: () => [
+        import('./models/nativeResourceList'),
+      ],
+    },
+    {
+      path: '/CronJob/:id',
+      exact: false,
+      component: () => import('./containers/Detail'),
+      models: () => [
+        import('./models/nativeDetail'),
+      ],
+    },
+    {
+      path: '/Pod',
+      component: () => import('./containers/Pod/index.tsx'),
+      models: () => [
+        import('./models/nativeResourceList'),
+      ],
+    },
+    {
+      path: '/Pod/:id',
+      exact: false,
+      component: () => import('./containers/Detail'),
+      models: () => [
+        import('./models/nativeDetail'),
+      ],
+    },
+    {
+      path: '/Service',
+      component: () => import('./containers/ServiceDiscovery'),
+      models: () => [
+        import('./models/nativeResourceList'),
+      ],
+    },
+    {
+      path: '/Service/:id',
+      exact: false,
+      component: () => import('./containers/Detail'),
+      models: () => [
+        import('./models/nativeDetail'),
+      ],
+    },
+    {
+      path: '/test',
+      component: () => import('./containers/Test'),
+    },
+    {
+      path: '/createWorkLoad',
+      component: () => import('./containers/CreateWorkLoad'),
+      models: () => [
+        import('./models/createNativeResource'),
+        import('./models/nativeResourceList'),
+      ],
+    },
+    {
+      path: '/app-stack',
+      component: () => import('./containers/AppStack'),
+      models: () => [
+        import('./models/appStack'),
+      ],
+    },
   ]
   return (
     <ConnectedRouter history={history}>

@@ -15,14 +15,16 @@
 import React from 'react'
 import { connect } from 'dva'
 import { Switch, Route, routerRedux } from 'dva/router'
-import { Tabs, notification } from 'antd'
+import { Tabs, notification, Spin } from 'antd'
 import Page from '@tenx-ui/page'
 import DetailHeader from './Header/index'
 import styles from './style/index.less'
+import Terminal from './Terminal'
 
 const TabPane = Tabs.TabPane
 
-const mapStateToProps = ({ nativeDetail: { type, name } }) => ({ type, name })
+const mapStateToProps = (
+  { nativeDetail: { type, name, dockVisible } }) => ({ type, name, dockVisible })
 
 @connect(mapStateToProps)
 class NativeDetail extends React.PureComponent {
@@ -38,6 +40,16 @@ class NativeDetail extends React.PureComponent {
     dispatch({
       type: 'nativeDetail/fetchNativeDetail',
     }).catch(() => notification.warn({ message: '获取应用详情出错' }))
+  }
+  componentWillUnmount() {
+    const { dispatch } = this.props
+    dispatch({
+      type: 'nativeDetail/updateState',
+      payload: {
+        type: '',
+        name: '',
+      },
+    })
   }
   onTabChange = (key, id, dispatch, type) => {
     let _pathname = `/${type}/${id}/${key}`
@@ -130,7 +142,8 @@ class NativeDetail extends React.PureComponent {
   }
 
   render() {
-    const { dispatch, children, location: { pathname }, type, name } = this.props
+    const { dispatch, children, location: { pathname }, type, name, dockVisible } = this.props
+    if (!type || !name) return <Spin/>
     const routes = this.getRoutes(type)
     return (
       <div>
@@ -158,6 +171,10 @@ class NativeDetail extends React.PureComponent {
               }
             </Switch>
           </div>
+          {
+            dockVisible &&
+            <Terminal headerContent={<div>终端</div>}/>
+          }
         </Page>
       </div>
     )

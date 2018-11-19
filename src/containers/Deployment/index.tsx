@@ -181,7 +181,7 @@ class Deployment extends React.Component<DeploymentProps, DeploymentState> {
     this.reload();
   }
   reload = async () => {
-    const filterString = [ 'tenxcloud.com/appName', 'tenxcloud.com/svcName' ]
+    const filterString = [ 'system/appName', 'system/svcName' ]
     try {
       const payload = { cluster: this.props.cluster , type: 'Deployment' }
       const res =
