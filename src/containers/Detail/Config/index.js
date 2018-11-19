@@ -144,31 +144,31 @@ class Config extends React.PureComponent {
       return configMaps
     }
   }
-  renderEnvValue = (data, i) => (getDeepValue(data, `spec.containers.${i}.env`) || []).map(
+  renderEnvValue = (data, i) => (getDeepValue(data, `spec.containers.${i}.env`.split('.')) || []).map(
     item => {
       if (item.value) return item.value
       // 加密变量secretKeyRef
-      if (getDeepValue(item, 'valueFrom.secretKeyRef')) {
+      if (getDeepValue(item, 'valueFrom.secretKeyRef'.split('.'))) {
         return (
           <div>
             <Tooltip title="加密变量">
               <SecretIcon className={styles.secretEnvIcon}/>
             </Tooltip>
-            {getDeepValue(item, 'valueFrom.secretKeyRef.name')}/
-            {getDeepValue(item, 'valueFrom.secretKeyRef.key')}
+            {getDeepValue(item, 'valueFrom.secretKeyRef.name'.split('.'))}/
+            {getDeepValue(item, 'valueFrom.secretKeyRef.key'.split('.'))}
           </div>
         )
       }
       // fieldRef
-      const path = getDeepValue(item, 'valueFrom.fieldRef')
-      if (path) return getDeepValue(data, path.fieldPath) || '--'
+      const path = getDeepValue(item, 'valueFrom.fieldRef'.split('.'))
+      if (path) return getDeepValue(data, path.fieldPath.split('.')) || '--'
       // resourceFieldRef
-      const resourceFieldRef = getDeepValue(item, 'valueFrom.resourceFieldRef')
+      const resourceFieldRef = getDeepValue(item, 'valueFrom.resourceFieldRef'.split('.'))
       if (resourceFieldRef) {
-        return getDeepValue(data, `spec.containers.${i}.resources.${resourceFieldRef.resource}`) || '--'
+        return getDeepValue(data, `spec.containers.${i}.resources.${resourceFieldRef.resource}`.split('.')) || '--'
       }
       // configMapKeyRef
-      const config = getDeepValue(item, 'valueFrom.configMapKeyRef')
+      const config = getDeepValue(item, 'valueFrom.configMapKeyRef'.split('.'))
       if (config) {
         return `${config.name}/${config.key}`
       }
@@ -178,12 +178,12 @@ class Config extends React.PureComponent {
   getMounts = (data, i) => {
     const res = { name: [], path: [], type: [] }
     const vObj = {}
-    ;(getDeepValue(data, 'spec.volumes') || []).filter(v => v.persistentVolumeClaim).map(
+    ;(getDeepValue(data, 'spec.volumes'.split('.')) || []).filter(v => v.persistentVolumeClaim).map(
       v => (vObj[v.name] = v.persistentVolumeClaim.claimName)
     )
-    const ann = getDeepValue(data, 'metadata.annotations')
+    const ann = getDeepValue(data, 'metadata.annotations'.split('.'))
     if (!Object.keys(vObj).length) return {}
-    ;(getDeepValue(data, `spec.containers.${i}.volumeMounts`) || []).map(mount => {
+    ;(getDeepValue(data, `spec.containers.${i}.volumeMounts`.split('.')) || []).map(mount => {
       if (vObj[mount.name]) {
         res.name.push(vObj[mount.name] || '--')
         res.path.push(mount.mountPath || '--')
@@ -207,23 +207,23 @@ class Config extends React.PureComponent {
       content: [{
         title: '镜像',
         value: (
-          getDeepValue(data, `spec.containers.${containerIndex}.image`)
+          getDeepValue(data, `spec.containers.${containerIndex}.image`.split('.'))
         ) || '--',
       }, {
         title: '所属节点',
-        value: getDeepValue(data, 'status.hostIP') || '--',
+        value: getDeepValue(data, 'status.hostIP'.split('.')) || '--',
       }],
     }, {
       header: '资源配置',
       content: [{
         title: 'CPU',
         value: cpuFormat(
-          getDeepValue(data, `spec.containers.${containerIndex}.resources.requests.memory`),
-          getDeepValue(data, `spec.containers.${containerIndex}.resources`)
+          getDeepValue(data, `spec.containers.${containerIndex}.resources.requests.memory`.split('.')),
+          getDeepValue(data, `spec.containers.${containerIndex}.resources`.split('.'))
         ) || '--',
       }, {
         title: '内存',
-        value: memoryFormat(getDeepValue(data, `spec.containers.${containerIndex}.resources`)),
+        value: memoryFormat(getDeepValue(data, `spec.containers.${containerIndex}.resources`.split('.'))),
       }, {
         title: '系统盘',
         value: '10G',
@@ -232,7 +232,7 @@ class Config extends React.PureComponent {
       header: '环境变量',
       content: [{
         title: '变量名',
-        value: (getDeepValue(data, `spec.containers.${containerIndex}.env`) || []).map(item => item.name || '--') || [],
+        value: (getDeepValue(data, `spec.containers.${containerIndex}.env`.split('.')) || []).map(item => item.name || '--') || [],
       }, {
         title: '变量值',
         value: this.renderEnvValue(data, containerIndex),
@@ -291,7 +291,7 @@ class Config extends React.PureComponent {
             onChange={this.onContainerChange}
             className={styles.slc}>
             {
-              (getDeepValue(data, 'spec.containers') || []).map((container, index) =>
+              (getDeepValue(data, 'spec.containers'.split('.')) || []).map((container, index) =>
                 <Option key={index} value={index}>{container.name}</Option>
               )
             }
