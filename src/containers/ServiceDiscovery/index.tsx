@@ -32,8 +32,9 @@ import compact from 'lodash/compact'
 // import styles from './styles/index.less'
 const Search = Input.Search
 
-function getColumns(self) {
+function getColumns(self): Array<any> {
   const { history } = self.props
+  const sortedInfo = self.state.sortedInfo
   const columns = [{
     title: '服务名称',
     dataIndex: 'name',
@@ -67,6 +68,8 @@ function getColumns(self) {
     title: '创建时间',
     dataIndex: 'createTime',
     key: 'createTime',
+    sorter: () => {},
+    sortOrder: sortedInfo.columnKey === 'createTime' && sortedInfo.order,
     render: time => {
     if (!time) { return <div>-</div> }
     return (
@@ -130,11 +133,16 @@ interface ServiceListNode {
   status: any;
   imageArray: string[];
 }
+interface SortedInfo {
+  columnKey: string;
+  order: string;
+}
 interface ServiceState {
   ServiceListState: ServiceListNode[];
   selectedRowKeys: Array<string> ;
   filter: string;
   currentPage: number;
+  sortedInfo: SortedInfo;
 }
 class Service extends React.Component<ServiceProps, ServiceState> {
   state = {
@@ -142,6 +150,10 @@ class Service extends React.Component<ServiceProps, ServiceState> {
     selectedRowKeys: [] as Array<string>,
     filter: '',
     currentPage: 1,
+    sortedInfo: {
+      columnKey: 'createTime',
+      order: 'descend',
+    },
   }
   componentDidMount() {
     this.reload();
@@ -174,8 +186,9 @@ class Service extends React.Component<ServiceProps, ServiceState> {
           CAddress,
           Address,
         }
-      })
-      this.setState({ ServiceListState: ServiceList })
+      }).sort(( a, b ) => { return new Date(b.createTime).valueOf() - new Date(a.createTime).valueOf() })
+      this.setState({ ServiceListState: ServiceList,
+        sortedInfo: { columnKey: 'createTime', order: 'descend' }, currentPage: 1 })
     } catch (e) {
       notification.error({ message: '获取Service列表失败', description: '' })
     }
@@ -251,6 +264,23 @@ class Service extends React.Component<ServiceProps, ServiceState> {
     }
     this.setState({ selectedRowKeys: [...currentRowKeys, record.name] })
   }
+  sort = (_, __, value) => {
+    const { order = 'descend' } = value
+    const sortedInfo = this.state.sortedInfo
+    const newSortedInfo = { ...sortedInfo }
+    newSortedInfo.order = order
+    const ServiceListState = this.state.ServiceListState
+    const newServiceListState = [...ServiceListState]
+    if (order === 'descend') {
+      newServiceListState.sort((a, b) => { return new Date(b.createTime).valueOf() - new Date(a.createTime).valueOf() })
+    }
+    if (order === 'ascend') {
+      newServiceListState.sort((a, b) => { return new Date(a.createTime).valueOf() - new Date(b.createTime).valueOf() })
+    }
+    this.setState({ ServiceListState: newServiceListState,
+                    currentPage: 1,
+                    sortedInfo: newSortedInfo as SortedInfo })
+  }
   render() {
     const { history } = this.props
     const rowSelection = {
@@ -308,6 +338,7 @@ class Service extends React.Component<ServiceProps, ServiceState> {
               };
             }}
             className="table-flex"
+            onChange={this.sort}
           />
         </Card>
       </QueueAnim>

@@ -36,8 +36,9 @@ import compact from 'lodash/compact'
 // import styles from './styles/index.less'
 const Search = Input.Search
 
-function getColumns(self) {
+function getColumns(self): Array<any> {
   const { history } = self.props
+  const sortedInfo = self.state.sortedInfo
   const columns = [{
     title: '名称',
     dataIndex: 'name',
@@ -89,6 +90,8 @@ function getColumns(self) {
     title: '创建时间',
     dataIndex: 'createTime',
     key: 'createTime',
+    sorter: () => {},
+    sortOrder: sortedInfo.columnKey === 'createTime' && sortedInfo.order,
     render: time => {
     if (!time) { return <div>-</div> }
     return (
@@ -152,11 +155,16 @@ interface DeploymentListNode {
   status: any;
   imageArray: string[];
 }
+interface SortedInfo {
+  columnKey: string;
+  order: string;
+}
 interface DeploymentState {
   DeploymentListState: DeploymentListNode[];
   selectedRowKeys: Array<string> ;
   filter: string;
   currentPage: number;
+  sortedInfo: SortedInfo;
 }
 class Deployment extends React.Component<DeploymentProps, DeploymentState> {
   state = {
@@ -164,6 +172,10 @@ class Deployment extends React.Component<DeploymentProps, DeploymentState> {
     selectedRowKeys: [] as Array<string>,
     filter: '',
     currentPage: 1,
+    sortedInfo: {
+      columnKey: 'createTime',
+      order: 'descend',
+    },
   }
   componentDidMount() {
     this.reload();
@@ -193,8 +205,10 @@ class Deployment extends React.Component<DeploymentProps, DeploymentState> {
           image: imageArray,
           joinTenxPass,
         }
-      })
-      this.setState({ DeploymentListState: DeploymentList })
+      }).sort(( a, b ) => { return new Date(b.createTime).valueOf() - new Date(a.createTime).valueOf() })
+      this.setState({ DeploymentListState: DeploymentList,
+        sortedInfo: { columnKey: 'createTime', order: 'descend' },
+      currentPage: 1 })
     } catch (e) {
       notification.error({ message: '获取Deployment列表失败', description: '' })
     }
@@ -271,6 +285,25 @@ class Deployment extends React.Component<DeploymentProps, DeploymentState> {
     }
     this.setState({ selectedRowKeys: [...currentRowKeys, record.name] })
   }
+  sort = (_, __, value) => {
+    const { order = 'descend' } = value
+    const sortedInfo = this.state.sortedInfo
+    const newSortedInfo = { ...sortedInfo }
+    newSortedInfo.order = order
+    const DeploymentListState = this.state.DeploymentListState
+    const newDeploymentListState = [...DeploymentListState]
+    if (order === 'descend') {
+      newDeploymentListState.sort((a, b) => {
+         return new Date(b.createTime).valueOf() - new Date(a.createTime).valueOf() })
+    }
+    if (order === 'ascend') {
+      newDeploymentListState.sort((a, b) => {
+        return new Date(a.createTime).valueOf() - new Date(b.createTime).valueOf() })
+    }
+    this.setState({ DeploymentListState: newDeploymentListState,
+                    currentPage: 1,
+                    sortedInfo: newSortedInfo as SortedInfo })
+  }
   render() {
     const { history } = this.props
     const rowSelection = {
@@ -327,6 +360,7 @@ class Deployment extends React.Component<DeploymentProps, DeploymentState> {
                 onClick: () => this.onRowClick(record),     // 点击行
               };
             }}
+            onChange={this.sort}
             className="table-flex"
           />
         </Card>

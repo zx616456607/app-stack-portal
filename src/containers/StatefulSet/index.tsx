@@ -35,8 +35,9 @@ import compact from 'lodash/compact'
 // import styles from './styles/index.less'
 const Search = Input.Search
 
-function getColumns(self) {
+function getColumns(self): Array<any> {
   const { history } = self.props
+  const sortedInfo = self.state.sortedInfo
   const columns = [{
     title: '名称',
     dataIndex: 'name',
@@ -70,6 +71,8 @@ function getColumns(self) {
     title: '创建时间',
     dataIndex: 'createTime',
     key: 'createTime',
+    sorter: () => {},
+    sortOrder: sortedInfo.columnKey === 'createTime' && sortedInfo.order,
     render: time => {
     if (!time) { return <div>-</div> }
     return (
@@ -133,11 +136,16 @@ interface StatefulSetListNode {
   status: any;
   imageArray: string[];
 }
+interface SortedInfo {
+  columnKey: string;
+  order: string;
+}
 interface StatefulSetState {
   StatefulSetListState: StatefulSetListNode[];
   selectedRowKeys: Array<string> ;
   filter: string;
   currentPage: number;
+  sortedInfo: SortedInfo;
 }
 class StatefulSet extends React.Component<StatefulSetProps, StatefulSetState> {
   state = {
@@ -145,6 +153,10 @@ class StatefulSet extends React.Component<StatefulSetProps, StatefulSetState> {
     selectedRowKeys: [] as Array<string>,
     filter: '',
     currentPage: 1,
+    sortedInfo: {
+      columnKey: 'createTime',
+      order: 'descend',
+    },
   }
   componentDidMount() {
     this.reload();
@@ -166,8 +178,10 @@ class StatefulSet extends React.Component<StatefulSetProps, StatefulSetState> {
           status: getStatefulSetStatus(StatefulSetNode),
           image: imageArray,
         }
-      })
-      this.setState({ StatefulSetListState: StatefulSetList })
+      }).sort(( a, b ) => { return new Date(b.createTime).valueOf() - new Date(a.createTime).valueOf() })
+      this.setState({ StatefulSetListState: StatefulSetList,
+        sortedInfo: { columnKey: 'createTime', order: 'descend' },
+      currentPage: 1 })
     } catch (e) {
       notification.error({ message: '获取StatefulSet列表失败', description: '' })
     }
@@ -243,6 +257,25 @@ class StatefulSet extends React.Component<StatefulSetProps, StatefulSetState> {
     }
     this.setState({ selectedRowKeys: [...currentRowKeys, record.name] })
   }
+  sort = (_, __, value) => {
+    const { order = 'descend' } = value
+    const sortedInfo = this.state.sortedInfo
+    const newSortedInfo = { ...sortedInfo }
+    newSortedInfo.order = order
+    const StatefulSetListState = this.state.StatefulSetListState
+    const newStatefulSetListState = [...StatefulSetListState]
+    if (order === 'descend') {
+      newStatefulSetListState.sort((a, b) => {
+         return new Date(b.createTime).valueOf() - new Date(a.createTime).valueOf() })
+    }
+    if (order === 'ascend') {
+      newStatefulSetListState.sort((a, b) => {
+        return new Date(a.createTime).valueOf() - new Date(b.createTime).valueOf() })
+    }
+    this.setState({ StatefulSetListState: newStatefulSetListState,
+                    currentPage: 1,
+                    sortedInfo: newSortedInfo as SortedInfo })
+  }
   render() {
     const { history } = this.props
     const rowSelection = {
@@ -300,6 +333,7 @@ class StatefulSet extends React.Component<StatefulSetProps, StatefulSetState> {
               };
             }}
             className="table-flex"
+            onChange={this.sort}
           />
         </Card>
       </QueueAnim>

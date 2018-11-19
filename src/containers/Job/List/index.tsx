@@ -35,8 +35,9 @@ import compact from 'lodash/compact'
 // import styles from './styles/index.less'
 const Search = Input.Search
 
-function getColumns(self) {
+function getColumns(self): Array<any> {
   const { history } = self.props
+  const sortedInfo = self.state.sortedInfo
   const columns = [{
     title: '名称',
     dataIndex: 'name',
@@ -72,6 +73,8 @@ function getColumns(self) {
     title: '创建时间',
     dataIndex: 'createTime',
     key: 'createTime',
+    sorter: () => {},
+    sortOrder: sortedInfo.columnKey === 'createTime' && sortedInfo.order,
     render: time => {
     if (!time) { return <div>-</div> }
     return (
@@ -124,11 +127,16 @@ interface JobListNode {
   status: any;
   imageArray: string[];
 }
+interface SortedInfo {
+  columnKey: string;
+  order: string;
+}
 interface JobState {
   JobListState: JobListNode[];
   selectedRowKeys: string[];
   filter: string;
   currentPage: number;
+  sortedInfo: SortedInfo;
 }
 class Job extends React.Component<JobProps, JobState> {
   state = {
@@ -136,6 +144,10 @@ class Job extends React.Component<JobProps, JobState> {
     selectedRowKeys: [] as string[],
     filter: '',
     currentPage: 1,
+    sortedInfo: {
+      columnKey: 'createTime',
+      order: 'descend',
+    },
   }
   componentDidMount() {
     this.reload();
@@ -157,7 +169,9 @@ class Job extends React.Component<JobProps, JobState> {
           status: getJobStatus(JobNode),
           image: imageArray,
         }
-      })
+      }).sort(( a, b ) => { return new Date(b.createTime).valueOf() - new Date(a.createTime).valueOf() })
+      this.setState({ JobListState: JobList, currentPage: 1,
+        sortedInfo: { columnKey: 'createTime', order: 'descend' } })
       this.setState({ JobListState: JobList })
     } catch (e) {
       notification.error({ message: '获取Job列表失败', description: '' })
@@ -234,6 +248,23 @@ class Job extends React.Component<JobProps, JobState> {
     }
     this.setState({ selectedRowKeys: [...currentRowKeys, record.name] })
   }
+  sort = (_, __, value) => {
+    const { order = 'descend' } = value
+    const sortedInfo = this.state.sortedInfo
+    const newSortedInfo = { ...sortedInfo }
+    newSortedInfo.order = order
+    const JobListState = this.state.JobListState
+    const newJobListState = [...JobListState]
+    if (order === 'descend') {
+      newJobListState.sort((a, b) => { return new Date(b.createTime).valueOf() - new Date(a.createTime).valueOf() })
+    }
+    if (order === 'ascend') {
+      newJobListState.sort((a, b) => { return new Date(a.createTime).valueOf() - new Date(b.createTime).valueOf() })
+    }
+    this.setState({ JobListState: newJobListState,
+                    currentPage: 1,
+                    sortedInfo: newSortedInfo as SortedInfo })
+  }
   render() {
     const { history } = this.props
     const rowSelection = {
@@ -291,6 +322,7 @@ class Job extends React.Component<JobProps, JobState> {
               };
             }}
             className="table-flex"
+            onChange={this.sort}
           />
         </Card>
       </QueueAnim>
