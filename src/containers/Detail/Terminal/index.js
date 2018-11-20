@@ -37,10 +37,15 @@ export default class Index extends React.Component {
   static propTypes = {
     headerContent: PropTypes.element,
   }
+  consts = {
+    isConnecting: '终端连接中...',
+    timeout: '连接超时',
+    connectStop: '连接已断开',
+  }
   state = {
     showSocket: false,
     connected: false,
-    termMsg: 'fuck yourself',
+    termMsg: this.consts.isConnecting,
     tipHasKnow: false,
   }
   componentDidMount() {
@@ -48,8 +53,17 @@ export default class Index extends React.Component {
     this.setState({
       showSocket: true,
     })
+    this.wsTimeout = setTimeout(() => {
+      this.setState({
+        termMsg: this.consts.timeout,
+      })
+    }, 10 * 1000)
   }
   componentWillUnmount() {
+    this.wsTimeout && clearTimeout(this.wsTimeout)
+    const term = this.xterm.xterm
+    if (term) term.destroy()
+    delete this.xterm
   }
   renderHeader = () => {
     const { headerContent = null, dockSize } = this.props
@@ -106,6 +120,24 @@ export default class Index extends React.Component {
     )
   }
   renderMsg = () => {
+    const { termMsg } = this.state
+    if (termMsg) {
+      return (
+        <span className={styles.termMsg}>
+          <div className={styles.webLoadingBox}>
+            {
+              termMsg === this.consts.isConnecting &&
+              <React.Fragment>
+                <span className={styles.terIcon}/>
+                <span className={styles.terIcon}/>
+                <span className={styles.terIcon}/>
+              </React.Fragment>
+            }
+            <span>{termMsg}</span>
+          </div>
+        </span>
+      )
+    }
     return null
   }
   updateState = payload => this.props.dispatch({
@@ -121,6 +153,10 @@ export default class Index extends React.Component {
     const that = this
     const term = this.xterm.xterm
     ws.onmessage = message => {
+      this.wsTimeout && clearTimeout(this.wsTimeout)
+      this.state.termMsg && this.setState({
+        termMsg: '',
+      })
       const msg = b64_to_utf8(message.data)
       // 终端 exit
       if (encodeURI(msg) === '%0D%0Aexit%0D%0A') {
@@ -134,8 +170,8 @@ export default class Index extends React.Component {
         })
       }
     }
-    ws.addEventListener('close', function() {
-      that.setState({ termMsg: '连接已断开' })
+    ws.addEventListener('close', () => {
+      that.setState({ termMsg: that.consts.connectStop })
     })
     term.attach(ws)
     term.setOption('fontFamily', '"Monospace Regular", "DejaVu Sans Mono", Menlo, Monaco, Consolas, monospace')
