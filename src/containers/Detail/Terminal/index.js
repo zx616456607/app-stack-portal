@@ -105,8 +105,8 @@ export default class Index extends React.Component {
     return (
       <span className={styles.warningTip}>
         <span>
-          <span>由于容器本身无状态且不可变的特性，以防容器销毁后，对容器内部做的改动无法保留，</span>
-          <span className={styles.notModify}>建议不要直接修改容器中内容（有状态容器中存储映射出来的目录除外）</span>
+          <span>由于Pod本身无状态且不可变的特性，以防Pod销毁后，对Pod内部做的改动无法保留，</span>
+          <span className={styles.notModify}>建议不要直接修改Pod中内容（有状态的Pod中存储映射出来的目录除外）</span>
         </span>
         <span>
           <Button
