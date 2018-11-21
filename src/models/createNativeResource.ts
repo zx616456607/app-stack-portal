@@ -13,6 +13,9 @@ import {
   updateNativeResource,
   createPSP,
   updatePSP,
+  createStack,
+  loadStackDetail,
+  loadStackList,
 } from '../services/createNativeResource'
 
 export default {
@@ -36,6 +39,18 @@ export default {
     },
     * updatePSP({ payload }, { call }) {
       const res = yield call(updatePSP, payload)
+      return res
+    },
+    * createStack({ payload }, { call }) {
+      const res = yield call(createStack, payload)
+      return res
+    },
+    * loadStackDetail({ payload }, { call }) {
+      const res = yield call(loadStackDetail, payload)
+      return res
+    },
+    * loadStackList({ payload }, { call }) {
+      const res = yield call(loadStackList, payload)
       return res
     },
   },

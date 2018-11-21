@@ -1,0 +1,55 @@
+/*
+ * Licensed Materials - Property of tenxcloud.com
+ * (C) Copyright 2018 TenxCloud. All Rights Reserved.
+ * ----
+ * editor.less page
+ *
+ * @author zhangtao
+ * @date Wednesday November 21st 2018
+ */
+@import "../../../assets/style/core/index.less";
+.operationBar {
+  padding: @padding-base 0;
+  background-color: #333;
+  > div {
+    margin: 0 auto;
+    width: 150px;
+    > button:first-child {
+      margin-right: 30px;
+    }
+  }
+  .darkButton {
+    background-color: #333;
+    color: white;
+  }
+}
+
+.editor {
+  :global {
+    .CodeMirror {
+      border-radius: 0 !important;
+      height: calc(100vh - 28px);
+    }
+  }
+}
+.editor.fullScreen {
+  :global {
+    .CodeMirror {
+      height: 100vh !important;
+    }
+  }
+}
+.editHeader {
+  height: 40px;
+  display: flex;
+  background-color: #333;
+  justify-content: flex-end;
+  align-items: center;
+  color: @primary-color;
+  .editIcon {
+    padding: @padding-base;
+  }
+  .editIcon:last-child {
+    padding-right: @padding-small;
+  }
+}

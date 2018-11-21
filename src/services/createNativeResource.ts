@@ -10,7 +10,7 @@
 import request from '../utils/request'
 import { paasApiUrl } from '../utils/config'
 // import { encodeImageFullname } from '../utils/helper'
-// import queryString from 'query-string'
+import queryString from 'query-string'
 
 // 符合yaml格式的string
 type yamlString = string
@@ -51,4 +51,41 @@ export const updatePSP = ({ cluster, yaml }: GetClusters) => request({
     method: 'PUT',
     body: yaml,
   },
+})
+
+interface CreateStack {
+  obj: {
+    is_public: number;
+    content: yamlString;
+    name: string;
+    description: string;
+  }
+}
+export const createStack = ({ obj }: CreateStack) => request({
+  url: `${paasApiUrl}/templates`,
+  options: {
+    method: 'POST',
+    body: {
+      'is_public': obj.is_public,
+      'content': obj.content,
+      'name': obj.name,
+      'description': obj.description,
+    },
+  },
+})
+
+interface LoadStackDetail {
+  id: string
+}
+export const loadStackDetail = ({ id }: LoadStackDetail) => request({
+  url: `${paasApiUrl}/templates/${id}`,
+})
+
+interface LoadStackList {
+  from: number;
+  size: number;
+  filter: string
+}
+export const loadStackList = (query: LoadStackList) => request({
+  url: `${paasApiUrl}/templates?${queryString.stringify(query)}`,
 })
