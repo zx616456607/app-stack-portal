@@ -190,7 +190,7 @@ class Service extends React.Component<ServiceProps, ServiceState> {
       this.setState({ ServiceListState: ServiceList,
         sortedInfo: { columnKey: 'createTime', order: 'descend' }, currentPage: 1 })
     } catch (e) {
-      notification.error({ message: '获取Service列表失败', description: '' })
+      notification.warn({ message: '获取Service列表失败', description: '' })
     }
   }
   onSelectChange = selectedRowKeys => {
@@ -216,7 +216,7 @@ class Service extends React.Component<ServiceProps, ServiceState> {
             notification.success({ message: '删除成功', description: '' })
             self.setState({ selectedRowKeys: [] as string[] })
           })
-        .catch(() => notification.error({ message: '删除操作失败', description: '' }))
+        .catch(() => notification.warn({ message: '删除操作失败', description: '' }))
       },
       onCancel() {},
     })

@@ -201,7 +201,7 @@ class Pod extends React.Component<PodProps, PodState> {
         sortedInfo: { columnKey: 'createTime', order: 'descend' } })
       this.setState({ PodListState: PodList })
     } catch (e) {
-      notification.error({ message: '获取Pod列表失败', description: '' })
+      notification.warn({ message: '获取Pod列表失败', description: '' })
     }
   }
   onSelectChange = selectedRowKeys => {
@@ -227,7 +227,7 @@ class Pod extends React.Component<PodProps, PodState> {
             notification.success({ message: '删除成功', description: '' })
             self.setState({ selectedRowKeys: [] as string[] })
           })
-        .catch(() => notification.error({ message: '删除操作失败', description: '' }))
+        .catch(() => notification.warn({ message: '删除操作失败', description: '' }))
       },
       onCancel() {},
     })
