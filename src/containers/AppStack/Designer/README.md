@@ -3,6 +3,3 @@
 
 h5 drag api 已实现
 
-## 2.joint js 相关内容整理
-
-

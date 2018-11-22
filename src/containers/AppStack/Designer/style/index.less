@@ -9,7 +9,7 @@
  * @author zhangpc
  * @date 2018-11-16
  */
-@import '../../../assets/style/core/index.less';
+@import '../../../../assets/style/core/index.less';
 
 :global {
   #app-stack-paper {
@@ -121,12 +121,22 @@
       }
     }
     .graph {
-      // position: relative;
-      height: 600px;
-      border: 1px solid @border-color-base;
+      display: flex;
+      flex-direction: column;
       flex-grow: 2;
-      background-color: #fff;
-      border-radius: @border-radius-base;
+      .toolBar {
+        & > * {
+          margin-right: @padding-base;
+        }
+        margin-bottom: @padding-small;
+      }
+      .paper {
+        height: 600px;
+        width: 100%;
+        border: 1px solid @border-color-base;
+        background-color: #fff;
+        border-radius: @border-radius-base;
+      }
     }
   }
   .yaml {

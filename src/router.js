@@ -129,7 +129,21 @@ function RouterConfig({ history, app }) {
     },
     {
       path: '/app-stack',
-      component: () => import('./containers/AppStack'),
+      component: () => import('./containers/AppStack/StackApps'),
+      models: () => [
+        import('./models/appStack'),
+      ],
+    },
+    {
+      path: '/app-stack/templates',
+      component: () => import('./containers/AppStack/Templates'),
+      models: () => [
+        import('./models/appStack'),
+      ],
+    },
+    {
+      path: '/app-stack/designer',
+      component: () => import('./containers/AppStack/Designer'),
       models: () => [
         import('./models/appStack'),
       ],

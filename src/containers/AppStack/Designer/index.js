@@ -21,10 +21,14 @@ import TenxEditor from '@tenx-ui/editor'
 import 'codemirror/mode/yaml/yaml'
 import '@tenx-ui/editor/assets/index.css'
 import { Button, notification } from 'antd'
+import $ from 'jquery'
 import styles from './style/index.less'
 import * as yamls from './yamls'
 import './shapes'
 
+const PAPER_SCALE_MAX = 5
+const PAPER_SCALE_MIN = 0.2
+const PAPER_SCALE_STEP = 0.1
 const RESOURCE_LIST = [
   {
     id: 'Application',
@@ -98,6 +102,7 @@ export default class AppStack extends React.Component {
     yamlStr: undefined,
     yamlObj: {},
     createBtnLoading: false,
+    paperScale: 1,
   }
 
   newEmbeds = []
@@ -341,18 +346,19 @@ export default class AppStack extends React.Component {
 
   onResourceDrop = ev => {
     ev.preventDefault();
-    // console.warn('onDrop ev', ev)
-    // console.warn('ev.screenX', ev.screenX)
-    // console.warn('ev.screenY', ev.screenY)
-    // console.warn('ev.pageX', ev.pageX)
-    // console.warn('ev.pageY', ev.pageY)
-    // console.warn('ev.clientX', ev.clientX)
-    // console.warn('ev.clientY', ev.clientY)
-    // console.warn('ev.movementX', ev.movementX)
-    // console.warn('ev.movementY', ev.movementY)
-    // console.warn('ev.target', ev.target)
-    // console.warn('ev.target.offsetHeight', ev.target.offsetHeight)
-    // console.warn('ev.target.offsetY', ev.target.offsetY)
+    console.warn('onDrop ev', ev)
+    console.warn('ev.screenX', ev.screenX)
+    console.warn('ev.screenY', ev.screenY)
+    console.warn('ev.pageX', ev.pageX)
+    console.warn('ev.pageY', ev.pageY)
+    console.warn('ev.clientX', ev.clientX)
+    console.warn('ev.clientY', ev.clientY)
+    console.warn('ev.movementX', ev.movementX)
+    console.warn('ev.movementY', ev.movementY)
+    console.warn('ev.target', ev.target)
+    console.warn('ev.target offset', $(ev.target).offset())
+    console.warn('ev.target.offsetHeight', ev.target.offsetHeight)
+    console.warn('ev.target.offsetY', ev.target.offsetY)
     // Get the id of the target and add the moved element to the target's DOM
     const id = ev.dataTransfer.getData('text');
     const options = {
@@ -361,7 +367,7 @@ export default class AppStack extends React.Component {
         y: ev.clientY - this.paperDom.offsetParent.offsetTop,
       },
     }
-    // console.warn('options', options)
+    console.warn('options', options)
     // console.warn('id', id)
 
     const {
@@ -421,6 +427,29 @@ export default class AppStack extends React.Component {
     }
   }
 
+  handlePaperScale = type => {
+    let { paperScale } = this.state
+    switch (type) {
+      case '+': {
+        paperScale += PAPER_SCALE_STEP
+        if (paperScale > PAPER_SCALE_MAX) {
+          paperScale = PAPER_SCALE_MAX
+        }
+        break
+      }
+      case '-':
+        paperScale -= PAPER_SCALE_STEP
+        if (paperScale < PAPER_SCALE_MIN) {
+          paperScale = PAPER_SCALE_MIN
+        }
+        break
+      default:
+        break
+    }
+    this.paper.scale(paperScale)
+    this.setState({ paperScale })
+  }
+
   render() {
     return (
       <QueueAnim
@@ -444,6 +473,20 @@ export default class AppStack extends React.Component {
                     // Add the target element's id to the data transfer object
                     ev.dataTransfer.setData('text/plain', id)
                     ev.dropEffect = 'move'
+                    console.warn('onDrop ev', ev)
+                    console.warn('ev.screenX', ev.screenX)
+                    console.warn('ev.screenY', ev.screenY)
+                    console.warn('ev.pageX', ev.pageX)
+                    console.warn('ev.pageY', ev.pageY)
+                    console.warn('ev.clientX', ev.clientX)
+                    console.warn('ev.clientY', ev.clientY)
+                    console.warn('ev.movementX', ev.movementX)
+                    console.warn('ev.movementY', ev.movementY)
+                    console.warn('ev.target', ev.target)
+                    console.warn('ev.dropTarget', ev.dropTarget)
+                    console.warn('ev.target offset', $(ev.target).offset())
+                    console.warn('ev.target.offsetHeight', ev.target.offsetHeight)
+                    console.warn('ev.target.offsetY', ev.target.offsetY)
                   }}
                 >
                   <span>{title}</span>
@@ -451,18 +494,48 @@ export default class AppStack extends React.Component {
               )
             }
           </div>
-          <div
-            id="app-stack-paper"
-            className={styles.graph}
-            key="paper"
-            onDragOver={ev => {
-              ev.preventDefault();
-              // Set the dropEffect to move
-              ev.dataTransfer.dropEffect = 'move'
-            }}
-            onDrop={this.onResourceDrop}
-          >
-            <div className="loading">loading ...</div>
+          <div className={styles.graph}>
+            <div className={styles.toolBar}>
+              <Button.Group>
+                <Button icon="left" />
+                <Button icon="right" />
+              </Button.Group>
+              <Button.Group>
+                <Button icon="up" />
+                <Button icon="down" />
+              </Button.Group>
+              <Button.Group>
+                <Button icon="zoom-in" onClick={() => this.handlePaperScale('+')} />
+                <Button icon="zoom-out" onClick={() => this.handlePaperScale('-')} />
+              </Button.Group>
+            </div>
+            <div
+              id="app-stack-paper"
+              className={styles.paper}
+              key="paper"
+              onDragOver={ev => {
+                ev.preventDefault();
+                // Set the dropEffect to move
+                // console.warn('onDrop ev', ev)
+                // console.warn('ev.screenX', ev.screenX)
+                // console.warn('ev.screenY', ev.screenY)
+                // console.warn('ev.pageX', ev.pageX)
+                // console.warn('ev.pageY', ev.pageY)
+                // console.warn('ev.clientX', ev.clientX)
+                // console.warn('ev.clientY', ev.clientY)
+                // console.warn('ev.movementX', ev.movementX)
+                // console.warn('ev.movementY', ev.movementY)
+                // console.warn('ev.target', ev.target)
+                // console.warn('ev.dropTarget', ev.dropTarget)
+                // console.warn('ev.target offset', $(ev.target).offset())
+                // console.warn('ev.target.offsetHeight', ev.target.offsetHeight)
+                // console.warn('ev.target.offsetY', ev.target.offsetY)
+                ev.dataTransfer.dropEffect = 'move'
+              }}
+              onDrop={this.onResourceDrop}
+            >
+              <div className="loading">loading ...</div>
+            </div>
           </div>
         </div>
         <div className={styles.yaml} key="yaml">

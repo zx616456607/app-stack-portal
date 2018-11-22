@@ -1,6 +1,7 @@
 {
   "private": true,
   "scripts": {
+    "analyze": "cross-env NODE_ENV=production ANALYZE=true roadhog build",
     "dev": "cross-env ESLINT=none TSLINT=none roadhog dev",
     "build": "cross-env NODE_ENV=production roadhog build",
     "build:no-compress": "cross-env COMPRESS=none roadhog build",
