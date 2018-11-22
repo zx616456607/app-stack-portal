@@ -173,7 +173,11 @@ class NativeDetail extends React.PureComponent {
           </div>
           {
             dockVisible &&
-            <Terminal headerContent={<div>终端</div>}/>
+            <Terminal headerContent={
+              <div className={styles.termName}>
+                {name}
+              </div>
+            }/>
           }
         </Page>
       </div>
