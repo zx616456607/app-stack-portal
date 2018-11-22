@@ -11,26 +11,29 @@ import * as React from 'react'
 import Page from '@tenx-ui/page'
 import '@tenx-ui/page/assets/index.css'
 import QueueAnim from 'rc-queue-anim'
-import { Icon, Button, notification } from 'antd'
+import { notification } from 'antd'
 import { withRouter, RouteComponentProps } from 'dva/router'
-import TenxEditor from '@tenx-ui/editor'
-import '@tenx-ui/editor/assets/index.css'
-import 'codemirror/mode/yaml/yaml'
 import queryString from 'query-string'
-import styles from './styles/index.less'
 import { connect, SubscriptionAPI } from 'dva'
 import yaml from 'js-yaml'
+import ExportComposeFile from './exportComposeFile'
+import { yamlString, IInstance, codemirror } from './editorType'
+import Editor from './editor'
 
 interface CreateWorkLoadProps extends RouteComponentProps, SubscriptionAPI {
-  cluster: string
+  cluster: string,
 }
 
-class CreateWorkLoad extends React.Component<CreateWorkLoadProps, any> {
+interface CreateWorkLoadState {
+  value: yamlString;
+  editflag: boolean;
+}
+class CreateWorkLoad extends React.Component<CreateWorkLoadProps, CreateWorkLoadState> {
   state = {
     value: '',
     editflag: false, // 默认是创建
   }
-  onChange = value => {
+  onBeforeChange = ( editor: IInstance, data: codemirror.EditorChange, value: string ) => {
     this.setState({ value })
   }
   async componentDidMount() {
@@ -49,6 +52,7 @@ class CreateWorkLoad extends React.Component<CreateWorkLoadProps, any> {
       notification.warn({ message: '获取详情失败', description: '' })
     }
   }
+  setYamlValue = (value: yamlString) => { this.setState({ value }) }
   createOrEditNative = async () => {
     const { location: { search }  } = this.props
     const config = queryString.parse(search)
@@ -100,36 +104,16 @@ class CreateWorkLoad extends React.Component<CreateWorkLoadProps, any> {
     return(
       <Page>
       <QueueAnim>
-        <div className={styles.createNativeEdit}>
-          <TenxEditor
-            onChange={this.onChange}
-            title="Yaml"
-            options={{ mode: 'yaml', theme: 'base16-dark' }}
-            value={this.state.value}
-            headerExtraContent={
-            <span className={styles.editOperation}>
-              <Icon type="plus" theme="outlined" />
-              <Icon type="save" theme="outlined" />
-            </span>}
-          />
-        </div>
-        <div className={styles.operationBar}>
-          <div>
-            <Button
-              className={styles.darkButton}
-              onClick={() => history.back()}
-            >
-              取消
-            </Button>
-            <Button
-              type="primary"
-              onClick={this.createOrEditNative}
-            >
-            {
-              this.state.editflag ? '保存' : '确定'
-            }
-            </Button>
-          </div>
+        <div key="page">
+        <Editor
+          onBeforeChange={this.onBeforeChange}
+          value={this.state.value}
+          createOrEditNative={this.createOrEditNative}
+          editflag={this.state.editflag}
+          dispatch={this.props.dispatch}
+          history={this.props.history}
+          setYamlValue={this.setYamlValue}
+        />
         </div>
       </QueueAnim>
     </Page>
