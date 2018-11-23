@@ -105,37 +105,74 @@
     display: flex;
     flex-direction: row;
     align-items: flex-start;
+    background-color: #fff;
+    border-radius: @border-radius-mini;
     .resourceList {
       width: @resourceListWidth;
-      background-color: #fff;
-      border: 1px solid @border-color-base;
-      border-radius: @border-radius-base;
-      margin-right: @padding-small;
       & > div {
-        text-align: center;
-        padding: 10px 0;
+        padding: 10px @padding-small;
+        border: 1px solid transparent;
+        cursor: not-allowed;
+      }
+      .resourceLeft {
+        & > *:first-child {
+          font-size: @font-size-medium;
+          padding-right: @padding-base;
+        }
+      }
+      .resourceRight {
+        visibility: hidden;
+      }
+      .enabled {
         cursor: move;
-        &:not(:last-child) {
-          border-bottom: 1px solid @border-color-base;
+        &:hover {
+          border: 1px dashed @primary-color;
+          border-radius: @border-radius-mini;
+          color: @primary-color;
+          .resourceRight {
+            visibility: visible;
+          }
         }
       }
     }
     .graph {
-      display: flex;
-      flex-direction: column;
       flex-grow: 2;
-      .toolBar {
+      .toolBtns {
+        position: absolute;
+        z-index: 2;
+        top: @padding-small;
+        margin-left: @padding-small;
         & > * {
           margin-right: @padding-base;
         }
-        margin-bottom: @padding-small;
+      }
+      .toolZoom {
+        position: absolute;
+        z-index: 2;
+        right: @padding-small;
+        top: @padding-small;
+        :global {
+          .ant-slider {
+            height: 120px;
+            .ant-slider-rail {
+              background: #ccc;
+            }
+          }
+          .ant-slider-vertical {
+            padding: 0;
+          }
+          .ant-slider-with-marks {
+            margin-top: @padding-small;
+            margin-bottom: @padding-small;
+          }
+        }
       }
       .paper {
         height: 600px;
         width: 100%;
-        border: 1px solid @border-color-base;
-        background-color: #fff;
-        border-radius: @border-radius-base;
+        border-left: 1px solid @border-color-base;
+        border-top-right-radius: @border-radius-mini;
+        border-bottom-right-radius: @border-radius-mini;
       }
     }
   }

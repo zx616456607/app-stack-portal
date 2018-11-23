@@ -20,74 +20,89 @@ import graphlib from 'graphlib'
 import TenxEditor from '@tenx-ui/editor'
 import 'codemirror/mode/yaml/yaml'
 import '@tenx-ui/editor/assets/index.css'
-import { Button, notification } from 'antd'
+import { Button, notification, Slider, Icon, Row, Col } from 'antd'
+import classnames from 'classnames'
 import $ from 'jquery'
 import styles from './style/index.less'
 import * as yamls from './yamls'
 import './shapes'
 
 const PAPER_SCALE_MAX = 5
-const PAPER_SCALE_MIN = 0.2
+const PAPER_SCALE_MIN = 0.1
 const PAPER_SCALE_STEP = 0.1
 const RESOURCE_LIST = [
   {
     id: 'Application',
+    icon: <Icon type="appstore" />,
     title: '应用',
-    draggable: true,
+    enabled: true,
   },
   {
     id: 'Deployment',
+    icon: <Icon type="appstore" />,
     title: 'Deployment',
-    draggable: true,
+    enabled: true,
   },
   {
     id: 'Service',
+    icon: <Icon type="appstore" />,
     title: 'Service',
-    draggable: true,
+    enabled: true,
   },
   {
     id: 'ConfigMap',
+    icon: <Icon type="appstore" />,
     title: 'ConfigMap',
-    draggable: true,
+    enabled: true,
   },
   {
     id: 'service-2',
+    icon: <Icon type="appstore" />,
     title: '服务配置·加密配置',
   },
   {
     id: 'service-3',
+    icon: <Icon type="appstore" />,
     title: '存储·独享型',
   },
   {
     id: 'service-4',
+    icon: <Icon type="appstore" />,
     title: '存储·共享型',
   },
   {
     id: 'service-5',
+    icon: <Icon type="appstore" />,
     title: '存储·本地存储',
   },
   {
     id: 'service-6',
+    icon: <Icon type="appstore" />,
     title: '服务发现',
   },
   {
     id: 'service-7',
+    icon: <Icon type="appstore" />,
     title: '应用负载均衡·集群内',
   },
   {
     id: 'service-8',
+    icon: <Icon type="appstore" />,
     title: '应用负载均衡·集群外',
   },
   {
     id: 'service-9',
+    icon: <Icon type="appstore" />,
     title: '集群网络出口',
   },
   {
     id: 'service-10',
+    icon: <Icon type="appstore" />,
     title: '自定义资源',
   },
   {
     id: 'service-11',
+    icon: <Icon type="appstore" />,
     title: '安全组',
   },
 ]
@@ -119,6 +134,7 @@ export default class AppStack extends React.Component {
       // a Graph model we want to render into the paper
       model: this.graph,
       // the dimensions of the rendered paper (in pixels)
+      width: '100%',
       height: 600,
       // the size of the grid to which elements are aligned.
       // affects the granularity of element movement
@@ -177,6 +193,8 @@ export default class AppStack extends React.Component {
         return sourceMagnet !== targetMagnet
       },
     })
+    // test
+    window._paper = this.paper
 
     // 可以做 redo undo
     // this.graph.on('change', function(cell) {
@@ -229,104 +247,6 @@ export default class AppStack extends React.Component {
 
     // this.initDemo()
   }
-
-  /* initDemo = () => {
-    const connect = (source, sourcePort, target, targetPort) => {
-      const link = new joint.shapes.devs.Link({
-        source: {
-          id: source.id,
-          port: sourcePort,
-        },
-        target: {
-          id: target.id,
-          port: targetPort,
-        },
-      })
-
-      // link.addTo(this.graph).reparent()
-    }
-
-    const c1 = new joint.shapes.devs.Coupled({
-      position: {
-        x: 230,
-        y: 50,
-      },
-      size: {
-        width: 300,
-        height: 300,
-      },
-    })
-
-    c1.set('inPorts', [ 'in' ])
-    c1.set('outPorts', [ 'out 1', 'out 2' ])
-
-    const a1 = new joint.shapes.devs.Atomic({
-      position: {
-        x: 360,
-        y: 260,
-      },
-      inPorts: [ 'xy' ],
-      outPorts: [ 'x', 'y' ],
-    })
-
-    const a2 = new joint.shapes.devs.Atomic({
-      position: {
-        x: 50,
-        y: 160,
-      },
-      outPorts: [ 'out' ],
-    })
-
-    const a3 = new joint.shapes.devs.Atomic({
-      position: {
-        x: 650,
-        y: 50,
-      },
-      size: {
-        width: 100,
-        height: 300,
-      },
-      inPorts: [ 'a', 'b' ],
-    })
-
-    const atomics = [ c1, a1, a2, a3 ]
-
-    atomics.forEach(element => {
-      element.attr({
-        '.body': {
-          rx: 6,
-          ry: 6,
-        },
-      })
-    })
-
-    this.graph.addCells([ c1, a1, a2, a3 ])
-
-    c1.embed(a1)
-
-    connect(a2, 'out', c1, 'in')
-    connect(c1, 'in', a1, 'xy')
-    connect(a1, 'x', c1, 'out 1')
-    connect(a1, 'y', c1, 'out 2')
-    connect(c1, 'out 1', a3, 'a')
-    connect(c1, 'out 2', a3, 'b')
-
-    // Interactions
-
-    const strokeDasharrayPath = '.body/strokeDasharray'
-
-    const toggleDelegation = element => {
-      element.attr(strokeDasharrayPath, element.attr(strokeDasharrayPath) ? '' : '15,1')
-    }
-
-    this.paper.setInteractivity(elementView => {
-      return {
-        stopDelegation: !elementView.model.attr(strokeDasharrayPath),
-      }
-    })
-
-    toggleDelegation(a1)
-  } */
 
   editYaml = () => {
     //
@@ -465,9 +385,9 @@ export default class AppStack extends React.Component {
         >
           <div className={styles.resourceList} key="resource">
             {
-              RESOURCE_LIST.map(({ id, title, draggable }) =>
+              RESOURCE_LIST.map(({ id, title, icon, enabled }) =>
                 <div
-                  draggable={draggable}
+                  draggable={enabled}
                   key={id}
                   onDragStart={ev => {
                     // Add the target element's id to the data transfer object
@@ -488,14 +408,23 @@ export default class AppStack extends React.Component {
                     console.warn('ev.target.offsetHeight', ev.target.offsetHeight)
                     console.warn('ev.target.offsetY', ev.target.offsetY)
                   }}
+                  className={classnames({ [styles.enabled]: enabled })}
                 >
-                  <span>{title}</span>
+                  <Row>
+                    <Col className={styles.resourceLeft} span={22}>
+                      {icon}
+                      <span>{title}</span>
+                    </Col>
+                    <Col span={2} className={styles.resourceRight}>
+                      <Icon type="smile" />
+                    </Col>
+                  </Row>
                 </div>
               )
             }
           </div>
           <div className={styles.graph}>
-            <div className={styles.toolBar}>
+            <div className={styles.toolBtns}>
               <Button.Group>
                 <Button icon="left" />
                 <Button icon="right" />
@@ -504,10 +433,33 @@ export default class AppStack extends React.Component {
                 <Button icon="up" />
                 <Button icon="down" />
               </Button.Group>
-              <Button.Group>
-                <Button icon="zoom-in" onClick={() => this.handlePaperScale('+')} />
-                <Button icon="zoom-out" onClick={() => this.handlePaperScale('-')} />
-              </Button.Group>
+            </div>
+            <div className={styles.toolZoom}>
+              <Button
+                shape="circle"
+                size="small"
+                icon="zoom-in"
+                onClick={() => this.handlePaperScale('+')}
+              />
+              <Slider
+                value={this.state.paperScale}
+                min={PAPER_SCALE_MIN}
+                max={PAPER_SCALE_MAX}
+                step={PAPER_SCALE_STEP}
+                marks={{ 1: '1x' }}
+                onChange={paperScale => {
+                  this.paper.scale(paperScale, paperScale)
+                  this.setState({ paperScale })
+                }}
+                tipFormatter={value => `${value}x`}
+                vertical
+              />
+              <Button
+                shape="circle"
+                size="small"
+                icon="zoom-out"
+                onClick={() => this.handlePaperScale('-')}
+              />
             </div>
             <div
               id="app-stack-paper"
