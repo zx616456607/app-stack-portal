@@ -22,7 +22,8 @@ import 'codemirror/mode/yaml/yaml'
 import '@tenx-ui/editor/assets/index.css'
 import { Button, notification, Slider, Icon, Row, Col } from 'antd'
 import classnames from 'classnames'
-import $ from 'jquery'
+// import $ from 'jquery'
+import Dock from 'react-dock'
 import styles from './style/index.less'
 import * as yamls from './yamls'
 import './shapes'
@@ -106,6 +107,7 @@ const RESOURCE_LIST = [
     title: '安全组',
   },
 ]
+const DOCK_DEFAULT_HEADER_SIZE = 32
 
 const mapStateToProps = state => {
   const { app: { cluster = '' } = {} } = state
@@ -118,6 +120,8 @@ export default class AppStack extends React.Component {
     yamlObj: {},
     createBtnLoading: false,
     paperScale: 1,
+    yamlDockVisible: false,
+    yamlDockSize: 340,
   }
 
   newEmbeds = []
@@ -244,8 +248,6 @@ export default class AppStack extends React.Component {
     })
 
     this.paper.on('blank:pointerclick', clearActiveElement)
-
-    // this.initDemo()
   }
 
   editYaml = () => {
@@ -266,19 +268,19 @@ export default class AppStack extends React.Component {
 
   onResourceDrop = ev => {
     ev.preventDefault();
-    console.warn('onDrop ev', ev)
-    console.warn('ev.screenX', ev.screenX)
-    console.warn('ev.screenY', ev.screenY)
-    console.warn('ev.pageX', ev.pageX)
-    console.warn('ev.pageY', ev.pageY)
-    console.warn('ev.clientX', ev.clientX)
-    console.warn('ev.clientY', ev.clientY)
-    console.warn('ev.movementX', ev.movementX)
-    console.warn('ev.movementY', ev.movementY)
-    console.warn('ev.target', ev.target)
-    console.warn('ev.target offset', $(ev.target).offset())
-    console.warn('ev.target.offsetHeight', ev.target.offsetHeight)
-    console.warn('ev.target.offsetY', ev.target.offsetY)
+    // console.warn('onDrop ev', ev)
+    // console.warn('ev.screenX', ev.screenX)
+    // console.warn('ev.screenY', ev.screenY)
+    // console.warn('ev.pageX', ev.pageX)
+    // console.warn('ev.pageY', ev.pageY)
+    // console.warn('ev.clientX', ev.clientX)
+    // console.warn('ev.clientY', ev.clientY)
+    // console.warn('ev.movementX', ev.movementX)
+    // console.warn('ev.movementY', ev.movementY)
+    // console.warn('ev.target', ev.target)
+    // console.warn('ev.target offset', $(ev.target).offset())
+    // console.warn('ev.target.offsetHeight', ev.target.offsetHeight)
+    // console.warn('ev.target.offsetY', ev.target.offsetY)
     // Get the id of the target and add the moved element to the target's DOM
     const id = ev.dataTransfer.getData('text');
     const options = {
@@ -370,6 +372,15 @@ export default class AppStack extends React.Component {
     this.setState({ paperScale })
   }
 
+  layout = options => {
+    options = Object.assign({}, options, {
+      nodeSep: 50,
+      edgeSep: 80,
+      rankDir: 'TB',
+    })
+    joint.layout.DirectedGraph.layout(this.graph, options)
+  }
+
   render() {
     return (
       <QueueAnim
@@ -393,20 +404,20 @@ export default class AppStack extends React.Component {
                     // Add the target element's id to the data transfer object
                     ev.dataTransfer.setData('text/plain', id)
                     ev.dropEffect = 'move'
-                    console.warn('onDrop ev', ev)
-                    console.warn('ev.screenX', ev.screenX)
-                    console.warn('ev.screenY', ev.screenY)
-                    console.warn('ev.pageX', ev.pageX)
-                    console.warn('ev.pageY', ev.pageY)
-                    console.warn('ev.clientX', ev.clientX)
-                    console.warn('ev.clientY', ev.clientY)
-                    console.warn('ev.movementX', ev.movementX)
-                    console.warn('ev.movementY', ev.movementY)
-                    console.warn('ev.target', ev.target)
-                    console.warn('ev.dropTarget', ev.dropTarget)
-                    console.warn('ev.target offset', $(ev.target).offset())
-                    console.warn('ev.target.offsetHeight', ev.target.offsetHeight)
-                    console.warn('ev.target.offsetY', ev.target.offsetY)
+                    // console.warn('onDrop ev', ev)
+                    // console.warn('ev.screenX', ev.screenX)
+                    // console.warn('ev.screenY', ev.screenY)
+                    // console.warn('ev.pageX', ev.pageX)
+                    // console.warn('ev.pageY', ev.pageY)
+                    // console.warn('ev.clientX', ev.clientX)
+                    // console.warn('ev.clientY', ev.clientY)
+                    // console.warn('ev.movementX', ev.movementX)
+                    // console.warn('ev.movementY', ev.movementY)
+                    // console.warn('ev.target', ev.target)
+                    // console.warn('ev.dropTarget', ev.dropTarget)
+                    // console.warn('ev.target offset', $(ev.target).offset())
+                    // console.warn('ev.target.offsetHeight', ev.target.offsetHeight)
+                    // console.warn('ev.target.offsetY', ev.target.offsetY)
                   }}
                   className={classnames({ [styles.enabled]: enabled })}
                 >
@@ -416,7 +427,7 @@ export default class AppStack extends React.Component {
                       <span>{title}</span>
                     </Col>
                     <Col span={2} className={styles.resourceRight}>
-                      <Icon type="smile" />
+                      <Icon type="drag" />
                     </Col>
                   </Row>
                 </div>
@@ -426,13 +437,28 @@ export default class AppStack extends React.Component {
           <div className={styles.graph}>
             <div className={styles.toolBtns}>
               <Button.Group>
-                <Button icon="left" />
-                <Button icon="right" />
+                <Button icon="arrow-left" />
+                <Button icon="arrow-right" />
               </Button.Group>
-              <Button.Group>
-                <Button icon="up" />
-                <Button icon="down" />
-              </Button.Group>
+              <Button icon="delete" onClick={() => this.graph.clear()}>
+              清空设计
+              </Button>
+              <Button icon="layout" onClick={this.layout}>
+              自动布局
+              </Button>
+              <Button
+                icon="gateway"
+                onClick={() => this.paper.scaleContentToFit({ maxScale: 2 })}
+              >
+              适应屏幕
+              </Button>
+              <Button icon="save">保存并提交</Button>
+              <Button
+                icon="deployment-unit"
+                onClick={() => this.setState({ yamlDockVisible: true })}
+              >
+              完善编排
+              </Button>
             </div>
             <div className={styles.toolZoom}>
               <Button
@@ -490,25 +516,26 @@ export default class AppStack extends React.Component {
             </div>
           </div>
         </div>
-        <div className={styles.yaml} key="yaml">
-          <TenxEditor
-            title="Yaml"
-            options={{ mode: 'yaml', theme: 'base16-dark' }}
-            value={this.state.yamlStr}
-            onChange={yamlStr => this.setState({ yamlStr })}
-          />
-          <div className={styles.yamlFooter}>
-            <Button
-              type="primary"
-              icon="rocket"
-              size="large"
-              loading={this.state.createBtnLoading}
-              onClick={this.deployTest}
-            >
-            创建 <sup>Beta</sup>
-            </Button>
+        <Dock
+          fluid={false}
+          size={this.state.yamlDockSize}
+          isVisible={this.state.yamlDockVisible}
+          position="bottom"
+          dimMode="none"
+          onSizeChange={yamlDockSize => {
+            if (yamlDockSize < DOCK_DEFAULT_HEADER_SIZE) return
+            this.setState({ yamlDockSize })
+          }}
+        >
+          <div className={styles.yaml}>
+            <TenxEditor
+              title="Yaml"
+              options={{ mode: 'yaml', theme: 'base16-dark' }}
+              value={this.state.yamlStr}
+              onChange={yamlStr => this.setState({ yamlStr })}
+            />
           </div>
-        </div>
+        </Dock>
       </QueueAnim>
     )
   }
