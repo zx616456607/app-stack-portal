@@ -120,7 +120,24 @@ export default {
         text: 'AppStack',
         icon: <Icon type="smile" />,
         key: 'app-stack',
-        to: '/app-stack',
+        type: 'SubMenu',
+        children: [
+          {
+            text: '堆栈',
+            key: 'app-stack',
+            to: '/app-stack',
+          },
+          {
+            text: '堆栈模板',
+            key: 'app-stack-templates',
+            to: '/app-stack/templates',
+          },
+          {
+            text: 'Designer',
+            key: 'designer',
+            to: '/app-stack/designer',
+          },
+        ],
       },
       {
         text: 'test',
