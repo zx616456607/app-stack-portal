@@ -174,7 +174,7 @@ class Job extends React.Component<JobProps, JobState> {
         sortedInfo: { columnKey: 'createTime', order: 'descend' } })
       this.setState({ JobListState: JobList })
     } catch (e) {
-      notification.error({ message: '获取Job列表失败', description: '' })
+      notification.warn({ message: '获取Job列表失败', description: '' })
     }
   }
   onSelectChange = selectedRowKeys => {
@@ -200,7 +200,7 @@ class Job extends React.Component<JobProps, JobState> {
              notification.success({ message: '删除成功', description: '' })
              self.setState({ selectedRowKeys: [] as string[] })
             } )
-        .catch(() => notification.error({ message: '删除操作失败', description: '' }))
+        .catch(() => notification.warn({ message: '删除操作失败', description: '' }))
       },
       onCancel() {},
     })

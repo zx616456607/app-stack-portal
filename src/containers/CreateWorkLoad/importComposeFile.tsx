@@ -61,7 +61,7 @@ class ImportComposeFile extends React.Component<FileProps, FileState> {
     try {
       res = await this.props.dispatch({ type: 'createNative/loadStackDetail', payload })
     } catch (e) {
-      return notification.error({ message: '加载编排文件详情失败', description: '' })
+      return notification.warn({ message: '加载编排文件详情失败', description: '' })
     }
     const content = getDeepValue(res, [ 'data', 'content' ])
     this.setState({ yamlValue: content, buttonDisables: false })
@@ -78,7 +78,7 @@ class ImportComposeFile extends React.Component<FileProps, FileState> {
     try {
      res = await this.props.dispatch({ type: 'createNative/loadStackList', payload })
     } catch (e) {
-      notification.error({ message: '加载编排文件失败', description: '' })
+      notification.warn({ message: '加载编排文件失败', description: '' })
     }
     const templates =  getDeepValue(res, ['data', 'templates'])
     const optionArray = templates.map(({ id, name }) => ({ id, name }))

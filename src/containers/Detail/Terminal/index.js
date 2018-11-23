@@ -16,27 +16,22 @@ import React from 'react'
 import { XTerm } from '@tenx-ui/xterm'
 import Dock from 'react-dock'
 import styles from './style/index.less'
-import PropTypes from 'prop-types'
 import { Icon, Button } from 'antd'
 import { connect } from 'dva'
 import { DOCK_DEFAULT_HEADER_SIZE, DOCK_DEFAULT_SIZE } from '../../../utils/constants'
 import { userPortalApi } from '../../../utils/config'
 import { WebSocket } from '@tenx-ui/webSocket'
-import { getDeepValue } from '../../../utils/helper'
 import { b64_to_utf8, utf8_to_b64 } from '../../../utils/helper'
 
 const TERM_TIPS_DISABLED = 'term_tips_disabled'
 
 const mapState = (
   { app: { cluster, project, user: { userName } },
-    nativeDetail: { dockSize, dockVisible, type, name, podDetail } }) =>
-  ({ dockSize, dockVisible, cluster, project, type, name, podDetail, userName })
+    nativeDetail: { dockSize, dockVisible, dockName, dockContainer } }) =>
+  ({ dockSize, dockVisible, cluster, project, userName, dockName, dockContainer })
 
 @connect(mapState)
 export default class Index extends React.Component {
-  static propTypes = {
-    headerContent: PropTypes.element,
-  }
   consts = {
     isConnecting: '终端连接中...',
     timeout: '连接超时',
@@ -66,12 +61,12 @@ export default class Index extends React.Component {
     delete this.xterm
   }
   renderHeader = () => {
-    const { headerContent = null, dockSize } = this.props
+    const { dockSize, dockName } = this.props
     return (
       <div className={styles.header}>
         <div className={styles.headerStatic}>
-          <div>
-            {headerContent}
+          <div className={styles.name}>
+            {dockName}
           </div>
           <span className={styles.right}>
             {
@@ -148,7 +143,11 @@ export default class Index extends React.Component {
     if (dockSize < DOCK_DEFAULT_HEADER_SIZE) return
     this.updateState({ dockSize })
   }
-  onCloseDock = () => this.updateState({ dockVisible: false })
+  onCloseDock = () => this.updateState({
+    dockVisible: false,
+    dockContainer: '',
+    dockName: '',
+  })
   onSetupSocket = ws => {
     const that = this
     const term = this.xterm.xterm
@@ -191,12 +190,11 @@ export default class Index extends React.Component {
   }
 
   renderWS = () => {
-    const { cluster, project, type, name, podDetail } = this.props
-    const container = getDeepValue(podDetail, 'spec.containers.0.name'.split('.'))
-    if (type !== 'Pod' || !name || !container) return null
+    const { cluster, project, dockName, dockContainer } = this.props
+    if (!dockName || !dockContainer) return null
     const protocol = userPortalApi.protocol === 'http' ? 'ws' : 'wss'
     const wsUrl = `${protocol}://${userPortalApi.host}/api/v1/cluster/${
-      cluster}/namespaces/${project}/pods/${name}/exec?container=${container}`
+      cluster}/namespaces/${project}/pods/${dockName}/exec?container=${dockContainer}`
     return <WebSocket
       url={wsUrl}
       protocol={'base64.channel.k8s.io'}

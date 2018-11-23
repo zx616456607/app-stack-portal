@@ -186,7 +186,7 @@ class CronJob extends React.Component<CronJobProps, CronJobState> {
       this.setState({ CronJobListState: CronJobList, currentPage: 1,
         sortedInfo: { columnKey: 'createTime', order: 'descend' } })
     } catch (e) {
-      notification.error({ message: '获取CronJob列表失败', description: '' })
+      notification.warn({ message: '获取CronJob列表失败', description: '' })
     }
   }
   onSelectChange = selectedRowKeys => {
@@ -212,7 +212,7 @@ class CronJob extends React.Component<CronJobProps, CronJobState> {
             notification.success({ message: '删除操作成功', description: '' })
             self.setState({ selectedRowKeys: [] as string[] })
           })
-        .catch(() => notification.error({ message: '删除操作失败', description: '' }))
+        .catch(() => notification.warn({ message: '删除操作失败', description: '' }))
       },
       onCancel() {},
     })
@@ -231,7 +231,7 @@ class CronJob extends React.Component<CronJobProps, CronJobState> {
         self.props.dispatch({ type: 'NativeResourceList/operationNativeResource', payload })
           .then(() => self.reload())
           .then(() => notification.success({ message: '启动操作成功', description: '' }))
-        .catch(() => notification.error({ message: '启动操作失败', description: '' }))
+        .catch(() => notification.warn({ message: '启动操作失败', description: '' }))
       },
       onCancel() {},
     })
