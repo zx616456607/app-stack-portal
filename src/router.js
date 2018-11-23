@@ -90,6 +90,7 @@ function RouterConfig({ history, app }) {
       component: () => import('./containers/Pod/index.tsx'),
       models: () => [
         import('./models/nativeResourceList'),
+        import('./models/nativeDetail'),
       ],
     },
     {

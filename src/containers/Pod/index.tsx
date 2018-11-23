@@ -32,6 +32,8 @@ import queryString from 'query-string'
 import Ellipsis from '@tenx-ui/ellipsis'
 import classnames from 'classnames'
 import compact from 'lodash/compact'
+import Terminal from '../Detail/Terminal'
+import styles from '../Detail/style/index.less';
 // import styles from './styles/index.less'
 const Search = Input.Search
 
@@ -92,16 +94,36 @@ function getColumns(self): Array<any> {
         <div className="actionBox commonData">
         <Dropdown.Button
           overlay={
-            <Menu onClick={e => self.onMenuChange(e.key, _.key}>
+            <Menu onClick={e => self.onMenuChange(e.key, _.key, self, record)}>
+              <Menu.Item key="yaml"><div>查看/编辑Yaml</div></Menu.Item>
               <Menu.Item key="delete"><div>&nbsp;&nbsp;强制删除&nbsp;&nbsp;</div></Menu.Item>
               <Menu.Item key="re"><div>&nbsp;&nbsp;重新分配&nbsp;&nbsp;</div></Menu.Item>
             </Menu>}
           type="ghost"
-          onClick={() =>
-            history.push(`/createWorkLoad?${queryString.stringify(
-              { edit: true, type: 'Pod', name: record.name })}`)}
+          onClick={async () => {
+            self.setState({
+              dockName: record.name,
+              terminalContainer: record.terminalContainer,
+            })
+            await self.props.dispatch({
+              type: 'nativeDetail/updateState',
+              payload: {
+                dockVisible: false,
+                dockContainer: '',
+                dockName: '',
+              },
+            })
+            await self.props.dispatch({
+              type: 'nativeDetail/updateState',
+              payload: {
+                dockVisible: true,
+                dockContainer: record.terminalContainer,
+                dockName: record.name,
+              },
+            })
+          }}
         >
-          查看/编辑Yaml
+          终端
         </Dropdown.Button>
       </div>
       )
@@ -113,6 +135,7 @@ function getColumns(self): Array<any> {
 interface PodProps extends RouteComponentProps, SubscriptionAPI {
   cluster: string;
   loading: boolean;
+  dockVisible: boolean;
 }
 
 interface PodListNode {
@@ -131,6 +154,8 @@ interface PodState {
   filter: string;
   currentPage: number;
   sortedInfo: SortedInfo;
+  dockName: string;
+  terminalContainer: string;
 }
 class Pod extends React.Component<PodProps, PodState> {
   state = {
@@ -142,6 +167,8 @@ class Pod extends React.Component<PodProps, PodState> {
       columnKey: 'createTime',
       order: 'descend',
     },
+    dockName: '',
+    terminalContainer: '',
   }
   componentDidMount() {
     this.reload();
@@ -171,12 +198,16 @@ class Pod extends React.Component<PodProps, PodState> {
       onCancel() {},
     })
   }
-  onMenuChange = async (key, name) => {
+  onMenuChange = async (key, name, self, record) => {
     if (key === 'delete') {
       this.redistributionPod(name, 'true')
     }
     if (key === 're') {
       this.redistributionPod(name)
+    }
+    if (key === 'yaml') {
+      self.props.history.push(`/createWorkLoad?${queryString.stringify(
+        { edit: true, type: 'Pod', name: record.name })}`)
     }
   }
   reload = async () => {
@@ -195,6 +226,7 @@ class Pod extends React.Component<PodProps, PodState> {
           createTime: PodNode.metadata.creationTimestamp,
           status: getPodStatus(PodNode),
           image: imageArray,
+          terminalContainer: getDeepValue(PodNode, 'spec.containers.0.name'.split('.')), // 登录终端用
         }
       }).sort(( a, b ) => { return new Date(b.createTime).valueOf() - new Date(a.createTime).valueOf() })
       this.setState({ PodListState: PodList, currentPage: 1,
@@ -293,7 +325,7 @@ class Pod extends React.Component<PodProps, PodState> {
                     sortedInfo: newSortedInfo as SortedInfo })
   }
   render() {
-    const { history } = this.props
+    const { history, dockVisible } = this.props
     const rowSelection = {
       selectedRowKeys: this.state.selectedRowKeys,
       onChange: this.onSelectChange,
@@ -353,16 +385,19 @@ class Pod extends React.Component<PodProps, PodState> {
           />
         </Card>
       </QueueAnim>
+      {
+        dockVisible && <Terminal/>
+      }
     </Page>
     )
   }
 }
 
 function mapStateToProps(state) {
-  const { app: { cluster = '' } = {} } = state
+  const { app: { cluster = '' } = {}, nativeDetail: { dockVisible } } = state
   const { loading: { effects = {} } = {} } = state
   const loading = effects['NativeResourceList/getNativeResourceList']
-  return { cluster, loading }
+  return { cluster, loading, dockVisible }
 }
 
 export default withRouter(connect(mapStateToProps)(Pod))

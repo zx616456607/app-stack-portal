@@ -22,6 +22,7 @@ import Ellipsis from '@tenx-ui/ellipsis'
 import { getStatus } from '../../../utils/status_identify'
 import NativeStatus from '../../../components/NativeStatus'
 import { confirm } from '@tenx-ui/modal'
+import { getDeepValue } from '../../../utils/helper'
 
 export default class Pods extends React.PureComponent {
   state = {
@@ -126,7 +127,24 @@ export default class Pods extends React.PureComponent {
             <Menu.Item key="delete"><div>&nbsp;&nbsp;强制删除&nbsp;&nbsp;</div></Menu.Item>
             <Menu.Item key="re"><div>&nbsp;&nbsp;重新分配&nbsp;&nbsp;</div></Menu.Item>
           </Menu>}
-        onClick={() => {}}
+        onClick={async () => {
+          await this.props.dispatch({
+            type: 'nativeDetail/updateState',
+            payload: {
+              dockVisible: false,
+              dockContainer: '',
+              dockName: '',
+            },
+          })
+          await this.props.dispatch({
+            type: 'nativeDetail/updateState',
+            payload: {
+              dockVisible: true,
+              dockContainer: getDeepValue(data, 'spec.containers.0.name'.split('.')),
+              dockName: getDeepValue(data, 'metadata.name'.split('.')),
+            },
+          })
+        }}
       >
         <div>终端</div>
       </Dropdown.Button>,
