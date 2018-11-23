@@ -1,0 +1,80 @@
+/**
+ * Licensed Materials - Property of tenxcloud.com
+ * (C) Copyright 2018 TenxCloud. All Rights Reserved.
+ */
+
+/**
+ * style of Templates
+ *
+ * @author zhouhaitao
+ * @date 2018-11-22
+ */
+@import "../../../../assets/style/core/index.less";
+.listItem {
+  width: 22%;
+  margin: 2.5% 2.5% 2.5% 0;
+  display: inline-block;
+  background: #fff;
+  position: relative;
+  .itemTag {
+    padding: 3px 5px;
+    border: 1px solid @primary-color;
+    color: @primary-color;
+    border-radius: @border-radius-base;
+    position: absolute;
+    left: @padding-small;
+    top: @padding-small;
+    background: #e8f7fe;
+  }
+  .itemTop {
+    padding: @padding-small;
+    margin-top: @padding-large;
+    .itemImg {
+      display: inline-block;
+      width: 25%;
+      height: 80px;
+      text-align: center;
+      line-height: 80px;
+      .stackIcon {
+        margin-top: 8px;
+        font-size: 60px;
+        color: @primary-color;
+      }
+    }
+    .itemInfo {
+      width: 50%;
+      display: inline-block;
+      vertical-align: top;
+      margin-left: @padding-small;
+      h2 {
+        font-weight: normal;
+      }
+    }
+  }
+  .itemBottom {
+    height: 70px;
+    width: 100%;
+    padding: @padding-small;
+    background: #f9f9f9;
+    border-top: 1px solid @border-color-split;
+    & >div {
+      display: inline-block;
+      vertical-align: middle;
+      width: 33.33333%;
+      text-align: center;
+      padding: 0 @padding-base;
+      &:nth-child(2) {
+        border-left: 1px solid @border-color-split;
+        border-right: 1px solid @border-color-split;
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 1366px) {
+  .listItem {
+    width: 30%;
+    margin: 2.5% 2.5% 2.5% 0;
+    background: #fff;
+  }
+}
