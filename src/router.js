@@ -142,6 +142,13 @@ function RouterConfig({ history, app }) {
       ],
     },
     {
+      path: '/app-stack/tempStackDetail/:name',
+      component: () => import('./containers/AppStack/Templates/TempStackDetail'),
+      models: () => [
+        import('./models/appStack'),
+      ],
+    },
+    {
       path: '/app-stack/designer',
       component: () => import('./containers/AppStack/Designer'),
       models: () => [
