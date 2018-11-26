@@ -318,7 +318,7 @@ class Deployment extends React.Component<DeploymentProps, DeploymentState> {
         <Button
           type={'primary'}
           icon="plus"
-          onClick={() => history.push('/createWorkLoad')}
+          onClick={() => history.push('/createWorkLoad?type=Deployment')}
         >
           Deployment
         </Button>

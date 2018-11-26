@@ -89,3 +89,11 @@ interface LoadStackList {
 export const loadStackList = (query: LoadStackList) => request({
   url: `${paasApiUrl}/templates?${queryString.stringify(query)}`,
 })
+
+interface LoadSampleProps {
+  cluster: string
+}
+
+export const loadSample = ({ cluster }: LoadSampleProps) => request({
+  url: `${paasApiUrl}/clusters/${cluster}/native/samples`,
+})

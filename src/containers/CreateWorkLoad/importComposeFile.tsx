@@ -127,6 +127,7 @@ class ImportComposeFile extends React.Component<FileProps, FileState> {
               onChange={this.handleChange}
               style={{ width: 280 }}
               onPopupScroll={debounce(this.onPopupScroll, 600)}
+              getPopupContainer={(node) => (node as HTMLElement)}
             >
               {
                 this.state.optionArray

@@ -279,7 +279,7 @@ class Job extends React.Component<JobProps, JobState> {
         <Button
           type={'primary'}
           icon="plus"
-          onClick={() => history.push('/createWorkLoad')}
+          onClick={() => history.push('/createWorkLoad?type=Job')}
         >
           Job
         </Button>

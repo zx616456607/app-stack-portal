@@ -295,7 +295,7 @@ class Service extends React.Component<ServiceProps, ServiceState> {
         <Button
           type={'primary'}
           icon="plus"
-          onClick={() => history.push('/createWorkLoad')}
+          onClick={() => history.push('/createWorkLoad?type=Service')}
         >
           创建服务
         </Button>
