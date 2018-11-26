@@ -23,18 +23,19 @@ import { Stack as StackIcon } from '@tenx-ui/icon'
   const { appStack, loading } = state
   return { appStack, loading }
 }, dispatch => ({
-  getAppStackTemplate: () => dispatch({
+  getAppStackTemplate: query => dispatch({
     type: 'appStack/fetchAppStackTemplate',
-    payload: {
-      from: 0,
-      size: 100,
-    },
+    payload: { query },
   }),
 }))
 class Templates extends React.Component {
   componentDidMount() {
     const { getAppStackTemplate } = this.props
-    getAppStackTemplate()
+    const query = {
+      from: 0,
+      size: 0,
+    }
+    getAppStackTemplate(query)
   }
   render() {
     const { loading, appStack } = this.props
@@ -82,26 +83,26 @@ class Templates extends React.Component {
                       <div>
                         <h5>应用</h5>
                         <span>
-                        <Ellipsis>
-                          {`${v.appCount}`}
-                        </Ellipsis>
-                      </span>
+                          <Ellipsis>
+                            {`${v.appCount}`}
+                          </Ellipsis>
+                        </span>
                       </div>
                       <div>
                         <h5>服务</h5>
                         <span>
-                        <Ellipsis>
-                          {`${v.serviceCount}`}
-                        </Ellipsis>
-                      </span>
+                          <Ellipsis>
+                            {`${v.serviceCount}`}
+                          </Ellipsis>
+                        </span>
                       </div>
                       <div>
                         <h5>容器</h5>
                         <span>
-                        <Ellipsis>
-                          {`${v.containerCount}`}
-                        </Ellipsis>
-                      </span>
+                          <Ellipsis>
+                            {`${v.containerCount}`}
+                          </Ellipsis>
+                        </span>
                       </div>
                     </div>
                   </Card>)

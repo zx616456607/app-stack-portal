@@ -28,8 +28,8 @@ export const templateListRequest = ({ query }) => request({
     method: 'GET',
   },
 })
-export const appStacksListRequest = ({clusterID, query }) => request({
-  url: `${paasApiUrl}/${clusterID}/appstacks?${queryString.stringify(query)}`,
+export const appStacksListRequest = ({ cluster, query }) => request({
+  url: `${paasApiUrl}/${cluster}/appstacks?${queryString.stringify(query)}`,
   options: {
     method: 'GET',
   },

@@ -11,7 +11,7 @@
  */
 
 import { deployAppstack, appStacksListRequest, templateListRequest } from '../services/appStack'
-import {notification} from "antd/lib/index";
+import { notification } from 'antd/lib/index';
 
 export default {
   namespace: 'appStack',
@@ -31,7 +31,7 @@ export default {
       })
       return res
     },
-    * fetchAppStackList({ cluster, query }, { call, put }) {
+    * fetchAppStackList({ payload: { cluster, query } }, { call, put }) {
       try {
         const res = yield call(appStacksListRequest, { cluster, query })
         yield put({
@@ -44,14 +44,14 @@ export default {
         notification.error({ message: '获取堆栈列表失败', description: '' })
       }
     },
-    * fetchAppStackTemplate({ cluster, query }, { call, put }) {
+    * fetchAppStackTemplate({ payload: { query } }, { call, put }) {
       try {
-        const res = yield call(templateListRequest, { cluster, query })
+        const res = yield call(templateListRequest, { query })
         if (res.code === 200) {
           yield put({
             type: 'appStackTemplateList',
             payload: {
-              templateList: res.data
+              templateList: res.data.appStacks,
             },
           })
         }
