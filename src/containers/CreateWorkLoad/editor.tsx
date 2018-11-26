@@ -8,18 +8,16 @@
  * @date Wednesday November 21st 2018
  */
 import * as React from 'react'
-import { Controlled as CodeMirror } from 'react-codemirror2'
 import styles from './styles/editor.less'
 import { Tooltip, Icon, Button } from 'antd'
-import 'codemirror/mode/yaml/yaml'
-import 'codemirror/lib/codemirror.css'
-import 'codemirror/theme/monokai.css'
-import { yamlString,  IInstance, codemirror  } from './editorType'
+import { yamlString } from './editorType'
 import fscreen from 'fscreen';
 import classnames from 'classnames'
 import ExportComposeFile from './exportComposeFile'
 import ImportComposeFile from './importComposeFile'
 import { SubscriptionAPI } from 'dva'
+import TenxEditor from '@tenx-ui/editor'
+import '@tenx-ui/editor/assets/index.css'
 
 const editorOpts = {
   lineNumbers: true,
@@ -32,7 +30,7 @@ const editorOpts = {
 }
 
 interface EditorProps extends SubscriptionAPI {
-  onBeforeChange: (editor: IInstance, data: codemirror.EditorChange, value: yamlString) => void;
+  onBeforeChange: (value: yamlString) => void;
   value: yamlString;
   createOrEditNative: () => void;
   editflag: boolean;
@@ -109,11 +107,13 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
           />
           </Tooltip>
         </div>
-        <CodeMirror
-          onBeforeChange={this.props.onBeforeChange}
-          options={editorOpts}
+        <div style={{ height: '100vh' }}>
+        <TenxEditor
+          titleDisplay={false}
+          onChange={this.props.onBeforeChange}
           value={this.props.value}
         />
+        </div>
         <div className={styles.operationBar} >
           <div>
             <Button
