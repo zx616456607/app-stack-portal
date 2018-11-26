@@ -123,11 +123,22 @@ class DetailHeader extends React.PureComponent {
     const act = getDeepValue(data, 'status.active'.split('.')) || 0
     return typeof act === 'object' ? '--' : act
   }
-  loginTerminal = () => {
-    this.props.dispatch({
+  loginTerminal = async () => {
+    const { data } = this.props
+    await this.props.dispatch({
+      type: 'nativeDetail/updateState',
+      payload: {
+        dockVisible: false,
+        dockContainer: '',
+        dockName: '',
+      },
+    })
+    await this.props.dispatch({
       type: 'nativeDetail/updateState',
       payload: {
         dockVisible: true,
+        dockContainer: getDeepValue(data, 'spec.containers.0.name'.split('.')),
+        dockName: getDeepValue(data, 'metadata.name'.split('.')),
       },
     })
   }
@@ -332,7 +343,7 @@ class DetailHeader extends React.PureComponent {
             {
               type === 'Pod' &&
               <Button
-                onClick={() => this.loginTerminal(dispatch, name, type)}
+                onClick={() => this.loginTerminal()}
                 className={styles.loginTerminal}>登录终端</Button>
             }
             <Button onClick={() => toYamlEditor(dispatch, name, type)} type="primary"> 编辑 Yaml</Button>

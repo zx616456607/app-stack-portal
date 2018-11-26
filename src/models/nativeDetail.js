@@ -42,6 +42,8 @@ export default {
     process: [],
     dockSize: DOCK_DEFAULT_SIZE,
     dockVisible: false,
+    dockContainer: '',
+    dockName: '',
   },
 
   reducers: {

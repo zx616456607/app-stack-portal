@@ -90,6 +90,7 @@ function RouterConfig({ history, app }) {
       component: () => import('./containers/Pod/index.tsx'),
       models: () => [
         import('./models/nativeResourceList'),
+        import('./models/nativeDetail'),
       ],
     },
     {
@@ -137,6 +138,13 @@ function RouterConfig({ history, app }) {
     {
       path: '/app-stack/templates',
       component: () => import('./containers/AppStack/Templates'),
+      models: () => [
+        import('./models/appStack'),
+      ],
+    },
+    {
+      path: '/app-stack/tempStackDetail/:name',
+      component: () => import('./containers/AppStack/Templates/TempStackDetail'),
       models: () => [
         import('./models/appStack'),
       ],

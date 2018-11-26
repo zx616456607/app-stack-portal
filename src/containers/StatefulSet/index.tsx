@@ -183,7 +183,7 @@ class StatefulSet extends React.Component<StatefulSetProps, StatefulSetState> {
         sortedInfo: { columnKey: 'createTime', order: 'descend' },
       currentPage: 1 })
     } catch (e) {
-      notification.error({ message: '获取StatefulSet列表失败', description: '' })
+      notification.warn({ message: '获取StatefulSet列表失败', description: '' })
     }
   }
   onSelectChange = selectedRowKeys => {
@@ -209,7 +209,7 @@ class StatefulSet extends React.Component<StatefulSetProps, StatefulSetState> {
             notification.success({ message: '删除成功', description: '' })
             self.setState({ selectedRowKeys: [] as string[] })
           })
-        .catch(() => notification.error({ message: '删除操作失败', description: '' }))
+        .catch(() => notification.warn({ message: '删除操作失败', description: '' }))
       },
       onCancel() {},
     })
