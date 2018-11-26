@@ -28,3 +28,9 @@ export const templateListRequest = ({ query }) => request({
     method: 'GET',
   },
 })
+export const appStacksListRequest = ({clusterID, query }) => request({
+  url: `${paasApiUrl}/${clusterID}/appstacks?${queryString.stringify(query)}`,
+  options: {
+    method: 'GET',
+  },
+})
