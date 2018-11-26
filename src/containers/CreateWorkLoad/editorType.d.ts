@@ -8,5 +8,3 @@
  * @date Wednesday November 21st 2018
  */
 export type yamlString = string;
-export { IInstance } from 'react-codemirror2'
-export { default as codemirror } from 'codemirror';

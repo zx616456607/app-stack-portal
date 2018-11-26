@@ -18,7 +18,6 @@ import * as joint from 'jointjs'
 import 'jointjs/dist/joint.css'
 import graphlib from 'graphlib'
 import TenxEditor from '@tenx-ui/editor'
-import 'codemirror/mode/yaml/yaml'
 import '@tenx-ui/editor/assets/index.css'
 import { Button, notification, Slider, Icon, Row, Col } from 'antd'
 import classnames from 'classnames'
@@ -448,7 +447,13 @@ export default class AppStack extends React.Component {
               </Button>
               <Button
                 icon="gateway"
-                onClick={() => this.paper.scaleContentToFit({ maxScale: 2 })}
+                onClick={() => {
+                  console.warn('this.paper', this.paper)
+                  console.warn(this.graph.getCells()[0])
+                  const scaleContentToFit = this.paper.scaleContentToFit({ maxScale: 2 })
+                  console.warn('scaleContentToFit', scaleContentToFit)
+                  console.warn(this.graph.getCells()[0])
+                }}
               >
               适应屏幕
               </Button>
@@ -529,8 +534,6 @@ export default class AppStack extends React.Component {
         >
           <div className={styles.yaml}>
             <TenxEditor
-              title="Yaml"
-              options={{ mode: 'yaml', theme: 'base16-dark' }}
               value={this.state.yamlStr}
               onChange={yamlStr => this.setState({ yamlStr })}
             />
