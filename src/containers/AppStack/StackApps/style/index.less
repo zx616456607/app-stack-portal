@@ -12,6 +12,83 @@
 
 @import "../../../../assets/style/core/index.less";
 
-.appStackContent {
-  color: red;
+.noData {
+  height: 800px;
+  width: 100%;
+  text-align: center;
+  line-height: 800px;
+}
+
+.listItem {
+  width: 22%;
+  margin: 2.5% 2.5% 2.5% 0;
+  display: inline-block;
+  background: #fff;
+  position: relative;
+  :global {
+    .ant-card-body {
+      padding: 0;
+    }
+  }
+  .itemTag {
+    padding: 3px 5px;
+    border: 1px solid @primary-color;
+    color: @primary-color;
+    border-radius: @border-radius-base;
+    position: absolute;
+    left: @padding-small;
+    top: @padding-small;
+    background: #e8f7fe;
+  }
+  .itemTop {
+    padding: @padding-medium @padding-small;
+    .itemImg {
+      display: inline-block;
+      width: 25%;
+      height: 80px;
+      text-align: center;
+      line-height: 80px;
+      .stackIcon {
+        margin-top: 8px;
+        font-size: 70px;
+        color: @primary-color;
+      }
+    }
+    .itemInfo {
+      width: 50%;
+      display: inline-block;
+      vertical-align: top;
+      margin-left: @padding-small;
+      h2 {
+        font-weight: normal;
+      }
+    }
+  }
+  .itemBottom {
+    height: 90px;
+    width: 100%;
+    padding: @padding-small;
+    background: #f9f9f9;
+    border-top: 1px solid @border-color-split;
+    & >div {
+      display: inline-block;
+      vertical-align: middle;
+      width: 33.33333%;
+      text-align: center;
+      padding: 0 @padding-base;
+      margin-top: 8px;
+      &:nth-child(2) {
+        border-left: 1px solid @border-color-split;
+        border-right: 1px solid @border-color-split;
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 1366px) {
+  .listItem {
+    width: 30%;
+    margin: 2.5% 2.5% 2.5% 0;
+    background: #fff;
+  }
 }
