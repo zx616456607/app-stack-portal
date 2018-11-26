@@ -16,25 +16,23 @@ import { withRouter, RouteComponentProps } from 'dva/router'
 import queryString from 'query-string'
 import { connect, SubscriptionAPI } from 'dva'
 import yaml from 'js-yaml'
-import ExportComposeFile from './exportComposeFile'
-import { yamlString, IInstance, codemirror } from './editorType'
+import { yamlString } from './editorType'
 import Editor from './editor'
 
 interface CreateWorkLoadProps extends RouteComponentProps, SubscriptionAPI {
   cluster: string,
+  yamlValue: yamlString,
 }
 
 interface CreateWorkLoadState {
-  value: yamlString;
   editflag: boolean;
 }
 class CreateWorkLoad extends React.Component<CreateWorkLoadProps, CreateWorkLoadState> {
   state = {
-    value: '',
     editflag: false, // 默认是创建
   }
-  onBeforeChange = ( editor: IInstance, data: codemirror.EditorChange, value: string ) => {
-    this.setState({ value })
+  onBeforeChange = ( value: string ) => {
+    this.props.dispatch({ type: 'createNative/updateYamlValue', payload: { yamlValue: value } })
   }
   async componentDidMount() {
     const { location: { search }  } = this.props
@@ -47,18 +45,21 @@ class CreateWorkLoad extends React.Component<CreateWorkLoadProps, CreateWorkLoad
       const res = await
       this.props.dispatch({ type: 'NativeResourceList/getNativeResourceDetail', payload })
       const K8sConfigJson = { kind: config.type, ...(res as any).data }
-      this.setState({ value: yaml.dump(K8sConfigJson) })
+      const newPayload = { yamlValue: yaml.dump(K8sConfigJson)  }
+      this.props.dispatch({ type: 'createNative/updateYamlValue', payload: newPayload })
     } catch (e) {
       notification.warn({ message: '获取详情失败', description: '' })
     }
   }
-  setYamlValue = (value: yamlString) => { this.setState({ value }) }
+  setYamlValue = (value: yamlString) => {
+    this.props.dispatch({ type: 'createNative/updateYamlValue', payload: { yamlValue: value } })
+  }
   createOrEditNative = async () => {
     const { location: { search }  } = this.props
     const config = queryString.parse(search)
     const urlCluster = config.cluster
     const cluster = urlCluster === undefined ? this.props.cluster : urlCluster
-    const payload = { cluster, yaml: this.state.value }
+    const payload = { cluster, yaml: this.props.yamlValue }
     if (!this.state.editflag) { // 创建
       try {
         if (config.type === 'PodSecurityPolicy') {
@@ -77,7 +78,7 @@ class CreateWorkLoad extends React.Component<CreateWorkLoadProps, CreateWorkLoad
         if (code === 500) {
           return notification.warn({ message: 'yaml格式错误', description: reason })
         }
-        notification.error({ message: '创建失败', description: reason })
+        notification.warn({ message: '创建失败', description: reason })
       }
       return
     }
@@ -107,7 +108,7 @@ class CreateWorkLoad extends React.Component<CreateWorkLoadProps, CreateWorkLoad
         <div key="page">
         <Editor
           onBeforeChange={this.onBeforeChange}
-          value={this.state.value}
+          value={this.props.yamlValue}
           createOrEditNative={this.createOrEditNative}
           editflag={this.state.editflag}
           dispatch={this.props.dispatch}
@@ -122,7 +123,7 @@ class CreateWorkLoad extends React.Component<CreateWorkLoadProps, CreateWorkLoad
 }
 
 function mapStateToProps(state) {
-  const { app: { cluster = '' } = {} } = state
-  return { cluster }
+  const { app: { cluster = '' } = {}, createNative: { yamlValue = '' } = {} } = state
+  return { cluster, yamlValue }
 }
 export default withRouter(connect(mapStateToProps)(CreateWorkLoad))

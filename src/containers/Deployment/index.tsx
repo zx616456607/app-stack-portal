@@ -210,7 +210,7 @@ class Deployment extends React.Component<DeploymentProps, DeploymentState> {
         sortedInfo: { columnKey: 'createTime', order: 'descend' },
       currentPage: 1 })
     } catch (e) {
-      notification.error({ message: '获取Deployment列表失败', description: '' })
+      notification.warn({ message: '获取Deployment列表失败', description: '' })
     }
   }
   onSelectChange = selectedRowKeys => {
@@ -237,7 +237,7 @@ class Deployment extends React.Component<DeploymentProps, DeploymentState> {
             self.setState({ selectedRowKeys: [] as string[] })
           })
         .catch(() => {
-        notification.error({ message: '删除操作失败', description: '' })})
+        notification.warn({ message: '删除操作失败', description: '' })})
       },
       onCancel() {},
     })

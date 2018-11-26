@@ -113,6 +113,8 @@
         padding: 10px @padding-small;
         border: 1px solid transparent;
         cursor: not-allowed;
+        color: @font-color-3;
+        user-select: none;
       }
       .resourceLeft {
         & > *:first-child {
@@ -125,6 +127,7 @@
       }
       .enabled {
         cursor: move;
+        color: @font-color-1;
         &:hover {
           border: 1px dashed @primary-color;
           border-radius: @border-radius-mini;
@@ -176,14 +179,18 @@
       }
     }
   }
-  .yaml {
-    margin-top: @padding-small;
-    .yamlFooter {
-      text-align: center;
-      background-color: #333;
-      padding: 12px;
-      border-bottom-left-radius: 4px;
-      border-bottom-right-radius: 4px;
+}
+.yaml {
+  :global {
+    .codeEditor {
+      .codeEditorHeader {
+        border-radius: 0;
+      }
+      .react-codemirror2 {
+        .CodeMirror {
+          border-radius: 0;
+        }
+      }
     }
   }
 }
