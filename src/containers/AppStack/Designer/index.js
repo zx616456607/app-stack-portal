@@ -19,13 +19,15 @@ import 'jointjs/dist/joint.css'
 import graphlib from 'graphlib'
 import TenxEditor from '@tenx-ui/editor'
 import '@tenx-ui/editor/assets/index.css'
-import { Button, notification, Slider, Icon, Row, Col } from 'antd'
+import { Button, notification, Slider, Icon, Row, Col, Tabs } from 'antd'
 import classnames from 'classnames'
 // import $ from 'jquery'
 import Dock from 'react-dock'
 import styles from './style/index.less'
 import * as yamls from './yamls'
 import './shapes'
+
+const TabPane = Tabs.TabPane
 
 const PAPER_SCALE_MAX = 5
 const PAPER_SCALE_MIN = 0.1
@@ -106,7 +108,7 @@ const RESOURCE_LIST = [
     title: '安全组',
   },
 ]
-const DOCK_DEFAULT_HEADER_SIZE = 32
+const DOCK_DEFAULT_HEADER_SIZE = 42
 
 const mapStateToProps = state => {
   const { app: { cluster = '' } = {} } = state
@@ -121,11 +123,14 @@ export default class AppStack extends React.Component {
     paperScale: 1,
     yamlDockVisible: false,
     yamlDockSize: 340,
+    yamlEditorTabKey: 'template',
   }
 
   newEmbeds = []
 
   activeElement = undefined
+
+  yarmlEditor = undefined
 
   initDesigner = () => {
     this.paperDom = document.getElementById('app-stack-paper')
@@ -529,13 +534,36 @@ export default class AppStack extends React.Component {
           dimMode="none"
           onSizeChange={yamlDockSize => {
             if (yamlDockSize < DOCK_DEFAULT_HEADER_SIZE) return
-            this.setState({ yamlDockSize })
+            this.setState({ yamlDockSize }, () => {
+              this.yarmlEditor.resize()
+            })
           }}
         >
-          <div className={styles.yaml}>
+          <div className={styles.yamlEditor}>
+            <div className={styles.yamlEditorHeader}>
+              <Tabs
+                activeKey={this.state.yamlEditorTabKey}
+                onChange={yamlEditorTabKey => this.setState({ yamlEditorTabKey })}
+                tabBarExtraContent={<div className={styles.yamlEditorHeaderBtns}>
+                  <Button type="dashed" icon="search" />
+                  <Button
+                    type="dashed"
+                    icon="minus"
+                    onClick={() => this.setState({ yamlDockVisible: false })}
+                  />
+                  {/* <Button type="dashed" icon="arrows-alt" /> */}
+                </div>}
+              >
+                <TabPane tab="模版" key="template"></TabPane>
+                <TabPane tab="输入" key="input"></TabPane>
+                <TabPane tab="输出" key="output"></TabPane>
+              </Tabs>
+            </div>
             <TenxEditor
+              theme="chrome"
               value={this.state.yamlStr}
               onChange={yamlStr => this.setState({ yamlStr })}
+              onLoad={editor => { this.yarmlEditor = editor }}
             />
           </div>
         </Dock>
