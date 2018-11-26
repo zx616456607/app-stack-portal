@@ -24,21 +24,6 @@
   }
 }
 
-.editor {
-  :global {
-    .CodeMirror {
-      border-radius: 0 !important;
-      height: calc(100vh - 28px);
-    }
-  }
-}
-.editor.fullScreen {
-  :global {
-    .CodeMirror {
-      height: 100vh !important;
-    }
-  }
-}
 .editHeader {
   height: 40px;
   display: flex;
@@ -51,5 +36,13 @@
   }
   .editIcon:last-child {
     padding-right: @padding-small;
+  }
+}
+.editLayout {
+  :global {
+    .ant-layout-content {
+      margin: 0;
+      padding: 0;
+    }
   }
 }

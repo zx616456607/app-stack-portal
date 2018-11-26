@@ -18,11 +18,21 @@ import {
   loadStackList,
 } from '../services/createNativeResource'
 
+interface YamlValuePar {
+  payload: {
+    yamlValue?: string | undefined;
+  }
+}
+
 export default {
   namespace: 'createNative',
   state: {
+    yamlValue: '',
   },
   reducers: {
+    updateYamlValue(state, { payload: { yamlValue = '' } = {} }: YamlValuePar) {
+      return { ...state, yamlValue }
+    },
   },
   effects: {
     * createNativeResource({ payload }, { call }) {

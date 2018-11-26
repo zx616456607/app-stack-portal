@@ -17,7 +17,6 @@ import TenxEditor from '@tenx-ui/editor'
 import '@tenx-ui/editor/assets/index.css'
 import yaml from 'js-yaml'
 import { connect } from 'dva'
-import 'codemirror/mode/yaml/yaml'
 
 const dvaStates = ({ nativeDetail: { detailData, type } }) => ({ data: detailData, type })
 
@@ -28,11 +27,11 @@ export default class YamlTab extends React.PureComponent {
     const { data, type } = this.props
     const value = { kind: type, ...data }
     return (
-      <div>
+      <div style={{ height: 500 }} >
         <TenxEditor
-          title="Yaml"
-          options={{ mode: 'yaml', theme: 'base16-dark' }}
           value={yaml.dump(value)}
+          readOnly={true}
+          onChange={yamlStr => this.setState({ yamlStr })}
         />
       </div>
     )

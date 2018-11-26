@@ -18,7 +18,6 @@ import * as joint from 'jointjs'
 import 'jointjs/dist/joint.css'
 import graphlib from 'graphlib'
 import TenxEditor from '@tenx-ui/editor'
-import 'codemirror/mode/yaml/yaml'
 import '@tenx-ui/editor/assets/index.css'
 import { Button, notification, Slider, Icon, Row, Col } from 'antd'
 import classnames from 'classnames'
@@ -492,8 +491,6 @@ export default class AppStack extends React.Component {
         </div>
         <div className={styles.yaml} key="yaml">
           <TenxEditor
-            title="Yaml"
-            options={{ mode: 'yaml', theme: 'base16-dark' }}
             value={this.state.yamlStr}
             onChange={yamlStr => this.setState({ yamlStr })}
           />
