@@ -1,0 +1,61 @@
+/**
+ * Licensed Materials - Property of tenxcloud.com
+ * (C) Copyright 2018 TenxCloud. All Rights Reserved.
+ */
+
+/**
+ * style of TempStackDetail
+ *
+ * @author zhouhaitao
+ * @date 2018-11-23
+ */
+
+@import "../../../../../assets/style/core/index.less";
+
+.stackInfo {
+  width: 600px;
+}
+.stackInfo h2, .config h2 {
+  font-size: @font-size-large;
+  position: relative;
+  padding-left: @padding-small;
+  &:before {
+    content: '';
+    display: block;
+    width: 6px;
+    height: 18px;
+    background: @primary-color;
+    position: absolute;
+    top: 3px;
+    left: 0;
+  }
+}
+
+.splitLine {
+  display: block;
+  height: 1px;
+  width: 100%;
+  background: @border-color-base;
+  margin: @padding-large 0;
+}
+.configContent {
+   :global {
+     .ant-collapse > .ant-collapse-item > .ant-collapse-header .arrow {
+       right: 16px !important;
+       left: auto !important;
+       svg {
+         transform: rotate(90deg);
+       }
+     }
+     .ant-collapse > .ant-collapse-item > .ant-collapse-header[aria-expanded="true"] .anticon-right svg {
+        transform: rotate(-90deg);
+     }
+     .ant-collapse > .ant-collapse-item > .ant-collapse-header {
+        padding: @padding-small;
+        font-size: @font-size-medium;
+     }
+     .ant-collapse-borderless > .ant-collapse-item > .ant-collapse-content {
+        background: #fff;
+     }
+   }
+}

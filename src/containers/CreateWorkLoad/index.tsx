@@ -78,7 +78,7 @@ class CreateWorkLoad extends React.Component<CreateWorkLoadProps, CreateWorkLoad
         if (code === 500) {
           return notification.warn({ message: 'yaml格式错误', description: reason })
         }
-        notification.error({ message: '创建失败', description: reason })
+        notification.warn({ message: '创建失败', description: reason })
       }
       return
     }
