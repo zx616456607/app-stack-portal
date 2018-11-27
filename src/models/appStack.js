@@ -75,7 +75,7 @@ export default {
           type: 'appStackList',
           payload: {
             // appStacks: listMock,
-            appStacks: res.data,
+            appStacks: res.data.appStacks,
           },
         })
       } catch (e) {
