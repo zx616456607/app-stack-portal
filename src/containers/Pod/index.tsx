@@ -335,13 +335,13 @@ class Pod extends React.Component<PodProps, PodState> {
     <Page>
       <QueueAnim>
         <div className="layout-content-btns" key="btns">
-        <Button
+        {/* <Button
           type={'primary'}
           icon="plus"
-          onClick={() => history.push('/createWorkLoad')}
+          onClick={() => history.push('/createWorkLoad?type=Pod')}
         >
           Pod
-        </Button>
+        </Button> */}
         <Button icon="reload" onClick={this.reload} >刷新</Button>
         <Button
           onClick={this.delete}

@@ -309,7 +309,7 @@ render() {
         <Button
           type={'primary'}
           icon="plus"
-          onClick={() => history.push('/createWorkLoad')}
+          onClick={() => history.push(`/createWorkLoad?type=CronJob`)}
         >
           CronJob
         </Button>
