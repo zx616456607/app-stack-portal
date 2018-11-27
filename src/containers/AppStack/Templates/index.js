@@ -13,7 +13,7 @@
 import React from 'react'
 import QueueAnim from 'rc-queue-anim'
 import { Card, Button } from 'antd'
-import { connect } from 'react-redux'
+import { connect } from 'dva'
 import { Link } from 'react-router-dom'
 import styles from './style/index.less'
 import Loader from '@tenx-ui/loader'
@@ -46,7 +46,7 @@ class Templates extends React.Component {
     return <QueueAnim
       id="stackTemplate"
     >
-      <div key="stackTemplate">
+      <div>
         <Button icon="plus" type="primary">设计堆栈</Button>
         {
           templateLoading ?

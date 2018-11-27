@@ -9,3 +9,38 @@
  * @author zhouhaitao
  * @date 2018-11-26
  */
+
+@import "../../../../../assets/style/core/index.less";
+
+.detailInfo {
+  margin-bottom: @padding-large;
+  .detailInfoLeft {
+    float: left;
+    display: flex;
+    align-items: center;
+    .detailName {
+      margin-left: @padding-large;
+    }
+    .detailIcon {
+      color: @primary-color;
+      font-size: 80px;
+    }
+  }
+  .detailInfoRight {
+    float: right;
+    display: inline-block;
+    line-height: 120px;
+    button {
+      margin-left: @padding-base;
+    }
+    .stopIcon {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      margin-right: @padding-base;
+      &:hover {
+        background: @primary-color !important;
+      }
+    }
+  }
+}

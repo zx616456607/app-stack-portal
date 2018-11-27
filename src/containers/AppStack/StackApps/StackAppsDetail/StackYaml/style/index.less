@@ -1,0 +1,54 @@
+@import "../../../../../../assets/style/core/index.less";
+.yamlEditor {
+  :global {
+    .codeEditorHeader {
+      height: 56px;
+    }
+    .ant-col-12 {
+      &:first-child {
+        display: none;
+      }
+      &:last-child {
+        width: 100%;
+      }
+      &:after {
+        content: '';
+        height: 0;
+        display: block;
+        clear: both;
+        zoom: 0;
+      }
+      .toggleFullscreen {
+        margin-top: 8px;
+      }
+    }
+  }
+  .yamlHeader {
+    list-style: none;
+    float: left;
+    padding: 8px 0;
+    margin: 0;
+    position: relative;
+    li {
+      display: inline-block;
+      color: #e4e4e4;
+      margin-right: @padding-large;
+      width: 100px;
+      text-align: center;
+      transition: all ease-in .1s;
+      &:hover {
+        color: @primary-color;
+      }
+    }
+    .activeLine {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      height: 2px;
+      background: @primary-color;
+    }
+    .active {
+      color: @primary-color;
+    }
+  }
+}
