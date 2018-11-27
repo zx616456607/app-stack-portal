@@ -290,7 +290,7 @@ class StatefulSet extends React.Component<StatefulSetProps, StatefulSetState> {
         <Button
           type={'primary'}
           icon="plus"
-          onClick={() => history.push('/createWorkLoad')}
+          onClick={() => history.push('/createWorkLoad?type=StatefulSet')}
         >
           StatefulSet
         </Button>

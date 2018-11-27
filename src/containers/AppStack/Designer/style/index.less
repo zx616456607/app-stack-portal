@@ -180,16 +180,28 @@
     }
   }
 }
-.yaml {
+@yamlEditorHeaderHeight: 42px;
+.yamlEditor {
+  height: 100%;
+  .yamlEditorHeader {
+    height: @yamlEditorHeaderHeight;
+    .yamlEditorHeaderBtns {
+      & > *:not(:last-child) {
+        margin-right: @padding-base;
+      }
+      :global {
+        .ant-btn {
+          border: none;
+        }
+      }
+    }
+  }
   :global {
     .codeEditor {
+      height: calc(~"100% - @{yamlEditorHeaderHeight}");
       .codeEditorHeader {
+        display: none;
         border-radius: 0;
-      }
-      .react-codemirror2 {
-        .CodeMirror {
-          border-radius: 0;
-        }
       }
     }
   }

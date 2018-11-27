@@ -16,6 +16,7 @@ import {
   createStack,
   loadStackDetail,
   loadStackList,
+  loadSample,
 } from '../services/createNativeResource'
 
 interface YamlValuePar {
@@ -61,6 +62,10 @@ export default {
     },
     * loadStackList({ payload }, { call }) {
       const res = yield call(loadStackList, payload)
+      return res
+    },
+    * loadSample({ payload }, { call }) {
+      const res = yield call(loadSample, payload)
       return res
     },
   },
