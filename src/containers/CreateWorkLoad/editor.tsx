@@ -80,10 +80,10 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
           saveOnClick={() => this.setState({ Exportvisible: true })}
           fullScreen={this.state.fullScreen}
           toggleFullScreen={this.toggleFullScreen}
-          onSiderClick={() => this.setState({ collapsed: !this.state.collapsed})}
+          onSiderClick={() => this.setState({ collapsed: !this.state.collapsed })}
         />
         <Layout
-          style={{height: this.state.fullScreen ? 'calc( 100vh - 30px )' : 'calc( 100vh - 152px )'}}
+          style={{ height: this.state.fullScreen ? 'calc( 100vh - 30px )' : 'calc( 100vh - 152px )' }}
         >
         <Content>
         <TenxEditor

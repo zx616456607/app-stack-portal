@@ -68,7 +68,7 @@ function mapStateToProps(state) {
 }
 export default withRouter(connect(mapStateToProps)(Tool))
 
-interface SampleProps extends RouteComponentProps{
+interface SampleProps extends RouteComponentProps {
   sampleInfo: {
     [index: string]: Array<Node>,
   }
@@ -110,8 +110,7 @@ class SampleInner extends React.Component<SampleProps, SampleState> {
             <Option key={value} value={value}>{value}</Option>)
           }
         </Select>
-        }
-        {
+        }{
           Object.entries(this.props.sampleInfo)
           .filter(([key]) => this.state.value.includes(key))
           .map(([_, value]) => value)
@@ -143,7 +142,16 @@ const SampleNode = ({
         <div className={styles.SampleNode}>
           <div className={styles.nodeTitle}>
             <div>{`${index}. ${dataNode.opt_name}`}</div>
-            <div className={styles.insert}><Icon type="form" />插入</div>
+            {
+              dataNode.opt_type === 2  &&
+              <div className={styles.insert}><Icon type="form" />插入</div>
+            }{
+              dataNode.opt_type === 1  &&
+              <div className={styles.insert}><Icon type="form" />使用</div>
+            }{
+              dataNode.opt_type === 0  &&
+              <div className={styles.info}>( 未开启服务网格 )</div>
+            }
           </div>
           <div className={styles.comments}>{dataNode.comments}</div>
         </div>
@@ -151,8 +159,6 @@ const SampleNode = ({
     </React.Fragment>
   )
 }
-
-
 
 interface PreviewProps {
 
