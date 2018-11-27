@@ -140,6 +140,7 @@ export default class AppStack extends React.Component {
 
   initDesigner = () => {
     this.paperDom = document.getElementById('app-stack-paper')
+    this.navigatorDom = document.getElementById('app-stack-paper-navigator')
     this.graph = new joint.dia.Graph()
     // http://resources.jointjs.com/docs/jointjs/v2.2/joint.html#dia.Paper.prototype.options.async
     this.paper = new joint.dia.Paper({
@@ -149,10 +150,17 @@ export default class AppStack extends React.Component {
       model: this.graph,
       // the dimensions of the rendered paper (in pixels)
       width: '100%',
-      height: 600,
+      height: 800,
       // the size of the grid to which elements are aligned.
       // affects the granularity of element movement
       gridSize: 8,
+      drawGrid: {
+        name: 'fixedDot',
+        // args: [
+        //   { color: 'red', thickness: 1 }, // settings for the primary mesh
+        //   { color: 'green', scaleFactor: 5, thickness: 5 } //settings for the secondary mesh
+        // ],
+      },
       snapLinks: true,
       linkPinning: false,
       // http://resources.jointjs.com/docs/jointjs/v2.2/joint.html#dia.Paper.prototype.options.embeddingMode
@@ -161,13 +169,6 @@ export default class AppStack extends React.Component {
       // no pointerclick event triggered after mouseup. It defaults to 0.
       clickThreshold: 5,
       defaultConnectionPoint: { name: 'boundary' },
-      drawGrid: {
-        name: 'fixedDot',
-        // args: [
-        //   { color: 'red', thickness: 1 }, // settings for the primary mesh
-        //   { color: 'green', scaleFactor: 5, thickness: 5 } //settings for the secondary mesh
-        // ],
-      },
       highlighting: {
         default: {
           name: 'stroke',
@@ -207,6 +208,21 @@ export default class AppStack extends React.Component {
         return sourceMagnet !== targetMagnet
       },
     })
+    // @Todo: 可以用来做鹰眼视图
+    this.navigatorPaper = new joint.dia.Paper({
+      // an HTML element into which the paper will be rendered
+      el: this.navigatorDom,
+      // a Graph model we want to render into the paper
+      model: this.graph,
+      // the dimensions of the rendered paper (in pixels)
+      width: 200,
+      height: 200,
+      // the size of the grid to which elements are aligned.
+      // affects the granularity of element movement
+      gridSize: 1,
+      interactive: false,
+    })
+    this.navigatorPaper.scale(0.1, 0.1);
     // test
     window._paper = this.paper
 
@@ -450,6 +466,10 @@ export default class AppStack extends React.Component {
   render() {
     const { form } = this.props
     const { getFieldDecorator } = form
+    const {
+      yamlDockSize, yamlDockVisible, paperScale, yamlEditorTabKey,
+      saveStackModal, saveStackBtnLoading,
+    } = this.state
     const FormItemLayout = {
       labelCol: {
         span: 4,
@@ -469,6 +489,9 @@ export default class AppStack extends React.Component {
         <div
           key="designer"
           className={styles.designer}
+          style={{
+            marginBottom: (yamlDockVisible ? yamlDockSize : 0),
+          }}
         >
           <div className={styles.resourceList} key="resource">
             {
@@ -557,7 +580,7 @@ export default class AppStack extends React.Component {
                 onClick={() => this.handlePaperScale('+')}
               />
               <Slider
-                value={this.state.paperScale}
+                value={paperScale}
                 min={PAPER_SCALE_MIN}
                 max={PAPER_SCALE_MAX}
                 step={PAPER_SCALE_STEP}
@@ -588,17 +611,24 @@ export default class AppStack extends React.Component {
             >
               <div className="loading">loading ...</div>
             </div>
+            <div
+              id="app-stack-paper-navigator"
+              className={styles.navigatorPaper}
+              key="navigator-paper"
+            >
+              <div className="loading">loading ...</div>
+            </div>
           </div>
         </div>
         <Dock
           fluid={false}
-          size={this.state.yamlDockSize}
-          isVisible={this.state.yamlDockVisible}
+          size={yamlDockSize}
+          isVisible={yamlDockVisible}
           position="bottom"
           dimMode="none"
-          onSizeChange={yamlDockSize => {
-            if (yamlDockSize < DOCK_DEFAULT_HEADER_SIZE) return
-            this.setState({ yamlDockSize }, () => {
+          onSizeChange={dockSize => {
+            if (dockSize < DOCK_DEFAULT_HEADER_SIZE) return
+            this.setState({ yamlDockSize: dockSize }, () => {
               this.yarmlEditor.resize()
             })
           }}
@@ -606,8 +636,8 @@ export default class AppStack extends React.Component {
           <div className={styles.yamlEditor}>
             <div className={styles.yamlEditorHeader}>
               <Tabs
-                activeKey={this.state.yamlEditorTabKey}
-                onChange={yamlEditorTabKey => this.setState({ yamlEditorTabKey })}
+                activeKey={yamlEditorTabKey}
+                onChange={yamlTabKey => this.setState({ yamlEditorTabKey: yamlTabKey })}
                 tabBarExtraContent={<div className={styles.yamlEditorHeaderBtns}>
                   <Button type="dashed" icon="search" />
                   <Button
@@ -634,8 +664,8 @@ export default class AppStack extends React.Component {
         <Modal
           title="保存堆栈模板"
           okText="确认保存"
-          visible={this.state.saveStackModal}
-          confirmLoading={this.state.saveStackBtnLoading}
+          visible={saveStackModal}
+          confirmLoading={saveStackBtnLoading}
           onOk={this.onStackSave}
           onCancel={() => this.setState({ saveStackModal: false })}
         >

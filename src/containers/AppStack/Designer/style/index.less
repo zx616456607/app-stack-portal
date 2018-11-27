@@ -94,7 +94,48 @@
       stroke-width: 6px;
       pointer-events: none;
     }
-   }
+  }
+  #app-stack-paper-navigator {
+    .joint-type-devs .body {
+      fill: @primary-color;
+      stroke: @primary-color;
+    }
+    .joint-type-devs .label {
+      fill: @primary-color;
+    }
+    .joint-type-devs .port-body {
+      stroke: @primary-color;
+      fill: @primary-color;
+    }
+    .joint-type-devs .port-label {
+      display: none;
+    }
+    .joint-type-devs .joint-port {
+      display: none;
+    }
+    .joint-type-devs.joint-type-devs-service .body {
+      stroke: @primary-color;
+    }
+    .joint-type-devs.joint-type-devs-service .label {
+      fill: @primary-color;
+    }
+    /* links */
+    .joint-link .connection {
+      stroke: @primary-color;
+      stroke-width: 4px;
+    }
+    .joint-link .marker-arrowheads .marker-arrowhead,
+    .joint-link .marker-vertex-group .marker-vertex,
+    .joint-link .marker-vertex-group .marker-vertex:hover {
+      fill: @primary-color;
+    }
+    .joint-link .marker-arrowheads .marker-arrowhead:hover {
+      fill: @primary-color;
+    }
+    .joint-link .link-tools .link-tool .tool-remove circle {
+      fill: @primary-color;
+    }
+  }
 }
 @resourceListWidth: 200px;
 .appStackDesigner {
@@ -171,11 +212,17 @@
         }
       }
       .paper {
-        height: 600px;
-        width: 100%;
         border-left: 1px solid @border-color-base;
         border-top-right-radius: @border-radius-mini;
         border-bottom-right-radius: @border-radius-mini;
+      }
+      .navigatorPaper {
+        position: absolute;
+        z-index: 2;
+        bottom: @padding-small;
+        right: @padding-small;
+        border: 1px solid @border-color-split;
+        border-radius: @border-radius-base;
       }
     }
   }
