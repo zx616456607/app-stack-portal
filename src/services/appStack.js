@@ -15,6 +15,13 @@ import { paasApiUrl } from '../utils/config'
 import { CLUSTERS } from './constants'
 import queryString from 'querystring'
 
+export const createAppstack = ({ name, body }) => request({
+  url: `${paasApiUrl}/appstacks/templates/${name}`,
+  options: {
+    method: 'POST',
+    body,
+  },
+})
 export const deployAppstack = ({ cluster, name, body }) => request({
   url: `${paasApiUrl}${CLUSTERS}/${cluster}/appstacks/${name}`,
   options: {

@@ -19,7 +19,9 @@ import 'jointjs/dist/joint.css'
 import graphlib from 'graphlib'
 import TenxEditor from '@tenx-ui/editor'
 import '@tenx-ui/editor/assets/index.css'
-import { Button, notification, Slider, Icon, Row, Col, Tabs } from 'antd'
+import {
+  Button, notification, Slider, Icon, Row, Col, Tabs, Modal, Form, Input,
+} from 'antd'
 import classnames from 'classnames'
 // import $ from 'jquery'
 import Dock from 'react-dock'
@@ -28,6 +30,7 @@ import * as yamls from './yamls'
 import './shapes'
 
 const TabPane = Tabs.TabPane
+const FormItem = Form.Item
 
 const PAPER_SCALE_MAX = 5
 const PAPER_SCALE_MIN = 0.1
@@ -114,6 +117,7 @@ const mapStateToProps = state => {
   const { app: { cluster = '' } = {} } = state
   return { cluster }
 }
+@Form.create()
 @connect(mapStateToProps)
 export default class AppStack extends React.Component {
   state = {
@@ -124,6 +128,8 @@ export default class AppStack extends React.Component {
     yamlDockVisible: false,
     yamlDockSize: 340,
     yamlEditorTabKey: 'template',
+    saveStackModal: false,
+    saveStackBtnLoading: false,
   }
 
   newEmbeds = []
@@ -252,6 +258,19 @@ export default class AppStack extends React.Component {
     })
 
     this.paper.on('blank:pointerclick', clearActiveElement)
+
+    // @Todo: 可以用来做画布平移
+    /* this.paper.on('blank:pointermove', e => {
+      console.warn('blank:pointermove', e)
+    })
+
+    this.paper.on('blank:mouseover', e => {
+      console.warn('blank:mouseover', e)
+    })
+
+    this.paper.on('paper:mouseenter', e => {
+      console.warn('paper:mouseenter', e)
+    }) */
   }
 
   editYaml = () => {
@@ -277,8 +296,10 @@ export default class AppStack extends React.Component {
     // console.warn('ev.screenY', ev.screenY)
     // console.warn('ev.pageX', ev.pageX)
     // console.warn('ev.pageY', ev.pageY)
-    // console.warn('ev.clientX', ev.clientX)
-    // console.warn('ev.clientY', ev.clientY)
+    console.warn('ev.clientX', ev.clientX)
+    console.warn('ev.clientY', ev.clientY)
+    console.warn('this.paperDom.offsetLeft', this.paperDom.offsetLeft)
+    console.warn('this.paperDom.offsetParent.offsetTop', this.paperDom.offsetParent.offsetTop)
     // console.warn('ev.movementX', ev.movementX)
     // console.warn('ev.movementY', ev.movementY)
     // console.warn('ev.target', ev.target)
@@ -287,6 +308,12 @@ export default class AppStack extends React.Component {
     // console.warn('ev.target.offsetY', ev.target.offsetY)
     // Get the id of the target and add the moved element to the target's DOM
     const id = ev.dataTransfer.getData('text');
+    const { tx, ty } = this.paper.translate()
+    const { paperScale } = this.state
+    console.warn('tx', tx)
+    console.warn('ty', ty)
+    this.paper.translate(0, 0)
+    this.paper.scale(1, 1)
     const options = {
       position: {
         x: ev.clientX - this.paperDom.offsetLeft - 200 - 16,
@@ -305,6 +332,9 @@ export default class AppStack extends React.Component {
 
     const resource = new joint.shapes.devs[id](options)
     this.graph.addCells([ resource ])
+
+    this.paper.translate(tx, ty)
+    this.paper.scale(paperScale, paperScale)
     // test only ---begin
     const { yamlObj } = this.state
     if (!yamlObj[id] && yamls[id]) {
@@ -385,7 +415,49 @@ export default class AppStack extends React.Component {
     joint.layout.DirectedGraph.layout(this.graph, options)
   }
 
+  onStackSave = () => {
+    const { form, dispatch } = this.props
+    const { validateFields } = form
+    this.setState({ saveStackBtnLoading: true })
+    validateFields(async (err, body) => {
+      if (err) {
+        return
+      }
+      body.content = JSON.stringify(this.graph.toJSON())
+      try {
+        await dispatch({
+          type: 'appStack/fetchCreateAppstack',
+          payload: {
+            name: body.name,
+            body,
+          },
+        })
+        this.setState({ saveStackModal: false })
+        notification.success({
+          message: '保存堆栈模版成功',
+        })
+      } catch (error) {
+        console.warn('error', error)
+        notification.warn({
+          message: '保存堆栈模版失败',
+        })
+      } finally {
+        this.setState({ saveStackBtnLoading: false })
+      }
+    })
+  }
+
   render() {
+    const { form } = this.props
+    const { getFieldDecorator } = form
+    const FormItemLayout = {
+      labelCol: {
+        span: 4,
+      },
+      wrapperCol: {
+        span: 20,
+      },
+    }
     return (
       <QueueAnim
         id="appStackDesigner"
@@ -453,16 +525,23 @@ export default class AppStack extends React.Component {
               <Button
                 icon="gateway"
                 onClick={() => {
-                  console.warn('this.paper', this.paper)
-                  console.warn(this.graph.getCells()[0])
-                  const scaleContentToFit = this.paper.scaleContentToFit({ maxScale: 2 })
-                  console.warn('scaleContentToFit', scaleContentToFit)
-                  console.warn(this.graph.getCells()[0])
+                  this.paper.scaleContentToFit({
+                    maxScale: 2,
+                    minScale: PAPER_SCALE_MIN,
+                  })
+                  const { sx: paperScale } = this.paper.scale()
+                  this.setState({ paperScale })
+                  // @Todo: 位置需要居中
                 }}
               >
               适应屏幕
               </Button>
-              <Button icon="save">保存并提交</Button>
+              <Button icon="save" onClick={() => this.setState({ saveStackModal: true })}>
+              保存并提交
+              </Button>
+              <Button icon="smile" onClick={this.deployTest}>
+                <span>部署<sup>test</sup></span>
+              </Button>
               <Button
                 icon="deployment-unit"
                 onClick={() => this.setState({ yamlDockVisible: true })}
@@ -503,21 +582,6 @@ export default class AppStack extends React.Component {
               key="paper"
               onDragOver={ev => {
                 ev.preventDefault();
-                // Set the dropEffect to move
-                // console.warn('onDrop ev', ev)
-                // console.warn('ev.screenX', ev.screenX)
-                // console.warn('ev.screenY', ev.screenY)
-                // console.warn('ev.pageX', ev.pageX)
-                // console.warn('ev.pageY', ev.pageY)
-                // console.warn('ev.clientX', ev.clientX)
-                // console.warn('ev.clientY', ev.clientY)
-                // console.warn('ev.movementX', ev.movementX)
-                // console.warn('ev.movementY', ev.movementY)
-                // console.warn('ev.target', ev.target)
-                // console.warn('ev.dropTarget', ev.dropTarget)
-                // console.warn('ev.target offset', $(ev.target).offset())
-                // console.warn('ev.target.offsetHeight', ev.target.offsetHeight)
-                // console.warn('ev.target.offsetY', ev.target.offsetY)
                 ev.dataTransfer.dropEffect = 'move'
               }}
               onDrop={this.onResourceDrop}
@@ -567,6 +631,43 @@ export default class AppStack extends React.Component {
             />
           </div>
         </Dock>
+        <Modal
+          title="保存堆栈模板"
+          okText="确认保存"
+          visible={this.state.saveStackModal}
+          confirmLoading={this.state.saveStackBtnLoading}
+          onOk={this.onStackSave}
+          onCancel={() => this.setState({ saveStackModal: false })}
+        >
+          <Form>
+            <FormItem
+              {...FormItemLayout}
+              label="堆栈名称"
+            >
+              {getFieldDecorator('name', {
+                rules: [
+                  {
+                    required: true,
+                    whitespace: true,
+                    message: '请输入堆栈名称',
+                  },
+                ],
+              })(
+                <Input placeholder="请输入堆栈名称" />
+              )}
+            </FormItem>
+            <FormItem
+              {...FormItemLayout}
+              label="堆栈描述"
+            >
+              {getFieldDecorator('description', {
+                //
+              })(
+                <Input.TextArea placeholder="请输入堆栈描述" />
+              )}
+            </FormItem>
+          </Form>
+        </Modal>
       </QueueAnim>
     )
   }
