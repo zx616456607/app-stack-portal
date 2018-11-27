@@ -144,7 +144,7 @@ export default {
           yield put({
             type: 'appStackDetail',
             payload: {
-              appstacksDetail: res.data,
+              appStacksDetail: res.data,
             },
           })
         }

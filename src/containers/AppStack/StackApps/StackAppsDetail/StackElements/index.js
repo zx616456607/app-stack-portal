@@ -14,6 +14,7 @@ import React from 'react'
 import { Button, Table, Input, Pagination } from 'antd'
 import styles from './style/index.less'
 import { connect } from 'react-redux'
+import { formatDate } from '../../../../../utils/helper';
 
 const Search = Input.Search
 @connect(state => {
@@ -28,7 +29,7 @@ class StackElements extends React.Component {
       },
       {
         title: '资源名称',
-        dataIndex: 'sourceName',
+        dataIndex: 'resourceName',
       },
       {
         title: '规格',
@@ -37,6 +38,7 @@ class StackElements extends React.Component {
       {
         title: '创建时间',
         dataIndex: 'creationTime',
+        render: text => formatDate(text),
       },
     ],
   }
@@ -45,6 +47,26 @@ class StackElements extends React.Component {
   }
   render() {
     const { columns } = this.state
+    const mockData = [
+      {
+        elementType: '1',
+        resourceName: '测试名称',
+        standards: '123',
+        creationTime: '2018-11-23T07:33:41Z',
+      },
+      {
+        elementType: '1',
+        resourceName: '测试名称',
+        standards: '123',
+        creationTime: '2018-11-23T07:33:41Z',
+      },
+      {
+        elementType: '1',
+        resourceName: '测试名称',
+        standards: '123',
+        creationTime: '2018-11-23T07:33:41Z',
+      },
+    ]
     return <div id="stackElements">
       <div className={styles.operation}>
         <div className={styles.operationLeft}>
@@ -62,6 +84,7 @@ class StackElements extends React.Component {
       </div>
       <Table
         columns={columns}
+        dataSource={mockData}
       />
     </div>
   }

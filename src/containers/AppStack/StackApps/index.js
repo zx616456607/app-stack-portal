@@ -40,7 +40,7 @@ class StackApps extends React.Component {
     const { getAppStackList, cluster } = this.props
     const query = {
       from: 0,
-      size: 0,
+      size: 100,
     }
     getAppStackList({ cluster, query })
   }
@@ -53,7 +53,9 @@ class StackApps extends React.Component {
     return <QueueAnim
       id="appStack"
     >
-      <Button type="primary" icon="plus" key="button">部署堆栈</Button>
+      <Link to="app-stack/templates">
+        <Button type="primary" icon="plus" key="button">部署堆栈</Button>
+      </Link>
       <div className={styles.appStackContent}>
         {
           stacksLoading ?

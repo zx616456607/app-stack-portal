@@ -47,7 +47,9 @@ class Templates extends React.Component {
       id="stackTemplate"
     >
       <div>
-        <Button icon="plus" type="primary">设计堆栈</Button>
+        <Link to="/app-stack/designer">
+          <Button icon="plus" type="primary">设计堆栈</Button>
+        </Link>
         {
           templateLoading ?
             <Loader
@@ -72,11 +74,12 @@ class Templates extends React.Component {
                             {v.name}
                           </Ellipsis>
                         </h2>
-                        <Button style={{ marginRight: 8 }}>设计</Button>
+                        <Link to={`/app-stack/designer/${v.name}/edit`}>
+                          <Button style={{ marginRight: 8 }}>设计</Button>
+                        </Link>
                         <Link to={`/app-stack/tempStackDetail/${v.name}`}>
                           <Button type="primary">部署</Button>
                         </Link>
-
                       </div>
                     </div>
                     <div className={styles.itemBottom}>

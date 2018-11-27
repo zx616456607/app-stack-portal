@@ -11,20 +11,21 @@
  */
 
 import React from 'react'
-import { Card, Button, Tabs } from 'antd'
-import QueueAnim from 'rc-queue-anim'
+import { Card, Button, Tabs, Modal, notification } from 'antd'
 import { Stack as StackIcon, Circle as CircleIcon } from '@tenx-ui/icon'
 import { connect } from 'dva'
 import styles from './style/index.less'
 import StackElements from './StackElements'
 import StackYaml from './StackYaml'
+import Loader from '@tenx-ui/loader'
+
 const Tabpane = Tabs.TabPane
 
 @connect(state => {
   const { appStack, loading, app } = state
   const { cluster } = app
-  return { appStack, loading, cluster }
-
+  const { appStacksDetail } = appStack
+  return { appStacksDetail, loading, cluster }
 }, dispatch => ({
   getStackDetail: ({ cluster, name }) => dispatch({
     type: 'appStack/fetchAppStackDetail',
@@ -45,6 +46,10 @@ const Tabpane = Tabs.TabPane
 
 }))
 class StackAppsDetail extends React.Component {
+  state = {
+    stopModal: false,
+    delModal: false,
+  }
   componentDidMount() {
     const { getStackDetail, cluster } = this.props
     const name = this.props.match.params.name
@@ -57,20 +62,69 @@ class StackAppsDetail extends React.Component {
     }
   }
   start = () => {
-
+    const name = this.props.match.params.name
+    const { cluster, appStackStart } = this.props
+    appStackStart({ cluster, name }).then(res => {
+      if (res.code === 200) {
+        notification.success({ message: '启动成功' })
+      } else {
+        notification.success({ message: '启动失败' })
+      }
+    })
   }
   stop = () => {
-
+    this.setState({
+      stopModal: true,
+    })
   }
   deleteStack = () => {
+    this.setState({
+      delModal: true,
+    })
+  }
 
+  confirmStop = () => {
+    const name = this.props.match.params.name
+    const { cluster, appStackStop } = this.props
+    appStackStop({ cluster, name }).then(res => {
+      if (res.code === 200) {
+        this.setState({
+          stopModal: false,
+        })
+        notification.success({ message: '停止成功' })
+      } else {
+        notification.success({ message: '停止失败' })
+      }
+    })
+  }
+  confirmDel = () => {
+    const name = this.props.match.params.name
+    const { cluster, appStackDelete } = this.props
+    appStackDelete({ cluster, name }).then(res => {
+      if (res.code === 200) {
+        this.setState({
+          delModal: false,
+        })
+        this.props.history.push('/app-stack')
+        notification.success({ message: '删除成功' })
+      } else {
+        notification.error({ message: '删除失败' })
+      }
+    })
   }
   render() {
     const name = this.props.match.params.name
-    const stackYamlContent = 'kind: Deployment\napiVersion: v1\nmetadata:\n  name: test\n  labels:\n    name: test\n    system/appName: test\n    system/svcName: test\n    system/appstack: test\n  annotations:\n    sidecar.istio.io/inject: \'false\'\nspec:\n  repicas: 1\n  lselector:\n    matchLabels:\n      name: test\n  template:\n    metadata:\n      labels:\n        name: test\n        system/appName: test\n        system/svcName: test\n        system/appstack: test\n      annotations:\n        sidecar.istio.io/inject: \'false\'\n    spec:\n      containers:\n        - name: test\n          image: \'192.168.1.52/public/hello-world:latest\'\n          ports:\n            - containerPort: 80\n              protocol: TCP\n          resources:\n            limits:\n              memory: 512Mi\n              cpu: 1000m\n            requests:\n              memory: 512Mi\n              cpu: 200m\n          args:\n            - /hello\n          imagePullPolicy: Always\n          volumeMounts:\n            - name: noclassify-configmap-classify-configmap-volume-1\n              mountPath: /home/example\n              readOnly: false\n              subPath: example\n      volumes:\n        - name: noclassify-configmap-classify-configmap-volume-1\n          configMap:\n            name: demo\n            items:\n              - key: example\n                path: example\n---\nkind: Service\napiVersion: v1\nmetadata:\n  name: test\n  labels:\n    system/appName: test\n    system/svcName: test\n    system/appstack: test\n    name: test\n  annotations:\n    system/lbgroup: none\nspec:\n  ports:\n    - name: tcp-test-0\n      protocol: TCP\n      targetPort: 80\n      port: 80\n  selector:\n    name: test\n\n---\napiVersion: v1\ndata:\n  example: example\nkind: ConfigMap\nmetadata:\n  name: demo\n  labels:\n    system/appstack: test'
-    const k8sYamlContent = 'kind: K8S\napiVersion: v1\nmetadata:\n  name: test\n  labels:\n    name: test\n    system/appName: test\n    system/svcName: test\n    system/appstack: test\n  annotations:\n    sidecar.istio.io/inject: \'false\'\nspec:\n  repicas: 1\n  lselector:\n    matchLabels:\n      name: test\n  template:\n    metadata:\n      labels:\n        name: test\n        system/appName: test\n        system/svcName: test\n        system/appstack: test\n      annotations:\n        sidecar.istio.io/inject: \'false\'\n    spec:\n      containers:\n        - name: test\n          image: \'192.168.1.52/public/hello-world:latest\'\n          ports:\n            - containerPort: 80\n              protocol: TCP\n          resources:\n            limits:\n              memory: 512Mi\n              cpu: 1000m\n            requests:\n              memory: 512Mi\n              cpu: 200m\n          args:\n            - /hello\n          imagePullPolicy: Always\n          volumeMounts:\n            - name: noclassify-configmap-classify-configmap-volume-1\n              mountPath: /home/example\n              readOnly: false\n              subPath: example\n      volumes:\n        - name: noclassify-configmap-classify-configmap-volume-1\n          configMap:\n            name: demo\n            items:\n              - key: example\n                path: example\n---\nkind: Service\napiVersion: v1\nmetadata:\n  name: test\n  labels:\n    system/appName: test\n    system/svcName: test\n    system/appstack: test\n    name: test\n  annotations:\n    system/lbgroup: none\nspec:\n  ports:\n    - name: tcp-test-0\n      protocol: TCP\n      targetPort: 80\n      port: 80\n  selector:\n    name: test\n\n---\napiVersion: v1\ndata:\n  example: example\nkind: ConfigMap\nmetadata:\n  name: demo\n  labels:\n    system/appstack: test'
+    const { appStacksDetail, loading } = this.props
+    const { stopModal, delModal } = this.state
+    // const stackYamlContent = 'kind: Deployment\napiVersion: v1\nmetadata:\n  name: test\n  labels:\n    name: test\n    system/appName: test\n    system/svcName: test\n    system/appstack: test\n  annotations:\n    sidecar.istio.io/inject: \'false\'\nspec:\n  repicas: 1\n  lselector:\n    matchLabels:\n      name: test\n  template:\n    metadata:\n      labels:\n        name: test\n        system/appName: test\n        system/svcName: test\n        system/appstack: test\n      annotations:\n        sidecar.istio.io/inject: \'false\'\n    spec:\n      containers:\n        - name: test\n          image: \'192.168.1.52/public/hello-world:latest\'\n          ports:\n            - containerPort: 80\n              protocol: TCP\n          resources:\n            limits:\n              memory: 512Mi\n              cpu: 1000m\n            requests:\n              memory: 512Mi\n              cpu: 200m\n          args:\n            - /hello\n          imagePullPolicy: Always\n          volumeMounts:\n            - name: noclassify-configmap-classify-configmap-volume-1\n              mountPath: /home/example\n              readOnly: false\n              subPath: example\n      volumes:\n        - name: noclassify-configmap-classify-configmap-volume-1\n          configMap:\n            name: demo\n            items:\n              - key: example\n                path: example\n---\nkind: Service\napiVersion: v1\nmetadata:\n  name: test\n  labels:\n    system/appName: test\n    system/svcName: test\n    system/appstack: test\n    name: test\n  annotations:\n    system/lbgroup: none\nspec:\n  ports:\n    - name: tcp-test-0\n      protocol: TCP\n      targetPort: 80\n      port: 80\n  selector:\n    name: test\n\n---\napiVersion: v1\ndata:\n  example: example\nkind: ConfigMap\nmetadata:\n  name: demo\n  labels:\n    system/appstack: test'
+    const stackYamlContent = appStacksDetail && appStacksDetail.appStack.spec.content
+    const k8sYamlContent = appStacksDetail && appStacksDetail.appStack.spec.k8sManifest
     const yamlContent = { stackYamlContent, k8sYamlContent }
-    return <QueueAnim
+    const contentLoading = loading.effects['appStack/fetchAppStackDetail']
+    const delLoading = loading.effects['appStack/stackDelete']
+    const startLoading = loading.effects['appStack/stackStart']
+    const stopLoading = loading.effects['appStack/stackStop']
+    return <div
       id="stackAppDetail"
     >
       <Card className={styles.detailInfo} hoverable key="header">
@@ -87,30 +141,57 @@ class StackAppsDetail extends React.Component {
           </div>
         </div>
         <div className={styles.detailInfoRight}>
-          <Button icon="caret-right" onClick={this.start}>启动</Button>
+          <Button icon="caret-right" onClick={this.start} loading={startLoading}>启动</Button>
           <Button onClick={this.stop}><span className={styles.stopIcon} style={{ background: '#666' }}></span>停止</Button>
           <Button onClick={this.deleteStack} icon="delete">删除</Button>
         </div>
       </Card>
-      <Card hoverable key="content">
-        <Tabs defaultActiveKey="element">
-          <Tabpane tab="堆栈元素" key="element">
-            <StackElements/>
-          </Tabpane>
-          <Tabpane tab="YAML" key="YAML">
-            <StackYaml
-              data={yamlContent}
-            />
-          </Tabpane>
-          <Tabpane tab="堆栈拓补" key="topology">
+      <Card hoverable key="content" className={styles.detailContent}>
+        {
+          contentLoading ?
+            <div className={styles.loading}>
+              <Loader
+                spinning={true}
+              />
+            </div>
+            :
+            <Tabs defaultActiveKey="element">
+              <Tabpane tab="堆栈元素" key="element">
+                <StackElements/>
+              </Tabpane>
+              <Tabpane tab="YAML" key="YAML">
+                <StackYaml
+                  data={yamlContent}
+                />
+              </Tabpane>
+              <Tabpane tab="堆栈拓补" key="topology">
 
-          </Tabpane>
-          <Tabpane tab="事件" key="event">
+              </Tabpane>
+              <Tabpane tab="事件" key="event">
 
-          </Tabpane>
-        </Tabs>
+              </Tabpane>
+            </Tabs>
+        }
       </Card>
-    </QueueAnim>
+      <Modal
+        title="确认停止吗？"
+        visible={stopModal}
+        onCancel={() => this.setState({ stopModal: false })}
+        onOk={this.confirmStop}
+        confirmLoading={stopLoading}
+      >
+
+      </Modal>
+      <Modal
+        title="确认删除吗？"
+        visible={delModal}
+        onCancel={() => this.setState({ delModal: false })}
+        onOk={this.confirmDel}
+        confirmLoading={delLoading}
+      >
+
+      </Modal>
+    </div>
   }
 }
 
