@@ -140,6 +140,7 @@ export default class AppStack extends React.Component {
 
   initDesigner = () => {
     this.paperDom = document.getElementById('app-stack-paper')
+    this.navigatorDom = document.getElementById('app-stack-paper-navigator')
     this.graph = new joint.dia.Graph()
     // http://resources.jointjs.com/docs/jointjs/v2.2/joint.html#dia.Paper.prototype.options.async
     this.paper = new joint.dia.Paper({
@@ -149,10 +150,17 @@ export default class AppStack extends React.Component {
       model: this.graph,
       // the dimensions of the rendered paper (in pixels)
       width: '100%',
-      height: 600,
+      height: 800,
       // the size of the grid to which elements are aligned.
       // affects the granularity of element movement
       gridSize: 8,
+      drawGrid: {
+        name: 'fixedDot',
+        // args: [
+        //   { color: 'red', thickness: 1 }, // settings for the primary mesh
+        //   { color: 'green', scaleFactor: 5, thickness: 5 } //settings for the secondary mesh
+        // ],
+      },
       snapLinks: true,
       linkPinning: false,
       // http://resources.jointjs.com/docs/jointjs/v2.2/joint.html#dia.Paper.prototype.options.embeddingMode
@@ -161,13 +169,6 @@ export default class AppStack extends React.Component {
       // no pointerclick event triggered after mouseup. It defaults to 0.
       clickThreshold: 5,
       defaultConnectionPoint: { name: 'boundary' },
-      drawGrid: {
-        name: 'fixedDot',
-        // args: [
-        //   { color: 'red', thickness: 1 }, // settings for the primary mesh
-        //   { color: 'green', scaleFactor: 5, thickness: 5 } //settings for the secondary mesh
-        // ],
-      },
       highlighting: {
         default: {
           name: 'stroke',
@@ -207,6 +208,21 @@ export default class AppStack extends React.Component {
         return sourceMagnet !== targetMagnet
       },
     })
+    // @Todo: 可以用来做鹰眼视图
+    this.navigatorPaper = new joint.dia.Paper({
+      // an HTML element into which the paper will be rendered
+      el: this.navigatorDom,
+      // a Graph model we want to render into the paper
+      model: this.graph,
+      // the dimensions of the rendered paper (in pixels)
+      width: 200,
+      height: 200,
+      // the size of the grid to which elements are aligned.
+      // affects the granularity of element movement
+      gridSize: 1,
+      interactive: false,
+    })
+    this.navigatorPaper.scale(0.1, 0.1);
     // test
     window._paper = this.paper
 
@@ -585,6 +601,13 @@ export default class AppStack extends React.Component {
                 ev.dataTransfer.dropEffect = 'move'
               }}
               onDrop={this.onResourceDrop}
+            >
+              <div className="loading">loading ...</div>
+            </div>
+            <div
+              id="app-stack-paper-navigator"
+              className={styles.navigatorPaper}
+              key="navigator-paper"
             >
               <div className="loading">loading ...</div>
             </div>
