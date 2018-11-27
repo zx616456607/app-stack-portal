@@ -466,6 +466,10 @@ export default class AppStack extends React.Component {
   render() {
     const { form } = this.props
     const { getFieldDecorator } = form
+    const {
+      yamlDockSize, yamlDockVisible, paperScale, yamlEditorTabKey,
+      saveStackModal, saveStackBtnLoading,
+    } = this.state
     const FormItemLayout = {
       labelCol: {
         span: 4,
@@ -485,6 +489,9 @@ export default class AppStack extends React.Component {
         <div
           key="designer"
           className={styles.designer}
+          style={{
+            marginBottom: (yamlDockVisible ? yamlDockSize : 0),
+          }}
         >
           <div className={styles.resourceList} key="resource">
             {
@@ -573,7 +580,7 @@ export default class AppStack extends React.Component {
                 onClick={() => this.handlePaperScale('+')}
               />
               <Slider
-                value={this.state.paperScale}
+                value={paperScale}
                 min={PAPER_SCALE_MIN}
                 max={PAPER_SCALE_MAX}
                 step={PAPER_SCALE_STEP}
@@ -615,13 +622,13 @@ export default class AppStack extends React.Component {
         </div>
         <Dock
           fluid={false}
-          size={this.state.yamlDockSize}
-          isVisible={this.state.yamlDockVisible}
+          size={yamlDockSize}
+          isVisible={yamlDockVisible}
           position="bottom"
           dimMode="none"
-          onSizeChange={yamlDockSize => {
-            if (yamlDockSize < DOCK_DEFAULT_HEADER_SIZE) return
-            this.setState({ yamlDockSize }, () => {
+          onSizeChange={dockSize => {
+            if (dockSize < DOCK_DEFAULT_HEADER_SIZE) return
+            this.setState({ yamlDockSize: dockSize }, () => {
               this.yarmlEditor.resize()
             })
           }}
@@ -629,8 +636,8 @@ export default class AppStack extends React.Component {
           <div className={styles.yamlEditor}>
             <div className={styles.yamlEditorHeader}>
               <Tabs
-                activeKey={this.state.yamlEditorTabKey}
-                onChange={yamlEditorTabKey => this.setState({ yamlEditorTabKey })}
+                activeKey={yamlEditorTabKey}
+                onChange={yamlTabKey => this.setState({ yamlEditorTabKey: yamlTabKey })}
                 tabBarExtraContent={<div className={styles.yamlEditorHeaderBtns}>
                   <Button type="dashed" icon="search" />
                   <Button
@@ -657,8 +664,8 @@ export default class AppStack extends React.Component {
         <Modal
           title="保存堆栈模板"
           okText="确认保存"
-          visible={this.state.saveStackModal}
-          confirmLoading={this.state.saveStackBtnLoading}
+          visible={saveStackModal}
+          confirmLoading={saveStackBtnLoading}
           onOk={this.onStackSave}
           onCancel={() => this.setState({ saveStackModal: false })}
         >
