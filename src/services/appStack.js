@@ -29,8 +29,32 @@ export const templateListRequest = ({ query }) => request({
   },
 })
 export const appStacksListRequest = ({ cluster, query }) => request({
-  url: `${paasApiUrl}/${cluster}/appstacks?${queryString.stringify(query)}`,
+  url: `${paasApiUrl}/clusters/${cluster}/appstacks?${queryString.stringify(query)}`,
   options: {
     method: 'GET',
+  },
+})
+export const appStacksDetailRequest = ({ cluster, name }) => request({
+  url: `${paasApiUrl}/clusters/${cluster}/appstacks/${name}`,
+  options: {
+    method: 'GET',
+  },
+})
+export const appStacksStartRequest = ({ cluster, name }) => request({
+  url: `${paasApiUrl}/clusters/${cluster}/appstacks/${name}/actions/start`,
+  options: {
+    method: 'PUT',
+  },
+})
+export const appStacksStopRequest = ({ cluster, name }) => request({
+  url: `${paasApiUrl}/clusters/${cluster}/appstacks/${name}/actions/stop`,
+  options: {
+    method: 'PUT',
+  },
+})
+export const appStacksDeleteRequest = ({ cluster, name }) => request({
+  url: `${paasApiUrl}/clusters/${cluster}/appstacks/${name}`,
+  options: {
+    method: 'DELETE',
   },
 })

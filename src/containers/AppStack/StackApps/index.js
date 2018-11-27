@@ -13,9 +13,9 @@
 
 import React from 'react'
 import QueueAnim from 'rc-queue-anim'
-import { connect } from 'react-redux'
+import { connect } from 'dva'
 import { Card, Button } from 'antd'
-// import { Link } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { Stack as StackIcon } from '@tenx-ui/icon'
 import Loader from '@tenx-ui/loader'
 import Ellipsis from '@tenx-ui/ellipsis'
@@ -54,7 +54,7 @@ class StackApps extends React.Component {
       id="appStack"
     >
       <Button type="primary" icon="plus" key="button">部署堆栈</Button>
-      <div key="appStackContent" className={styles.appStackContent}>
+      <div className={styles.appStackContent}>
         {
           stacksLoading ?
             <Loader
@@ -78,7 +78,10 @@ class StackApps extends React.Component {
                             {v.name}
                           </Ellipsis>
                         </h2>
-                        <Button type="primary">管理应用堆栈</Button>
+                        <Link to={`/app-stack/appStackDetail/${v.name}`}>
+                          <Button type="primary">管理应用堆栈</Button>
+                        </Link>
+
                       </div>
                     </div>
                     <div className={styles.itemBottom}>

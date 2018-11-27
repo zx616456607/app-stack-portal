@@ -10,7 +10,15 @@
  * @date 2018-11-16
  */
 
-import { deployAppstack, appStacksListRequest, templateListRequest } from '../services/appStack'
+import {
+  deployAppstack,
+  appStacksListRequest,
+  templateListRequest,
+  appStacksStartRequest,
+  appStacksStopRequest,
+  appStacksDeleteRequest,
+  appStacksDetailRequest,
+} from '../services/appStack'
 import { notification } from 'antd/lib/index';
 
 export default {
@@ -18,6 +26,9 @@ export default {
   state: {},
   reducers: {
     appStackList(state, { payload }) {
+      return { ...state, ...payload }
+    },
+    appStackDetail(state, { payload }) {
       return { ...state, ...payload }
     },
     appStackTemplateList(state, { payload }) {
@@ -34,14 +45,74 @@ export default {
     * fetchAppStackList({ payload: { cluster, query } }, { call, put }) {
       try {
         const res = yield call(appStacksListRequest, { cluster, query })
+        /*        const listMock = [
+          {
+            name: 'myAppStack1',
+            appCount: 6,
+            serviceCount: 69988,
+            containerCount: 2225442,
+          },
+          {
+            name: 'myAppStack2',
+            appCount: 6,
+            serviceCount: 69988,
+            containerCount: 2225442,
+          },
+          {
+            name: 'myAppStack3',
+            appCount: 6,
+            serviceCount: 69988,
+            containerCount: 2225442,
+          },
+          {
+            name: 'myAppStack4',
+            appCount: 6,
+            serviceCount: 69988,
+            containerCount: 2225442,
+          },
+        ]*/
         yield put({
           type: 'appStackList',
           payload: {
-            appStacks: res.data,
+            // appStacks: listMock,
+            appStacks: res.data.appStacks,
           },
         })
       } catch (e) {
         notification.error({ message: '获取堆栈列表失败', description: '' })
+        const listMock = [
+          {
+            name: 'myAppStack1',
+            appCount: 6,
+            serviceCount: 69988,
+            containerCount: 2225442,
+          },
+          {
+            name: 'myAppStack2',
+            appCount: 6,
+            serviceCount: 69988,
+            containerCount: 2225442,
+          },
+          {
+            name: 'myAppStack3',
+            appCount: 6,
+            serviceCount: 69988,
+            containerCount: 2225442,
+          },
+          {
+            name: 'myAppStack4',
+            appCount: 6,
+            serviceCount: 69988,
+            containerCount: 2225442,
+          },
+        ]
+        yield put({
+          type: 'appStackList',
+          payload: {
+            appStacks: listMock,
+            // appStacks: res.data,
+          },
+        })
       }
     },
     * fetchAppStackTemplate({ payload: { query } }, { call, put }) {
@@ -58,6 +129,33 @@ export default {
       } catch (e) {
         notification.error({ message: '获取堆栈模板列表失败', description: '' })
       }
+    },
+    * fetchAppStackDetail({ payload: { cluster, name } }, { call, put }) {
+      try {
+        const res = yield call(appStacksDetailRequest, { cluster, name })
+        if (res.code === 200) {
+          yield put({
+            type: 'appStackDetail',
+            payload: {
+              appstacksDetail: res.data,
+            },
+          })
+        }
+      } catch (e) {
+        notification.error({ message: '获取堆栈详情失败', description: '' })
+      }
+    },
+    * stackStart({ payload: { cluster, name } }, { call }) {
+      const res = yield call(appStacksStartRequest, { cluster, name })
+      return res
+    },
+    * stackStop({ payload: { cluster, name } }, { call }) {
+      const res = yield call(appStacksStopRequest, { cluster, name })
+      return res
+    },
+    * stackDelete({ payload: { cluster, name } }, { call }) {
+      const res = yield call(appStacksDeleteRequest, { cluster, name })
+      return res
     },
   },
 }
