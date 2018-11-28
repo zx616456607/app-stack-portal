@@ -174,22 +174,22 @@ class StackAppsDetail extends React.Component {
         }
       </Card>
       <Modal
-        title="确认停止吗？"
+        title="停止堆栈？"
         visible={stopModal}
         onCancel={() => this.setState({ stopModal: false })}
         onOk={this.confirmStop}
         confirmLoading={stopLoading}
       >
-
+        确定停止堆栈吗？
       </Modal>
       <Modal
-        title="确认删除吗？"
+        title="删除堆栈？"
         visible={delModal}
         onCancel={() => this.setState({ delModal: false })}
         onOk={this.confirmDel}
         confirmLoading={delLoading}
       >
-
+        确认删除堆栈吗？
       </Modal>
     </div>
   }

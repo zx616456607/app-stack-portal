@@ -19,6 +19,7 @@ import {
   appStacksStopRequest,
   appStacksDeleteRequest,
   appStacksDetailRequest,
+  templateDetailRequest,
 } from '../services/appStack'
 import { notification } from 'antd/lib/index';
 
@@ -75,6 +76,21 @@ export default {
         }
       } catch (e) {
         notification.error({ message: '获取堆栈模板列表失败', description: '' })
+      }
+    },
+    * fetchAppStackTemplateDetail({ payload: { name } }, { call, put }) {
+      try {
+        const res = yield call(templateDetailRequest, name)
+        if (res.code === 200) {
+          yield put({
+            type: 'appStackTemplateList',
+            payload: {
+              templateDetail: res.data,
+            },
+          })
+        }
+      } catch (e) {
+        notification.error({ message: '获取堆栈模板详情失败', description: '' })
       }
     },
     * fetchAppStackDetail({ payload: { cluster, name } }, { call, put }) {
