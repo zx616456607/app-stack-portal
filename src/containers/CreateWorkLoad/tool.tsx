@@ -195,20 +195,6 @@ class Preview extends React.Component<PreviewProps, PreviewState> {
   }
 };
 
-// const preViewKey = ['StatefulSet', 'Deployment', 'StatefulSet', 'CronJob'] // 只解析这四种类型
-// function analyzeYamlPreview(aceEditor: AceEditor) {
-//   if (!aceEditor) { return []}
-//   const data = preViewKey.map((name) => {
-//     const content = aceEditor.find(name, { wholeWord: true })
-//     return  [name, content]
-//   })
-//   data.filter(([name, value]) => {
-//     if (value === undefined) { return false }
-//     const
-//   })
-//   console.log('data', data)
-// }
-
 function analyzeYamlPreview1(value: yamlString) {
   const singaleValue = compact(value.split(`---`))
   const objValue = singaleValue
@@ -234,6 +220,7 @@ interface Label {
   [index: string]: string
 }
 function manage(type: string, labels: Label[]) {
+  // TODO: 这块还没做
   // switch (type) {
   //   case '':
   //     break;
