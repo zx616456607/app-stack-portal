@@ -40,7 +40,7 @@ class StackApps extends React.Component {
     const { getAppStackList, cluster } = this.props
     const query = {
       from: 0,
-      size: 100,
+      size: 0,
     }
     getAppStackList({ cluster, query })
   }

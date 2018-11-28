@@ -52,74 +52,14 @@ export default {
     * fetchAppStackList({ payload: { cluster, query } }, { call, put }) {
       try {
         const res = yield call(appStacksListRequest, { cluster, query })
-        /*        const listMock = [
-          {
-            name: 'myAppStack1',
-            appCount: 6,
-            serviceCount: 69988,
-            containerCount: 2225442,
-          },
-          {
-            name: 'myAppStack2',
-            appCount: 6,
-            serviceCount: 69988,
-            containerCount: 2225442,
-          },
-          {
-            name: 'myAppStack3',
-            appCount: 6,
-            serviceCount: 69988,
-            containerCount: 2225442,
-          },
-          {
-            name: 'myAppStack4',
-            appCount: 6,
-            serviceCount: 69988,
-            containerCount: 2225442,
-          },
-        ]*/
         yield put({
           type: 'appStackList',
           payload: {
-            // appStacks: listMock,
             appStacks: res.data.appStacks,
           },
         })
       } catch (e) {
         notification.error({ message: '获取堆栈列表失败', description: '' })
-        const listMock = [
-          {
-            name: 'myAppStack1',
-            appCount: 6,
-            serviceCount: 69988,
-            containerCount: 2225442,
-          },
-          {
-            name: 'myAppStack2',
-            appCount: 6,
-            serviceCount: 69988,
-            containerCount: 2225442,
-          },
-          {
-            name: 'myAppStack3',
-            appCount: 6,
-            serviceCount: 69988,
-            containerCount: 2225442,
-          },
-          {
-            name: 'myAppStack4',
-            appCount: 6,
-            serviceCount: 69988,
-            containerCount: 2225442,
-          },
-        ]
-        yield put({
-          type: 'appStackList',
-          payload: {
-            appStacks: listMock,
-            // appStacks: res.data,
-          },
-        })
       }
     },
     * fetchAppStackTemplate({ payload: { query } }, { call, put }) {
