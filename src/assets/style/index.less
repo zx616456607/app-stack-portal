@@ -169,6 +169,9 @@ body {
 
 :global {
   .table-flex {
+    table, thead, tbody {
+      display: block !important;
+    }
     tr {
       display: flex;
     }
@@ -193,6 +196,7 @@ body {
     }
     th:last-child, td:last-child {
       flex-shrink: 0;
+      flex-basis: 160px;
     }
   }
   .Moreoperations {

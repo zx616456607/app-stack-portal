@@ -105,7 +105,7 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
           width={300}
           className={styles.sider}
         >
-          <Tool/>
+          <Tool aceEditor={this.Ace} value={this.props.value}/>
         </Sider>
         </Layout>
         { this.state.Exportvisible &&
