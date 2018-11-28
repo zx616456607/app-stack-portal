@@ -25,8 +25,9 @@ import {
 import classnames from 'classnames'
 // import $ from 'jquery'
 import Dock from 'react-dock'
+import yamlParser from 'js-yaml'
 import styles from './style/index.less'
-import * as yamls from './yamls'
+// import * as yamls from './yamls'
 import './shapes'
 
 const TabPane = Tabs.TabPane
@@ -121,7 +122,9 @@ const mapStateToProps = state => {
 @connect(mapStateToProps)
 export default class AppStack extends React.Component {
   state = {
-    yamlStr: undefined,
+    templateYamlStr: `nodes: []
+inputs: []`,
+    inputYamlStr: '',
     yamlObj: {},
     createBtnLoading: false,
     paperScale: 1,
@@ -138,6 +141,8 @@ export default class AppStack extends React.Component {
 
   yarmlEditor = undefined
 
+  yaml2GraphTimeout = undefined
+
   initDesigner = () => {
     this.paperDom = document.getElementById('app-stack-paper')
     this.navigatorDom = document.getElementById('app-stack-paper-navigator')
@@ -153,7 +158,7 @@ export default class AppStack extends React.Component {
       height: 800,
       // the size of the grid to which elements are aligned.
       // affects the granularity of element movement
-      gridSize: 8,
+      gridSize: 16,
       drawGrid: {
         name: 'fixedDot',
         // args: [
@@ -223,8 +228,6 @@ export default class AppStack extends React.Component {
       interactive: false,
     })
     this.navigatorPaper.scale(0.1, 0.1);
-    // test
-    window._paper = this.paper
 
     // 可以做 redo undo
     // this.graph.on('change', function(cell) {
@@ -246,6 +249,11 @@ export default class AppStack extends React.Component {
       }
       this.newEmbeds = newEmbeds
     })
+
+    // test
+    window._paper = this.paper
+    window._graph = this.graph
+
     // this.graph.on('change:position', (element, newPosition) => {
     //   console.log('element1 moved to ' + newPosition.x + ',' + newPosition.y)
     // })
@@ -299,6 +307,7 @@ export default class AppStack extends React.Component {
       case 'Delete':
       case 'Backspace':
         this.activeElement && this.activeElement.remove()
+        this.graph2Yaml()
         break
       default:
         break
@@ -348,23 +357,82 @@ export default class AppStack extends React.Component {
 
     const resource = new joint.shapes.devs[id](options)
     this.graph.addCells([ resource ])
+    this.graph2Yaml()
 
     this.paper.translate(tx, ty)
     this.paper.scale(paperScale, paperScale)
     // test only ---begin
-    const { yamlObj } = this.state
+    /* const { yamlObj } = this.state
     if (!yamlObj[id] && yamls[id]) {
       yamlObj[id] = yamls[id]
-      const yamlStr = Object.keys(yamlObj).map(key => yamlObj[key]).join(yamls.YAML_SEPARATOR)
-      this.setState({ yamlObj, yamlStr })
-    }
+      const templateYamlStr = Object.keys(yamlObj).map(key => yamlObj[key]).join(yamls.YAML_SEPARATOR)
+      this.setState({ yamlObj, templateYamlStr })
+    } */
     // test only ---end
 
     // console.log('graph.toJSON()', JSON.stringify(this.graph.toJSON()))
   }
 
+  graph2Yaml = () => {
+    const yamlObj = {
+      nodes: {},
+      inputs: {},
+    }
+    this.graph.getCells().forEach(cell => {
+      const { cid, attributes: { _app_stack_template, _app_stack_input } } = cell
+      if (_app_stack_template) {
+        yamlObj.nodes[cid] = _app_stack_template
+        yamlObj.inputs[cid] = _app_stack_input
+      }
+    })
+    this.setState({
+      yamlObj,
+      templateYamlStr: yamlParser.safeDump(yamlObj),
+      inputYamlStr: yamlParser.safeDump(yamlObj.inputs),
+    })
+  }
+
+  yaml2Graph = (templateYamlStr, inputYamlStr) => {
+    if (!templateYamlStr && !inputYamlStr) {
+      return
+    }
+    try {
+      let yamlObj
+      if (templateYamlStr) {
+        yamlObj = yamlParser.safeLoad(templateYamlStr)
+      } else {
+        yamlObj = { inputs: yamlParser.safeLoad(inputYamlStr) }
+      }
+      this.setState({ yamlObj })
+      Object.keys(yamlObj.nodes || yamlObj.inputs).forEach(key => {
+        const cell = this.graph.getCell(key)
+        if (yamlObj.nodes) {
+          cell.attributes._app_stack_template = yamlObj.nodes[key]
+        }
+        if (yamlObj.inputs) {
+          cell.attributes._app_stack_input = yamlObj.inputs[key]
+        }
+      })
+      this.graph2Yaml()
+    } catch (error) {
+      console.warn('parse yaml failed', error)
+    }
+  }
+
+  onTemplateYamlChange = templateYamlStr => {
+    this.setState({ templateYamlStr })
+    clearTimeout(this.yaml2GraphTimeout)
+    this.yaml2GraphTimeout = setTimeout(() => this.yaml2Graph(templateYamlStr), 300);
+  }
+
+  onInputYamlChange = inputYamlStr => {
+    this.setState({ inputYamlStr })
+    clearTimeout(this.yaml2GraphTimeout)
+    this.yaml2GraphTimeout = setTimeout(() => this.yaml2Graph(null, inputYamlStr), 300);
+  }
+
   deployTest = async () => {
-    const { yamlStr, yamlObj } = this.state
+    const { templateYamlStr, yamlObj } = this.state
     if (!yamlObj || Object.keys(yamlObj).length !== 3) {
       return notification.info({
         message: '请完成设计后再点击创建',
@@ -381,7 +449,7 @@ export default class AppStack extends React.Component {
           cluster,
           body: {
             conent: JSON.stringify(this.graph.toJSON()),
-            k8sManifest: yamlStr,
+            k8sManifest: templateYamlStr,
           },
         },
       })
@@ -542,7 +610,7 @@ export default class AppStack extends React.Component {
               <Button icon="delete" onClick={() => this.graph.clear()}>
               清空设计
               </Button>
-              <Button icon="layout" onClick={this.layout}>
+              <Button icon="layout" onClick={this.layout} disabled>
               自动布局
               </Button>
               <Button
@@ -552,10 +620,11 @@ export default class AppStack extends React.Component {
                     maxScale: 2,
                     minScale: PAPER_SCALE_MIN,
                   })
-                  const { sx: paperScale } = this.paper.scale()
-                  this.setState({ paperScale })
+                  const { sx } = this.paper.scale()
+                  this.setState({ paperScale: sx })
                   // @Todo: 位置需要居中
                 }}
+                disabled
               >
               适应屏幕
               </Button>
@@ -585,9 +654,9 @@ export default class AppStack extends React.Component {
                 max={PAPER_SCALE_MAX}
                 step={PAPER_SCALE_STEP}
                 marks={{ 1: '1x' }}
-                onChange={paperScale => {
-                  this.paper.scale(paperScale, paperScale)
-                  this.setState({ paperScale })
+                onChange={scale => {
+                  this.paper.scale(scale, scale)
+                  this.setState({ paperScale: scale })
                 }}
                 tipFormatter={value => `${value}x`}
                 vertical
@@ -650,15 +719,31 @@ export default class AppStack extends React.Component {
               >
                 <TabPane tab="模版" key="template"></TabPane>
                 <TabPane tab="输入" key="input"></TabPane>
-                <TabPane tab="输出" key="output"></TabPane>
+                {/* <TabPane tab="输出" key="output"></TabPane> */}
               </Tabs>
             </div>
-            <TenxEditor
-              theme="chrome"
-              value={this.state.yamlStr}
-              onChange={yamlStr => this.setState({ yamlStr })}
-              onLoad={editor => { this.yarmlEditor = editor }}
-            />
+            {
+              yamlEditorTabKey === 'template' &&
+              <TenxEditor
+                name="app_stack_template"
+                theme="chrome"
+                fontSize={12}
+                value={this.state.templateYamlStr}
+                onChange={this.onTemplateYamlChange}
+                onLoad={editor => { this.yarmlEditor = editor }}
+              />
+            }
+            {
+              yamlEditorTabKey === 'input' &&
+              <TenxEditor
+                name="app_stack_input"
+                theme="chrome"
+                fontSize={12}
+                value={this.state.inputYamlStr}
+                onChange={this.onInputYamlChange}
+                onLoad={editor => { this.yarmlEditor = editor }}
+              />
+            }
           </div>
         </Dock>
         <Modal
