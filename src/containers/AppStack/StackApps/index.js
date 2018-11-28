@@ -53,7 +53,9 @@ class StackApps extends React.Component {
     return <QueueAnim
       id="appStack"
     >
-      <Button type="primary" icon="plus" key="button">部署堆栈</Button>
+      <Link to="app-stack/templates">
+        <Button type="primary" icon="plus" key="button">部署堆栈</Button>
+      </Link>
       <div className={styles.appStackContent}>
         {
           stacksLoading ?
