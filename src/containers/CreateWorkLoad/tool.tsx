@@ -14,11 +14,17 @@ import { connect, SubscriptionAPI } from 'dva'
 import { notification, Select, Icon } from 'antd'
 import queryString from 'query-string'
 import { withRouter, RouteComponentProps } from 'dva/router'
+import { Editor as AceEditor } from 'brace'
+import { yamlString } from './editorType'
+import yaml from 'js-yaml'
+import compact from 'lodash/compact'
 
 const Option = Select.Option;
 
-interface ToolProps extends SubscriptionAPI, RouteComponentProps {
+export interface ToolProps extends SubscriptionAPI, RouteComponentProps {
   cluster: string
+  aceEditor: AceEditor
+  value: yamlString
 }
 interface ToolState {
   sampleInfo: {
@@ -55,7 +61,7 @@ class Tool extends React.Component<ToolProps, ToolState> {
           <Sample
             sampleInfo={this.state.sampleInfo}
           />
-          <Preview/>
+          <Preview aceEditor={this.props.aceEditor} value={this.props.value}/>
         </PanelGroup>
       </div>
     )
@@ -66,7 +72,7 @@ function mapStateToProps(state) {
   const { app: { cluster = '' } = {} } = state
   return { cluster }
 }
-export default withRouter(connect(mapStateToProps)(Tool))
+export default connect(mapStateToProps)(withRouter(Tool))
 
 interface SampleProps extends RouteComponentProps {
   sampleInfo: {
@@ -161,19 +167,65 @@ const SampleNode = ({
 }
 
 interface PreviewProps {
-
+  aceEditor: AceEditor
+  value: yamlString
 }
 interface PreviewState {
 
 }
+
 class Preview extends React.Component<PreviewProps, PreviewState> {
   render() {
+    // analyzeYamlPreview(this.props.aceEditor)
     return(
       <div className={styles.Preview}>
         <div className={styles.SampleHeader}>
           概览
         </div>
+        {
+          analyzeYamlPreview1(this.props.value).map((nodeInfo) =>
+          <div className={styles.previewNode} key={nodeInfo[1]}>
+            <div>{nodeInfo[0]}</div>
+            <div>{nodeInfo[1]}</div>
+            <div>{nodeInfo[2] ? '管' : '原'}</div>
+          </div>)
+        }
       </div>
     )
   }
 };
+
+function analyzeYamlPreview1(value: yamlString) {
+  const singaleValue = compact(value.split(`---`))
+  const objValue = singaleValue
+  .map((ivalue) => {
+    let res = []
+    try {
+      res = yaml.load(ivalue)
+    } catch (error) {
+      console.warn(error)
+    }
+    return res
+  })
+  .filter((node) => node.length !== 0)
+  .map((node) => {
+    const { kind, metadata: { name = '-', labels = '-' } = {} } = node
+    const manageFlag = manage(kind, labels)
+    return [kind, name, manageFlag]
+  })
+  return objValue
+}
+
+interface Label {
+  [index: string]: string
+}
+function manage(type: string, labels: Label[]) {
+  // TODO: 这块还没做
+  // switch (type) {
+  //   case '':
+  //     break;
+  //   default:
+  //     break;
+  // }
+  return true
+}
