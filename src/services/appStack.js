@@ -48,6 +48,12 @@ export const templateDetailRequest = name => request({
     method: 'GET',
   },
 })
+export const templateDeleteRequest = name => request({
+  url: `${paasApiUrl}/appstacks/templates/${name}`,
+  options: {
+    method: 'DELETE',
+  },
+})
 export const appStacksListRequest = ({ cluster, query }) => request({
   url: `${paasApiUrl}/clusters/${cluster}/appstacks?${queryString.stringify(query)}`,
   options: {
