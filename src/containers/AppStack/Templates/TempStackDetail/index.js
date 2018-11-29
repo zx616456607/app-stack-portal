@@ -12,7 +12,8 @@
 
 import React from 'react'
 import QueueAnim from 'rc-queue-anim'
-import { Card, Form, Input, Collapse, Table } from 'antd'
+import { Card, Form, Input, Collapse, Table, Button } from 'antd'
+import { Link } from 'react-router-dom'
 import { connect } from 'dva'
 import Loader from '@tenx-ui/loader'
 import styles from './style/index.less'
@@ -53,13 +54,13 @@ class TempStackDetail extends React.Component {
       },
       {
         title: '参数类型',
-        dataIndex: 'type',
+        dataIndex: 'label',
       },
       {
         title: '参数值',
         dataIndex: 'value',
-        render: () => {
-          return <Input style={{ width: 100 }}/>
+        render: text => {
+          return <Input defaultValue={text} style={{ width: 100 }}/>
         },
       },
       {
@@ -67,25 +68,26 @@ class TempStackDetail extends React.Component {
         dataIndex: 'description',
       },
     ],
+
   }
   componentDidMount() {
     const { appStackTemplateDetail } = this.props
     appStackTemplateDetail(this.props.match.params.name)
   }
+  appStackStart() {
+
+  }
   render() {
     const { match, loading, templateDetail, form } = this.props
     const { getFieldDecorator } = form
     const templateDetailLoading = loading.effects['appStack/fetchAppStackTemplateDetail']
-    const mockData = [
-      {
-        name: 'canshuming',
-        type: 'ttgdgfgfd.madsa',
-        value: '',
-        description: '决赛oh hi反对放得开了几分打算拉框',
-      },
-    ]
-    const { column } = this.state
 
+    const { column } = this.state
+    let paramsConfig = []
+    if (templateDetail) {
+      const { inputs } = JSON.parse(templateDetail.content)
+      paramsConfig = inputs
+    }
     return <QueueAnim
       id="tempStackDetail"
     >
@@ -137,22 +139,37 @@ class TempStackDetail extends React.Component {
               <div className={styles.config}>
                 <h2>参数配置</h2>
                 <div className={styles.configContent}>
-                  <Collapse bordered={false} defaultActiveKey={[ '1' ]}>
-                    <Panel header="标签" key="1" style={panelStyle}>
-                      <Table
-                        columns={column}
-                        dataSource={mockData}
-                        pagination={false}
-                      />
-                    </Panel>
-                    <Panel header="标签" key="2" style={panelStyle}>
-                      <p>{45654654}</p>
-                    </Panel>
-                    <Panel header="标签" key="3" style={panelStyle}>
-                      <p>{45645312312}</p>
-                    </Panel>
+                  <Collapse bordered={false}>
+                    {
+                      Object.keys(paramsConfig).map(k => {
+                        const item = paramsConfig[k].input
+                        const data = []
+                        Object.keys(item).forEach(k => {
+                          data.push({
+                            name: k,
+                            label: item[k].label,
+                            value: item[k].default,
+                            description: item[k].description,
+                            key: k,
+                          })
+                        })
+                        return <Panel header={`标签: ${k}`} key={k} style={panelStyle}>
+                          <Table
+                            columns={column}
+                            dataSource={data}
+                            pagination={false}
+                          />
+                        </Panel>
+                      })
+                    }
                   </Collapse>
                 </div>
+              </div>
+              <div className={styles.btnGroup}>
+                <Link to="/app-stack/templates">
+                  <Button>取消</Button>
+                </Link>
+                <Button type="primary" onClick={this.appStackStart}>启动应用堆栈</Button>
               </div>
             </Form>
           </Card>
