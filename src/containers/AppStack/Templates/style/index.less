@@ -19,7 +19,7 @@
 
 .listItem {
   width: 22%;
-  margin: 2% 2% 2% 0;
+  margin: 20px 20px 0 0;
   display: inline-block;
   background: #fff;
   position: relative;
@@ -38,49 +38,53 @@
     top: @padding-small;
     background: #e8f7fe;
   }
+  .setting {
+    padding: 3px 5px;
+    position: absolute;
+    right: @padding-small;
+    top: @padding-small;
+    &:hover {
+      color: @primary-color;
+    }
+  }
   .itemTop {
     padding: @padding-small;
+    height: 128px;
     margin-top: @padding-large;
+    display: flex;
+    align-items: center;
     .itemImg {
-      display: inline-block;
       width: 30%;
       height: 80px;
       text-align: center;
       line-height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       .stackIcon {
-        margin-top: 8px;
-        font-size: 70px;
+        font-size: 50px;
         color: @primary-color;
       }
     }
     .itemInfo {
       width: 68%;
-      display: inline-block;
-      vertical-align: top;
       margin-left: 2%;
       h2 {
         font-weight: normal;
+        font-size: 16px;
+        line-height: 16px;
       }
     }
   }
   .itemBottom {
-    height: 90px;
+    height: 65px;
     width: 100%;
     padding: @padding-small;
     background: #f9f9f9;
     border-top: 1px solid @border-color-split;
-    & >div {
-      display: inline-block;
-      vertical-align: middle;
-      width: 33.33333%;
-      text-align: center;
-      padding: 0 @padding-base;
-      margin-top: 8px;
-      &:nth-child(2) {
-        border-left: 1px solid @border-color-split;
-        border-right: 1px solid @border-color-split;
-      }
-    }
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
   }
 }
 

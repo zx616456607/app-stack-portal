@@ -107,6 +107,18 @@ const formatDate = (timestamp, format) => {
 }
 
 /**
+ * Calculate time from now
+ * Option
+ * - beginDate
+ * Output
+ * - three days ago, etc
+ *
+ * @param {any} beginDate format string
+ * @return {string} formatted datetime string
+ */
+const calcuDate = beginDate => moment(beginDate).fromNow()
+
+/**
  * Format date
  * `YYYY-MM-DD HH:mm:ss`
  * @export
@@ -568,6 +580,7 @@ export {
   safeParseJSON,
   encodeImageFullname,
   formatDate,
+  calcuDate,
   getDeepValue,
   parseK8sSize,
   getBuildStatusTextAndClass,

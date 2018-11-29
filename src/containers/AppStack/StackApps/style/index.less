@@ -21,7 +21,7 @@
 
 .listItem {
   width: 22%;
-  margin: 2.5% 2.5% 2.5% 0;
+  margin: 20px 20px 0 0;
   display: inline-block;
   background: #fff;
   position: relative;
@@ -42,24 +42,30 @@
   }
   .itemTop {
     padding: @padding-medium @padding-small;
+    display: flex;
+    align-items: center;
     .itemImg {
-      display: inline-block;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       width: 30%;
-      height: 80px;
+      height: 102px;
       text-align: center;
       line-height: 80px;
       .stackIcon {
-        margin-top: 8px;
-        font-size: 70px;
+        font-size: 60px;
         color: @primary-color;
       }
     }
     .itemInfo {
-      width: 50%;
-      display: inline-block;
+      width: 60%;
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
       vertical-align: top;
-      margin-left: @padding-small;
+      margin-left: 2%;
       h2 {
+        width: 100px;
         font-weight: normal;
       }
     }

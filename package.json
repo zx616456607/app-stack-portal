@@ -33,7 +33,7 @@
     "@antv/data-set": "^0.10.0",
     "@tenx-ui/editor": "2.0.2",
     "@tenx-ui/ellipsis": "^0.0.4",
-    "@tenx-ui/icon": "^2.1.17",
+    "@tenx-ui/icon": "^2.1.21",
     "@tenx-ui/loader": "^0.0.3",
     "@tenx-ui/logs": "^1.1.6",
     "@tenx-ui/modal": "^1.0.9",

@@ -76,7 +76,7 @@ class StackApps extends React.Component {
                       </div>
                       <div className={styles.itemInfo}>
                         <h2>
-                          <Ellipsis>
+                          <Ellipsis lines={1}>
                             {v.name}
                           </Ellipsis>
                         </h2>
