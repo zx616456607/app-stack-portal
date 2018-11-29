@@ -256,8 +256,8 @@ inputs: []`,
       // a Graph model we want to render into the paper
       model: this.graph,
       // the dimensions of the rendered paper (in pixels)
-      width: 200,
-      height: 200,
+      width: 150,
+      height: 150,
       // the size of the grid to which elements are aligned.
       // affects the granularity of element movement
       gridSize: 1,
@@ -367,21 +367,21 @@ inputs: []`,
       } catch (error) {
         //
       }
-      if (!graphData || !graphData.cells) {
-        return
+      if (graphData && graphData.cells && graphData.cells.length > 0) {
+        const self = this
+        confirm({
+          modalTitle: '打开未保存模板',
+          title: '您有未保存的模板，是否要打开未保存的模板？',
+          width: 420,
+          onOk() {
+            self.graph.fromJSON(graphData)
+            self.graph2Yaml()
+          },
+          onCancel() {
+            self._removeGraphObjFromLS()
+          },
+        })
       }
-      const self = this
-      confirm({
-        modalTitle: '打开未保存模板',
-        title: '您有未保存的模板，是否要打开未保存的模板？',
-        onOk() {
-          self.graph.fromJSON(graphData)
-          self.graph2Yaml()
-        },
-        onCancel() {
-          self._removeGraphObjFromLS()
-        },
-      })
     }
   }
 
