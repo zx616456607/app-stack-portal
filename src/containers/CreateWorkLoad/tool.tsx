@@ -18,7 +18,7 @@ import { Editor as AceEditor } from 'brace'
 import { yamlString } from './editorType'
 import yaml from 'js-yaml'
 import compact from 'lodash/compact'
-import { AppStack1 as AppStack1Icon ,Cronjob as CronjobIcon, Deployment as DeploymentIcon,
+import { AppStack1 as AppStack1Icon , Cronjob as CronjobIcon, Deployment as DeploymentIcon,
   Statefulset as StatefulsetIcon, Job as JobIcon, Pod as PodIcon, Service as ServiceIcon,
   Secret as SecretIcon, Pvc as PvcIcon, Configmap as ConfigmapIcon,
 } from '@tenx-ui/icon'
@@ -247,7 +247,7 @@ class Preview extends React.Component<PreviewProps, PreviewState> {
                 <div className="BorderIcon">
                   <Tooltip
                     title={'已被平台纳管'}
-                    getPopupContainer={(node) => this.props.editorNode }
+                    getPopupContainer={(node) => this.props.editorNode}
                   >
                     <div>
                       管

@@ -330,7 +330,7 @@ inputs: []`,
     this.paper.on('element:pointerclick', elementView => {
       clearActiveElement()
       const element = elementView.model
-      element.attr('.body/strokeWidth', 3)
+      element.attr('.body/strokeWidth', 2)
       this.activeElement = element
     })
 
@@ -592,6 +592,22 @@ inputs: []`,
     this.setState({ paperScale })
   }
 
+  clearGraph = () => {
+    const self = this
+    confirm({
+      modalTitle: '确认操作',
+      title: '您是否要清除当前模板设计？',
+      width: 420,
+      onOk() {
+        self.graph.clear()
+        self.graph2Yaml()
+      },
+      onCancel() {
+        //
+      },
+    })
+  }
+
   layout = options => {
     options = Object.assign({}, options, {
       nodeSep: 50,
@@ -744,7 +760,7 @@ inputs: []`,
                 <Button icon="arrow-left" />
                 <Button icon="arrow-right" />
               </Button.Group>
-              <Button icon="delete" onClick={() => this.graph.clear() && this.graph2Yaml()}>
+              <Button icon="delete" onClick={this.clearGraph}>
               清空设计
               </Button>
               <Button icon="layout" onClick={this.layout} disabled>
@@ -769,9 +785,6 @@ inputs: []`,
                 {
                   this.editMode ? '保存更新' : '保存并提交'
                 }
-              </Button>
-              <Button icon="smile" onClick={this.deployTest}>
-                <span>部署<sup>test</sup></span>
               </Button>
               <Button
                 icon="deployment-unit"
