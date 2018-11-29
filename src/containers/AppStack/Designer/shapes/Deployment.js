@@ -45,9 +45,6 @@ const options = {
         'system/svcName': {
           get_input: 'deployment_name',
         },
-        'system/appstack': {
-          get_input: 'appstack',
-        },
       },
     },
     spec: {
@@ -75,15 +72,15 @@ const options = {
           },
           labels: {
             app: {
-              get_input: 'deployment_name',
+              get_input: 'app_name',
             },
             name: {
               get_input: 'deployment_name',
             },
-            'tenxcloud.com/appName': {
+            'system/appName': {
               get_input: 'app_name',
             },
-            'tenxcloud.com/svcName': {
+            'system/svcName': {
               get_input: 'deployment_name',
             },
           },
@@ -144,11 +141,6 @@ const options = {
       app_name: {
         label: '扩展资源',
         description: '应用名称',
-        default: '',
-      },
-      appstack: {
-        label: '扩展资源',
-        description: '堆栈名称',
         default: '',
       },
       replicas: {

@@ -11,6 +11,7 @@
  */
 
 import './Application'
+import './DeploymentService'
 import './Deployment'
 import './Service'
 import './ConfigMap'

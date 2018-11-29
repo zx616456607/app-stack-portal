@@ -27,6 +27,11 @@ import classnames from 'classnames'
 // import $ from 'jquery'
 import Dock from 'react-dock'
 import yamlParser from 'js-yaml'
+import {
+  AppC as AppIcon,
+  ServiceC as ServiceIcon,
+  ConfigmapC as ConfigmapIcon,
+} from '@tenx-ui/icon'
 import styles from './style/index.less'
 // import * as yamls from './yamls'
 import './shapes'
@@ -40,27 +45,31 @@ const PAPER_SCALE_STEP = 0.1
 const RESOURCE_LIST = [
   {
     id: 'Application',
-    icon: <Icon type="appstore" />,
+    icon: <AppIcon />,
     title: '应用',
+    enabled: true,
+  },
+  {
+    id: 'DeploymentService',
+    icon: <ServiceIcon />,
+    title: '服务',
+    enabled: true,
+  },
+  {
+    id: 'ConfigMap',
+    icon: <ConfigmapIcon />,
+    title: 'ConfigMap',
     enabled: true,
   },
   {
     id: 'Deployment',
     icon: <Icon type="appstore" />,
     title: 'Deployment',
-    enabled: true,
   },
   {
     id: 'Service',
     icon: <Icon type="appstore" />,
     title: 'Service',
-    enabled: true,
-  },
-  {
-    id: 'ConfigMap',
-    icon: <Icon type="appstore" />,
-    title: 'ConfigMap',
-    enabled: true,
   },
   {
     id: 'service-2',
@@ -153,6 +162,10 @@ inputs: []`,
   }
 
   componentWillUnmount() {
+    const { dispatch } = this.props
+    dispatch({
+      type: 'appStack/clearAppStackTemplateDetail',
+    })
     window.removeEventListener('beforeunload', this.handleWindowClose)
     this._saveGraphObj2LS()
   }
@@ -248,6 +261,10 @@ inputs: []`,
       validateConnection(sourceView, sourceMagnet, targetView, targetMagnet) {
         return sourceMagnet !== targetMagnet
       },
+      // https://resources.jointjs.com/docs/jointjs/v2.2/joint.html#dia.Paper.prototype.options.guard
+      /* guard() {
+        return true
+      }, */
     })
     // @Todo: 可以用来做鹰眼视图
     this.navigatorPaper = new joint.dia.Paper({
@@ -466,6 +483,8 @@ inputs: []`,
       const { cid, attributes: { _app_stack_template, _app_stack_input } } = cell
       if (_app_stack_template) {
         yamlObj.nodes[cid] = _app_stack_template
+      }
+      if (_app_stack_input) {
         yamlObj.inputs[cid] = _app_stack_input
       }
     })
@@ -582,24 +601,29 @@ inputs: []`,
     joint.layout.DirectedGraph.layout(this.graph, options)
   }
 
-  _generateStackContent = () => {
-    const { yamlObj } = this.state
-    const content = {
-      ...yamlObj,
-      _graph: this.graph.toJSON(),
-    }
-    return JSON.stringify(content)
-  }
-
   onStackSave = () => {
     const { form, dispatch, history } = this.props
     const { validateFields } = form
-    this.setState({ saveStackBtnLoading: true })
     validateFields(async (err, body) => {
       if (err) {
         return
       }
-      body.content = this._generateStackContent()
+      const _graph = this.graph.toJSON()
+      if (_graph.cells.length === 0) {
+        this.setState({ saveStackModal: false })
+        notification.info({
+          message: '保存堆栈模版失败',
+          description: '无效的空白模版',
+        })
+        return
+      }
+      this.setState({ saveStackBtnLoading: true })
+      const { name } = body
+      const { yamlObj } = this.state
+      body.content = JSON.stringify({
+        ...yamlObj,
+        _graph,
+      })
       try {
         await dispatch({
           type: (
@@ -608,7 +632,7 @@ inputs: []`,
               : 'appStack/fetchCreateAppstack'
           ),
           payload: {
-            name: body.name,
+            name,
             body,
           },
         })
@@ -616,10 +640,19 @@ inputs: []`,
         notification.success({
           message: '保存堆栈模版成功',
         })
+
+        // clear graph for handleWindowClose
+        this.graph.clear()
+
         this._removeGraphObjFromLS()
         history.push('/app-stack/templates')
       } catch (error) {
-        console.warn('error', error)
+        if (error.status === 409) {
+          notification.warn({
+            message: `堆栈 ${name} 已存在，请使用其他名称`,
+          })
+          return
+        }
         notification.warn({
           message: '保存堆栈模版失败',
         })
@@ -711,7 +744,7 @@ inputs: []`,
                 <Button icon="arrow-left" />
                 <Button icon="arrow-right" />
               </Button.Group>
-              <Button icon="delete" onClick={() => this.graph.clear()}>
+              <Button icon="delete" onClick={() => this.graph.clear() && this.graph2Yaml()}>
               清空设计
               </Button>
               <Button icon="layout" onClick={this.layout} disabled>
@@ -836,7 +869,10 @@ inputs: []`,
                 fontSize={12}
                 value={this.state.templateYamlStr}
                 onChange={this.onTemplateYamlChange}
-                onLoad={editor => { this.yarmlEditor = editor }}
+                onLoad={editor => {
+                  editor.$blockScrolling = Infinity
+                  this.yarmlEditor = editor
+                }}
               />
             }
             {
@@ -847,7 +883,10 @@ inputs: []`,
                 fontSize={12}
                 value={this.state.inputYamlStr}
                 onChange={this.onInputYamlChange}
-                onLoad={editor => { this.yarmlEditor = editor }}
+                onLoad={editor => {
+                  editor.$blockScrolling = Infinity
+                  this.yarmlEditor = editor
+                }}
               />
             }
           </div>

@@ -13,86 +13,78 @@
 
 :global {
   #app-stack-paper {
-    .joint-type-devs text {
-      font-weight: 800;
-      font-family: "Source Sans Pro", sans-serif;
-    }
-
-    .joint-type-devs .body {
-      fill: #fff;
-      stroke: #31d0c6;
-      &:hover {
-        stroke-width: 3px;
+    .joint-type-devs {
+      text {
+        font-family: "Source Sans Pro", sans-serif;
+      }
+      .body {
+        fill: #fff;
+        stroke: @primary-color;
+        &:hover {
+          stroke-width: 2px;
+        }
+      }
+      .label {
+        fill: @font-color-2;
+        font-size: 14px;
+      }
+      .port-body {
+        stroke: @primary-color;
+        &:hover {
+          opacity: 1;
+          stroke-width: 2px;
+          fill: @primary-color;
+        }
+      }
+      .port-label {
+        display: none;
+      }
+      &.joint-type-devs-application {
+        .body {
+          stroke-dasharray: 6;
+          fill: rgba(45,183,245,.1);
+        }
       }
     }
 
-    .joint-type-devs .label {
-      fill: #31d0c6;
-      font-size: 14px;
-    }
-
-    .joint-type-devs .port-body {
-      stroke: #fff;
-      stroke-width: 6px;
-      fill: #7c68fc;
-    }
-
-    .joint-type-devs .port-body:hover {
-      opacity: 1;
-      fill: #ff7e5d;
-    }
-
-    .joint-type-devs .port-label {
-      fill: #7c68fc;
-      text-decoration: none;
-    }
-
-    .joint-type-devs.joint-type-devs-service .body {
-      stroke: #feb663;
-    }
-
-    .joint-type-devs.joint-type-devs-service .label {
-      fill: #feb663;
-    }
-
     /* links */
+    .joint-link {
+      .connection {
+        stroke: @primary-color;
+        stroke-width: 1px;
+      }
 
-    .joint-link .connection {
-      stroke: #4b4f6a;
-      stroke-width: 4px;
-    }
+      .marker-arrowheads .marker-arrowhead,
+      .marker-vertex-group .marker-vertex,
+      .marker-vertex-group .marker-vertex:hover {
+        fill: rgba(45,183,245,.5);;
+      }
 
-    .joint-link .marker-arrowheads .marker-arrowhead,
-    .joint-link .marker-vertex-group .marker-vertex,
-    .joint-link .marker-vertex-group .marker-vertex:hover {
-      fill: #31d0c6;
-    }
+      .marker-arrowheads .marker-arrowhead:hover {
+        fill: @primary-color;
+      }
 
-    .joint-link .marker-arrowheads .marker-arrowhead:hover {
-      fill: #f39c12;
-    }
-
-    .joint-link .link-tools .link-tool .tool-remove circle {
-      fill: #fe854f;
+      .link-tools .link-tool .tool-remove circle {
+        fill: @warning-color;
+      }
     }
 
     /* highlighting */
 
-    .highlighted-parent .body {
-      stroke: #fe854f;
-      transition: stroke .5s;
-    }
-
-    .highlighted-parent .label {
-      fill: #fe854f;
-      transition: fill .5s;
-      text-decoration: underline;
-    }
-
-    .joint-type-devs .joint-highlight-stroke {
-      stroke: #ff7e5d;
-      stroke-width: 6px;
-      pointer-events: none;
+    .highlighted-parent {
+      &.joint-type-devs-application {
+        .body {
+          transition: stroke .5s;
+          fill: rgba(45,183,245,.3);
+        }
+      }
+      .label {
+        transition: fill .5s;
+      }
+      .joint-highlight-stroke {
+        stroke-width: 6px;
+        pointer-events: none;
+      }
     }
   }
   #app-stack-paper-navigator {

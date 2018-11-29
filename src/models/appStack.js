@@ -105,6 +105,14 @@ export default {
         notification.error({ message: '获取堆栈模板详情失败', description: '' })
       }
     },
+    * clearAppStackTemplateDetail(_, { put }) {
+      yield put({
+        type: 'appStackTemplateList',
+        payload: {
+          templateDetail: {},
+        },
+      })
+    },
     * fetchAppStackDetail({ payload: { cluster, name } }, { call, put }) {
       try {
         const res = yield call(appStacksDetailRequest, { cluster, name })
