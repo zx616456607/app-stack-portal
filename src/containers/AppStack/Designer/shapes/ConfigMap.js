@@ -38,11 +38,7 @@ const options = {
       name: {
         get_input: 'configMap_name',
       },
-      labels: {
-        'system/appstack': {
-          get_input: 'appstack',
-        },
-      },
+      labels: {},
     },
   },
   _app_stack_input: {
@@ -50,11 +46,6 @@ const options = {
       configMap_name: {
         label: '原生资源',
         description: '服务配置名称',
-        default: '',
-      },
-      appstack: {
-        label: '扩展资源',
-        description: '堆栈名称',
         default: '',
       },
     },

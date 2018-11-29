@@ -27,6 +27,11 @@ import classnames from 'classnames'
 // import $ from 'jquery'
 import Dock from 'react-dock'
 import yamlParser from 'js-yaml'
+import {
+  AppC as AppIcon,
+  ServiceC as ServiceIcon,
+  ConfigmapC as ConfigmapIcon,
+} from '@tenx-ui/icon'
 import styles from './style/index.less'
 // import * as yamls from './yamls'
 import './shapes'
@@ -40,27 +45,31 @@ const PAPER_SCALE_STEP = 0.1
 const RESOURCE_LIST = [
   {
     id: 'Application',
-    icon: <Icon type="appstore" />,
+    icon: <AppIcon />,
     title: '应用',
+    enabled: true,
+  },
+  {
+    id: 'DeploymentService',
+    icon: <ServiceIcon />,
+    title: '服务',
+    enabled: true,
+  },
+  {
+    id: 'ConfigMap',
+    icon: <ConfigmapIcon />,
+    title: 'ConfigMap',
     enabled: true,
   },
   {
     id: 'Deployment',
     icon: <Icon type="appstore" />,
     title: 'Deployment',
-    enabled: true,
   },
   {
     id: 'Service',
     icon: <Icon type="appstore" />,
     title: 'Service',
-    enabled: true,
-  },
-  {
-    id: 'ConfigMap',
-    icon: <Icon type="appstore" />,
-    title: 'ConfigMap',
-    enabled: true,
   },
   {
     id: 'service-2',
@@ -252,6 +261,10 @@ inputs: []`,
       validateConnection(sourceView, sourceMagnet, targetView, targetMagnet) {
         return sourceMagnet !== targetMagnet
       },
+      // https://resources.jointjs.com/docs/jointjs/v2.2/joint.html#dia.Paper.prototype.options.guard
+      /* guard() {
+        return true
+      }, */
     })
     // @Todo: 可以用来做鹰眼视图
     this.navigatorPaper = new joint.dia.Paper({
@@ -470,6 +483,8 @@ inputs: []`,
       const { cid, attributes: { _app_stack_template, _app_stack_input } } = cell
       if (_app_stack_template) {
         yamlObj.nodes[cid] = _app_stack_template
+      }
+      if (_app_stack_input) {
         yamlObj.inputs[cid] = _app_stack_input
       }
     })
@@ -729,7 +744,7 @@ inputs: []`,
                 <Button icon="arrow-left" />
                 <Button icon="arrow-right" />
               </Button.Group>
-              <Button icon="delete" onClick={() => this.graph.clear()}>
+              <Button icon="delete" onClick={() => this.graph.clear() && this.graph2Yaml()}>
               清空设计
               </Button>
               <Button icon="layout" onClick={this.layout} disabled>

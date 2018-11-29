@@ -20,12 +20,22 @@ const options = {
   outPorts: [ 'out' ],
   attrs: {
     '.label': {
-      text: 'Application',
+      text: '应用',
     },
     '.body': {
       rx: 6,
       ry: 6,
       strokeWidth: 1,
+    },
+  },
+  // _app_stack_template: {},
+  _app_stack_input: {
+    input: {
+      app_name: {
+        label: '扩展资源',
+        description: '应用名称',
+        default: '',
+      },
     },
   },
 }

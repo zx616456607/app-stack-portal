@@ -39,9 +39,6 @@ const options = {
         'system/svcName': {
           get_input: 'service_name',
         },
-        'system/appstack': {
-          get_input: 'appstack',
-        },
       },
       name: {
         get_input: 'service_name',
@@ -75,11 +72,6 @@ const options = {
         default: '扩展资源',
         label: '',
         description: '应用名称',
-      },
-      appstack: {
-        label: '扩展资源',
-        description: '堆栈名称',
-        default: '',
       },
       service_port: {
         label: '原生资源',
