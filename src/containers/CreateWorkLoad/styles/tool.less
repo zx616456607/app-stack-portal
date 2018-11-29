@@ -63,6 +63,9 @@
   &:hover {
     background-color: #515561;
   }
+  &:active {
+    background-color: #444;
+  }
   display: flex;
   height: 40px;
   justify-content: space-between;
@@ -71,5 +74,18 @@
   div:nth-child(3) {
     flex-grow: 1;
     text-align: right;
+  }
+}
+.resourceIcon {
+  i {
+    padding-left: @padding-small;
+    padding-right: @padding-base;
+  }
+}
+
+.IconWrap {
+  > div {
+    float: right;
+    margin-right: @padding-base;
   }
 }

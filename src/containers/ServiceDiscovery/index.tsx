@@ -68,7 +68,7 @@ function getColumns(self): Array<any> {
     title: '创建时间',
     dataIndex: 'createTime',
     key: 'createTime',
-    sorter: () => {},
+    sorter: true,
     sortOrder: sortedInfo.columnKey === 'createTime' && sortedInfo.order,
     render: time => {
     if (!time) { return <div>-</div> }

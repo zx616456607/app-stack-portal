@@ -11,13 +11,17 @@ import * as React from 'react'
 import styles from './styles/tool.less';
 import PanelGroup from 'react-panelgroup'
 import { connect, SubscriptionAPI } from 'dva'
-import { notification, Select, Icon } from 'antd'
+import { notification, Select, Icon, Tooltip } from 'antd'
 import queryString from 'query-string'
 import { withRouter, RouteComponentProps } from 'dva/router'
 import { Editor as AceEditor } from 'brace'
 import { yamlString } from './editorType'
 import yaml from 'js-yaml'
 import compact from 'lodash/compact'
+import { AppStack1 as AppStack1Icon ,Cronjob as CronjobIcon, Deployment as DeploymentIcon,
+  Statefulset as StatefulsetIcon, Job as JobIcon, Pod as PodIcon, Service as ServiceIcon,
+  Secret as SecretIcon, Pvc as PvcIcon, Configmap as ConfigmapIcon,
+} from '@tenx-ui/icon'
 
 const Option = Select.Option;
 
@@ -25,6 +29,7 @@ export interface ToolProps extends SubscriptionAPI, RouteComponentProps {
   cluster: string
   aceEditor: AceEditor
   value: yamlString
+  editorNode: HTMLDivElement
 }
 interface ToolState {
   sampleInfo: {
@@ -61,7 +66,11 @@ class Tool extends React.Component<ToolProps, ToolState> {
           <Sample
             sampleInfo={this.state.sampleInfo}
           />
-          <Preview aceEditor={this.props.aceEditor} value={this.props.value}/>
+          <Preview
+            aceEditor={this.props.aceEditor}
+            value={this.props.value}
+            editorNode={this.props.editorNode}
+          />
         </PanelGroup>
       </div>
     )
@@ -169,25 +178,84 @@ const SampleNode = ({
 interface PreviewProps {
   aceEditor: AceEditor
   value: yamlString
+  editorNode: HTMLDivElement
 }
 interface PreviewState {
 
 }
 
 class Preview extends React.Component<PreviewProps, PreviewState> {
+  jumpTo = (row: number) => {
+    const Ace = this.props.aceEditor
+    Ace.gotoLine(row, 0, true)
+    Ace.scrollToLine(row, true, true, () => {})
+  }
+  onClick = (index, length) => {
+    this.props.aceEditor.gotoLine(1, 0, true)
+    const placeArray = [] as any[]
+    for (let i = 0; i <= length; i++) {
+      const place = this.props.aceEditor.find(`---`, { wholeWord: true } )
+      placeArray.push(place)
+    }
+    const { start: { row = 0 } = {} } = placeArray[0] || {}
+    if (row < 4 ) {
+      if (index === 0) {
+        return this.jumpTo(row + 2)
+      }
+      if (index !== 0) {
+        return this.jumpTo(placeArray[index].start.row + 2)
+      }
+    }
+    if (row >= 4) {
+      if (index === 0) {
+        return this.jumpTo(1)
+      }
+      if (index !== 0) {
+        const { start: { row: twoRow = 0 } = {} } = placeArray[index - 1] || {}
+        return this.jumpTo(twoRow + 2)
+      }
+    }
+  }
   render() {
-    // analyzeYamlPreview(this.props.aceEditor)
+    const previewNode = analyzeYamlPreview1(this.props.value)
+    const previewNodeLenght = previewNode.length
     return(
       <div className={styles.Preview}>
         <div className={styles.SampleHeader}>
           概览
         </div>
         {
-          analyzeYamlPreview1(this.props.value).map((nodeInfo) =>
-          <div className={styles.previewNode} key={nodeInfo[1]}>
-            <div>{nodeInfo[0]}</div>
+          analyzeYamlPreview1(this.props.value).map((nodeInfo, index) =>
+          <div
+            className={styles.previewNode}
+            key={nodeInfo[1]}
+            onClick={() => this.onClick(index, previewNodeLenght)}
+          >
+            <div className={styles.resourceIcon} >
+            {
+              <Tooltip
+                title={nodeInfo[0]}
+                getPopupContainer={() => this.props.editorNode}
+              >
+                {selectIcon(nodeInfo[0])}
+              </Tooltip>}
+            </div>
             <div>{nodeInfo[1]}</div>
-            <div>{nodeInfo[2] ? '管' : '原'}</div>
+            {
+              nodeInfo[2] &&
+              <div className={styles.IconWrap}>
+                <div className="BorderIcon">
+                  <Tooltip
+                    title={'已被平台纳管'}
+                    getPopupContainer={(node) => this.props.editorNode }
+                  >
+                    <div>
+                      管
+                    </div>
+                  </Tooltip>
+                </div>
+              </div>
+            }
           </div>)
         }
       </div>
@@ -204,10 +272,11 @@ function analyzeYamlPreview1(value: yamlString) {
       res = yaml.load(ivalue)
     } catch (error) {
       console.warn(error)
+    } finally {
+      return res
     }
-    return res
   })
-  .filter((node) => node.length !== 0)
+  .filter((node = []) => node.length !== 0)
   .map((node) => {
     const { kind, metadata: { name = '-', labels = '-' } = {} } = node
     const manageFlag = manage(kind, labels)
@@ -228,4 +297,22 @@ function manage(type: string, labels: Label[]) {
   //     break;
   // }
   return true
+}
+
+// 渲染组件
+
+// 根据资源类型选择不同的icon
+function selectIcon(type: string = '') {
+  const newtype = type.toLocaleLowerCase()
+  if ( newtype === 'configmap' ) { return <ConfigmapIcon /> }
+  if ( newtype === 'cronjob' ) { return <CronjobIcon /> }
+  if ( newtype === 'deployment' ) { return <DeploymentIcon />}
+  if ( newtype === 'job') { return <JobIcon/> }
+  if ( newtype === 'pod' ) { return <PodIcon /> }
+  if ( newtype === 'cronjob' ) { return <CronjobIcon /> }
+  if ( newtype === 'pvc' ) { return <PvcIcon />}
+  if ( newtype === 'secret') { return <SecretIcon/> }
+  if ( newtype === 'service' ) { return <ServiceIcon />}
+  if ( newtype === 'statefulset') { return <StatefulsetIcon/> }
+  return <Icon type="question-circle" />
 }
