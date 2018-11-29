@@ -153,6 +153,10 @@ inputs: []`,
   }
 
   componentWillUnmount() {
+    const { dispatch } = this.props
+    dispatch({
+      type: 'appStack/clearAppStackTemplateDetail',
+    })
     window.removeEventListener('beforeunload', this.handleWindowClose)
     this._saveGraphObj2LS()
   }
@@ -582,24 +586,29 @@ inputs: []`,
     joint.layout.DirectedGraph.layout(this.graph, options)
   }
 
-  _generateStackContent = () => {
-    const { yamlObj } = this.state
-    const content = {
-      ...yamlObj,
-      _graph: this.graph.toJSON(),
-    }
-    return JSON.stringify(content)
-  }
-
   onStackSave = () => {
     const { form, dispatch, history } = this.props
     const { validateFields } = form
-    this.setState({ saveStackBtnLoading: true })
     validateFields(async (err, body) => {
       if (err) {
         return
       }
-      body.content = this._generateStackContent()
+      const _graph = this.graph.toJSON()
+      if (_graph.cells.length === 0) {
+        this.setState({ saveStackModal: false })
+        notification.info({
+          message: '保存堆栈模版失败',
+          description: '无效的空白模版',
+        })
+        return
+      }
+      this.setState({ saveStackBtnLoading: true })
+      const { name } = body
+      const { yamlObj } = this.state
+      body.content = JSON.stringify({
+        ...yamlObj,
+        _graph,
+      })
       try {
         await dispatch({
           type: (
@@ -608,7 +617,7 @@ inputs: []`,
               : 'appStack/fetchCreateAppstack'
           ),
           payload: {
-            name: body.name,
+            name,
             body,
           },
         })
@@ -616,10 +625,19 @@ inputs: []`,
         notification.success({
           message: '保存堆栈模版成功',
         })
+
+        // clear graph for handleWindowClose
+        this.graph.clear()
+
         this._removeGraphObjFromLS()
         history.push('/app-stack/templates')
       } catch (error) {
-        console.warn('error', error)
+        if (error.status === 409) {
+          notification.warn({
+            message: `堆栈 ${name} 已存在，请使用其他名称`,
+          })
+          return
+        }
         notification.warn({
           message: '保存堆栈模版失败',
         })
@@ -836,7 +854,10 @@ inputs: []`,
                 fontSize={12}
                 value={this.state.templateYamlStr}
                 onChange={this.onTemplateYamlChange}
-                onLoad={editor => { this.yarmlEditor = editor }}
+                onLoad={editor => {
+                  editor.$blockScrolling = Infinity
+                  this.yarmlEditor = editor
+                }}
               />
             }
             {
@@ -847,7 +868,10 @@ inputs: []`,
                 fontSize={12}
                 value={this.state.inputYamlStr}
                 onChange={this.onInputYamlChange}
-                onLoad={editor => { this.yarmlEditor = editor }}
+                onLoad={editor => {
+                  editor.$blockScrolling = Infinity
+                  this.yarmlEditor = editor
+                }}
               />
             }
           </div>
