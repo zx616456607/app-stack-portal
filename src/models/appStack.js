@@ -20,6 +20,7 @@ import {
   appStacksDeleteRequest,
   appStacksDetailRequest,
   templateDetailRequest,
+  templateDeleteRequest,
 } from '../services/appStack'
 import { notification } from 'antd/lib/index';
 
@@ -77,6 +78,10 @@ export default {
       } catch (e) {
         notification.error({ message: '获取堆栈模板列表失败', description: '' })
       }
+    },
+    * fetchAppStackTemplateDelete({ payload: { name } }, { call }) {
+      const res = yield call(templateDeleteRequest, name)
+      return res
     },
     * fetchAppStackTemplateDetail({ payload: { name } }, { call, put }) {
       try {

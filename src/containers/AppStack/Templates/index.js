@@ -12,13 +12,14 @@
 
 import React from 'react'
 import QueueAnim from 'rc-queue-anim'
-import { Card, Button } from 'antd'
+import { Card, Button, Menu, Dropdown, Icon, Modal, notification } from 'antd'
 import { connect } from 'dva'
 import { Link } from 'react-router-dom'
 import styles from './style/index.less'
 import Loader from '@tenx-ui/loader'
 import Ellipsis from '@tenx-ui/ellipsis'
 import { Stack as StackIcon } from '@tenx-ui/icon'
+
 @connect(state => {
   const { appStack, loading } = state
   return { appStack, loading }
@@ -27,8 +28,16 @@ import { Stack as StackIcon } from '@tenx-ui/icon'
     type: 'appStack/fetchAppStackTemplate',
     payload: { query },
   }),
+  deleteAppStackTemplate: name => dispatch({
+    type: 'appStack/fetchAppStackTemplateDelete',
+    payload: { name },
+  }),
 }))
 class Templates extends React.Component {
+  state = {
+    delModal: false,
+    stackName: '',
+  }
   componentDidMount() {
     const { getAppStackTemplate } = this.props
     const query = {
@@ -37,9 +46,41 @@ class Templates extends React.Component {
     }
     getAppStackTemplate(query)
   }
+  menu = name => <Menu>
+    <Menu.Item onClick={() => {
+      this.setState({
+        delModal: true,
+        stackName: name,
+      })
+    }
+    }>
+      <span>删除</span>
+    </Menu.Item>
+  </Menu>
+  delTemplate = async () => {
+    const { deleteAppStackTemplate, getAppStackTemplate } = this.props
+    const { stackName } = this.state
+    const res = await deleteAppStackTemplate(stackName)
+    if (res.code === 200) {
+      const query = {
+        from: 0,
+        size: 0,
+      }
+      getAppStackTemplate(query)
+    } else {
+      notification.error({
+        message: '删除失败',
+      })
+    }
+    this.setState({
+      delModal: false,
+    })
+  }
   render() {
     const { loading, appStack } = this.props
+    const { delModal } = this.state
     const templateLoading = loading.effects['appStack/fetchAppStackTemplate']
+    const delLoading = loading.effects['appStack/fetchAppStackTemplateDelete']
     const { templateList } = appStack
     let appStackTemps = []
     if (templateList) appStackTemps = templateList
@@ -77,42 +118,32 @@ class Templates extends React.Component {
                         <Link to={`/app-stack/designer/${v.name}/edit`}>
                           <Button style={{ marginRight: 8 }}>设计</Button>
                         </Link>
-                        <Link to={`/app-stack/tempStackDetail/${v.name}`}>
-                          <Button type="primary">部署</Button>
-                        </Link>
+                        <span>
+                          <Dropdown overlay={this.menu(v.name)}>
+                            <Link to={`/app-stack/tempStackDetail/${v.name}`}>
+                              <Button>部署 <Icon type="down" /></Button>
+                            </Link>
+                          </Dropdown>
+                        </span>
                       </div>
                     </div>
                     <div className={styles.itemBottom}>
-                      <div>
-                        <h5>应用</h5>
-                        <span>
-                          <Ellipsis>
-                            {`${v.appCount}`}
-                          </Ellipsis>
-                        </span>
-                      </div>
-                      <div>
-                        <h5>服务</h5>
-                        <span>
-                          <Ellipsis>
-                            {`${v.serviceCount}`}
-                          </Ellipsis>
-                        </span>
-                      </div>
-                      <div>
-                        <h5>容器</h5>
-                        <span>
-                          <Ellipsis>
-                            {`${v.containerCount}`}
-                          </Ellipsis>
-                        </span>
-                      </div>
+                      描述：{v.description || '--'}
                     </div>
                   </Card>)
               }
             </div>
         }
       </div>
+      <Modal
+        title="删除堆栈模板"
+        visible={delModal}
+        onCancel={() => this.setState({ delModal: false })}
+        onOk={this.delTemplate}
+        confirmLoading={delLoading}
+      >
+        确定删除堆栈模板吗？
+      </Modal>
     </QueueAnim>
   }
 }
