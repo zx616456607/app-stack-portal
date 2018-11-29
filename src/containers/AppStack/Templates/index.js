@@ -12,13 +12,14 @@
 
 import React from 'react'
 import QueueAnim from 'rc-queue-anim'
-import { Card, Button, Menu, Dropdown, Icon, Modal, notification } from 'antd'
+import { Card, Button, Menu, Dropdown, Icon, Modal, notification, Tooltip } from 'antd'
 import { connect } from 'dva'
 import { Link } from 'react-router-dom'
 import styles from './style/index.less'
 import Loader from '@tenx-ui/loader'
 import Ellipsis from '@tenx-ui/ellipsis'
-import { Stack as StackIcon } from '@tenx-ui/icon'
+import { StackTemplate as StackTemplateIcon } from '@tenx-ui/icon'
+import { calcuDate } from '../../../utils/helper';
 
 @connect(state => {
   const { appStack, loading } = state
@@ -105,30 +106,44 @@ class Templates extends React.Component {
                   :
                   appStackTemps.map(v => <Card hoverable key={v.name} className={styles.listItem}>
                     <div className={styles.itemTag}>堆栈模板</div>
+                    <div className={styles.setting}>
+                      <Dropdown overlay={this.menu(v.name)}>
+                        <span>
+                          <Icon type="setting" style={{ fontSize: 18 }}/>
+                        </span>
+                      </Dropdown>
+                    </div>
                     <div className={styles.itemTop}>
                       <div className={styles.itemImg}>
-                        <StackIcon className={styles.stackIcon}/>
+                        <StackTemplateIcon className={styles.stackIcon}/>
                       </div>
                       <div className={styles.itemInfo}>
                         <h2>
-                          <Ellipsis>
+                          <Ellipsis lines={1}>
                             {v.name}
                           </Ellipsis>
                         </h2>
+                        <Ellipsis lines={2}>
+                          {v.description || '--'}
+                        </Ellipsis>
+                      </div>
+                    </div>
+                    <div className={styles.itemBottom}>
+                      <div className={styles.updateIcon}>
+                        <Tooltip title={`更新于${calcuDate(v.create_time)}`}>
+                          <Icon type="clock-circle" /> {calcuDate(v.create_time)}
+                        </Tooltip>
+                      </div>
+                      <div>
                         <Link to={`/app-stack/designer/${v.name}/edit`}>
                           <Button style={{ marginRight: 8 }}>设计</Button>
                         </Link>
                         <span>
-                          <Dropdown overlay={this.menu(v.name)}>
-                            <Link to={`/app-stack/tempStackDetail/${v.name}`}>
-                              <Button>部署 <Icon type="down" /></Button>
-                            </Link>
-                          </Dropdown>
+                          <Link to={`/app-stack/tempStackDetail/${v.name}`}>
+                            <Button type="primary">部署</Button>
+                          </Link>
                         </span>
                       </div>
-                    </div>
-                    <div className={styles.itemBottom}>
-                      描述：{v.description || '--'}
                     </div>
                   </Card>)
               }
