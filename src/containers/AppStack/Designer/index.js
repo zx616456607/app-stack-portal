@@ -19,6 +19,7 @@ import 'jointjs/dist/joint.css'
 import graphlib from 'graphlib'
 import TenxEditor from '@tenx-ui/editor'
 import '@tenx-ui/editor/assets/index.css'
+import { confirm } from '@tenx-ui/modal'
 import {
   Button, notification, Slider, Icon, Row, Col, Tabs, Modal, Form, Input,
 } from 'antd'
@@ -113,10 +114,12 @@ const RESOURCE_LIST = [
   },
 ]
 const DOCK_DEFAULT_HEADER_SIZE = 42
+const APP_STACK_LOCAL_STORAGE_KEY = '_app_stack_graph'
 
 const mapStateToProps = state => {
-  const { app: { cluster = '' } = {} } = state
-  return { cluster }
+  const { app: { cluster = '' } = {}, appStack, loading } = state
+  const { templateDetail } = appStack
+  return { cluster, templateDetail, loading }
 }
 @Form.create()
 @connect(mapStateToProps)
@@ -135,6 +138,8 @@ inputs: []`,
     saveStackBtnLoading: false,
   }
 
+  editMode = this.props.match.path === '/app-stack/designer/:name/edit'
+
   newEmbeds = []
 
   activeElement = undefined
@@ -142,6 +147,37 @@ inputs: []`,
   yarmlEditor = undefined
 
   yaml2GraphTimeout = undefined
+
+  componentDidMount() {
+    window.addEventListener('beforeunload', this.handleWindowClose)
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('beforeunload', this.handleWindowClose)
+    this._saveGraphObj2LS()
+  }
+
+  handleWindowClose = () => {
+    this._saveGraphObj2LS()
+    return true
+  }
+
+  // edit mode not support
+  _saveGraphObj2LS = () => {
+    if (this.editMode) {
+      return
+    }
+    const graphData = JSON.stringify(this.graph.toJSON())
+    return localStorage.setItem(APP_STACK_LOCAL_STORAGE_KEY, graphData)
+  }
+
+  _removeGraphObjFromLS = () => {
+    return localStorage.removeItem(APP_STACK_LOCAL_STORAGE_KEY)
+  }
+
+  _getGraphObjFromLS = () => {
+    return localStorage.getItem(APP_STACK_LOCAL_STORAGE_KEY)
+  }
 
   initDesigner = () => {
     this.paperDom = document.getElementById('app-stack-paper')
@@ -295,10 +331,58 @@ inputs: []`,
     this.paper.on('paper:mouseenter', e => {
       console.warn('paper:mouseenter', e)
     }) */
+
+    this.initGraph()
   }
 
-  editYaml = () => {
-    //
+  initGraph = async () => {
+    const {
+      match: { path, params: { name } },
+      dispatch,
+    } = this.props
+    // editMode: get app stack template detail
+    if (path === '/app-stack/designer/:name/edit') {
+      try {
+        await dispatch({
+          type: 'appStack/fetchAppStackTemplateDetail',
+          payload: ({ name }),
+        })
+        const { templateDetail } = this.props
+        const { _graph } = JSON.parse(templateDetail.content)
+        if (_graph && _graph.cells) {
+          this.graph.fromJSON(_graph)
+          this.graph2Yaml()
+        }
+      } catch (error) {
+        console.warn(error)
+        notification.error({
+          message: '加载模版详情失败',
+        })
+      }
+    } else {
+      // check localStorage
+      let graphData = this._getGraphObjFromLS()
+      try {
+        graphData = JSON.parse(graphData)
+      } catch (error) {
+        //
+      }
+      if (!graphData || !graphData.cells) {
+        return
+      }
+      const self = this
+      confirm({
+        modalTitle: '打开未保存模板',
+        title: '您有未保存的模板，是否要打开未保存的模板？',
+        onOk() {
+          self.graph.fromJSON(graphData)
+          self.graph2Yaml()
+        },
+        onCancel() {
+          self._removeGraphObjFromLS()
+        },
+      })
+    }
   }
 
   onKeyDown = e => {
@@ -413,7 +497,6 @@ inputs: []`,
           cell.attributes._app_stack_input = yamlObj.inputs[key]
         }
       })
-      this.graph2Yaml()
     } catch (error) {
       console.warn('parse yaml failed', error)
     }
@@ -499,15 +582,24 @@ inputs: []`,
     joint.layout.DirectedGraph.layout(this.graph, options)
   }
 
+  _generateStackContent = () => {
+    const { yamlObj } = this.state
+    const content = {
+      ...yamlObj,
+      _graph: this.graph.toJSON(),
+    }
+    return JSON.stringify(content)
+  }
+
   onStackSave = () => {
-    const { form, dispatch } = this.props
+    const { form, dispatch, history } = this.props
     const { validateFields } = form
     this.setState({ saveStackBtnLoading: true })
     validateFields(async (err, body) => {
       if (err) {
         return
       }
-      body.content = JSON.stringify(this.graph.toJSON())
+      body.content = this._generateStackContent()
       try {
         await dispatch({
           type: 'appStack/fetchCreateAppstack',
@@ -520,6 +612,8 @@ inputs: []`,
         notification.success({
           message: '保存堆栈模版成功',
         })
+        this._removeGraphObjFromLS()
+        history.push('/app-stack/templates')
       } catch (error) {
         console.warn('error', error)
         notification.warn({
@@ -529,6 +623,12 @@ inputs: []`,
         this.setState({ saveStackBtnLoading: false })
       }
     })
+  }
+
+  onYamlTabChange = yamlTabKey => {
+    // sync graph to yaml when change tab
+    this.graph2Yaml()
+    this.setState({ yamlEditorTabKey: yamlTabKey })
   }
 
   render() {
@@ -636,7 +736,7 @@ inputs: []`,
               </Button>
               <Button
                 icon="deployment-unit"
-                onClick={() => this.setState({ yamlDockVisible: true })}
+                onClick={() => this.setState({ yamlDockVisible: !yamlDockVisible })}
               >
               完善编排
               </Button>
@@ -706,7 +806,7 @@ inputs: []`,
             <div className={styles.yamlEditorHeader}>
               <Tabs
                 activeKey={yamlEditorTabKey}
-                onChange={yamlTabKey => this.setState({ yamlEditorTabKey: yamlTabKey })}
+                onChange={this.onYamlTabChange}
                 tabBarExtraContent={<div className={styles.yamlEditorHeaderBtns}>
                   <Button type="dashed" icon="search" />
                   <Button

@@ -164,6 +164,13 @@ function RouterConfig({ history, app }) {
       ],
     },
     {
+      path: '/app-stack/designer/:name/edit',
+      component: () => import('./containers/AppStack/Designer'),
+      models: () => [
+        import('./models/appStack'),
+      ],
+    },
+    {
       path: '/app-stack/designer/:name/:mode',
       component: () => import('./containers/AppStack/Designer'),
       models: () => [
