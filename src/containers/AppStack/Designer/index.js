@@ -149,7 +149,7 @@ inputs: []`,
 
   editMode = this.props.match.path === '/app-stack/designer/:name/edit'
 
-  newEmbeds = []
+  embedsMap = {}
 
   activeElement = undefined
 
@@ -242,20 +242,11 @@ inputs: []`,
         const graph = paper.model
         return graphlib.alg.findCycles(graph.toGraphLib()).length === 0;
       },
-      validateEmbedding(childView, parentView) {
+      validateEmbedding: (childView, parentView) => {
         const isEmbedding = parentView.model instanceof joint.shapes.devs.Application
           && !(childView.model instanceof joint.shapes.devs.Application)
         // resizes the `Application` shape,
         // so it visually contains all shapes embedded in.
-        if (isEmbedding) {
-          // parentView.model.fitEmbeds({
-          //   deep: true,
-          //   padding: 48,
-          // })
-          setTimeout(() => {
-            // childView.remove()
-          }, 5000)
-        }
         return isEmbedding
       },
       validateConnection(sourceView, sourceMagnet, targetView, targetMagnet) {
@@ -289,18 +280,40 @@ inputs: []`,
 
     // 可以做 自适应
     this.graph.on('change:embeds', (element, newEmbeds) => {
+      const { id } = element
       const fitEmbeds = () => {
-        const currentElement = this.graph.getCell(element.id)
+        const currentElement = this.graph.getCell(id)
         if (currentElement) {
           currentElement.fitEmbeds({ deep: true, padding: 48 })
         }
       }
-      if (newEmbeds && newEmbeds.length <= this.newEmbeds.length) {
+      const currentOldEmbeds = this.embedsMap[id] || []
+
+      // [embed-label-handle-part-2] change child input label to app_name label when isEmbedding
+      const parentInputLabel = element.attributes._app_stack_input.input.app_name.label
+      newEmbeds.forEach(embedId => {
+        const currentElement = this.graph.getCell(embedId)
+        const childInput = currentElement.attributes._app_stack_input.input
+        Object.keys(childInput).forEach(key => {
+          childInput[key].label = parentInputLabel
+        })
+      })
+      // [embed-label-handle-part-3] remove app_name label when embed out
+      const movedOutEmbeds = currentOldEmbeds.filter(embed => newEmbeds.indexOf(embed) < 0)
+      movedOutEmbeds.forEach(embedId => {
+        const currentElement = this.graph.getCell(embedId)
+        const childInput = currentElement.attributes._app_stack_input.input
+        Object.keys(childInput).forEach(key => {
+          childInput[key].label = '其他配置'
+        })
+      })
+      this.graph2Yaml()
+      if (newEmbeds && newEmbeds.length <= currentOldEmbeds.length) {
         this.fitEmbedsTimeout = setTimeout(fitEmbeds, 5000)
       } else {
         fitEmbeds()
       }
-      this.newEmbeds = newEmbeds
+      this.embedsMap[id] = newEmbeds
     })
 
     // test
@@ -357,6 +370,16 @@ inputs: []`,
       match: { path, params: { name } },
       dispatch,
     } = this.props
+    const _initGraph = _graph => {
+      this.graph.fromJSON(_graph)
+      this.graph2Yaml()
+      // [embed-label-handle-part-1] init embeds map
+      _graph.cells.forEach(({ id, embeds }) => {
+        if (embeds && embeds.length > 0) {
+          this.embedsMap[id] = embeds
+        }
+      })
+    }
     // editMode: get app stack template detail
     if (path === '/app-stack/designer/:name/edit') {
       try {
@@ -367,8 +390,7 @@ inputs: []`,
         const { templateDetail } = this.props
         const { _graph } = JSON.parse(templateDetail.content)
         if (_graph && _graph.cells) {
-          this.graph.fromJSON(_graph)
-          this.graph2Yaml()
+          _initGraph(_graph)
         }
       } catch (error) {
         console.warn(error)
@@ -376,29 +398,28 @@ inputs: []`,
           message: '加载模版详情失败',
         })
       }
-    } else {
-      // check localStorage
-      let graphData = this._getGraphObjFromLS()
-      try {
-        graphData = JSON.parse(graphData)
-      } catch (error) {
-        //
-      }
-      if (graphData && graphData.cells && graphData.cells.length > 0) {
-        const self = this
-        confirm({
-          modalTitle: '打开未保存模板',
-          title: '您有未保存的模板，是否要打开未保存的模板？',
-          width: 420,
-          onOk() {
-            self.graph.fromJSON(graphData)
-            self.graph2Yaml()
-          },
-          onCancel() {
-            self._removeGraphObjFromLS()
-          },
-        })
-      }
+      return
+    }
+    // check localStorage
+    let graphData = this._getGraphObjFromLS()
+    try {
+      graphData = JSON.parse(graphData)
+    } catch (error) {
+      //
+    }
+    if (graphData && graphData.cells && graphData.cells.length > 0) {
+      const self = this
+      confirm({
+        modalTitle: '打开未保存模板',
+        title: '您有未保存的模板，是否要打开未保存的模板？',
+        width: 420,
+        onOk() {
+          _initGraph(graphData)
+        },
+        onCancel() {
+          self._removeGraphObjFromLS()
+        },
+      })
     }
   }
 
@@ -422,10 +443,10 @@ inputs: []`,
     // console.warn('ev.screenY', ev.screenY)
     // console.warn('ev.pageX', ev.pageX)
     // console.warn('ev.pageY', ev.pageY)
-    console.warn('ev.clientX', ev.clientX)
-    console.warn('ev.clientY', ev.clientY)
-    console.warn('this.paperDom.offsetLeft', this.paperDom.offsetLeft)
-    console.warn('this.paperDom.offsetParent.offsetTop', this.paperDom.offsetParent.offsetTop)
+    // console.warn('ev.clientX', ev.clientX)
+    // console.warn('ev.clientY', ev.clientY)
+    // console.warn('this.paperDom.offsetLeft', this.paperDom.offsetLeft)
+    // console.warn('this.paperDom.offsetParent.offsetTop', this.paperDom.offsetParent.offsetTop)
     // console.warn('ev.movementX', ev.movementX)
     // console.warn('ev.movementY', ev.movementY)
     // console.warn('ev.target', ev.target)
@@ -436,8 +457,8 @@ inputs: []`,
     const id = ev.dataTransfer.getData('text');
     const { tx, ty } = this.paper.translate()
     const { paperScale } = this.state
-    console.warn('tx', tx)
-    console.warn('ty', ty)
+    // console.warn('tx', tx)
+    // console.warn('ty', ty)
     this.paper.translate(0, 0)
     this.paper.scale(1, 1)
     const options = {
@@ -446,7 +467,7 @@ inputs: []`,
         y: ev.clientY - this.paperDom.offsetParent.offsetTop,
       },
     }
-    console.warn('options', options)
+    // console.warn('options', options)
     // console.warn('id', id)
 
     const {
@@ -462,16 +483,11 @@ inputs: []`,
 
     this.paper.translate(tx, ty)
     this.paper.scale(paperScale, paperScale)
-    // test only ---begin
-    /* const { yamlObj } = this.state
-    if (!yamlObj[id] && yamls[id]) {
-      yamlObj[id] = yamls[id]
-      const templateYamlStr = Object.keys(yamlObj).map(key => yamlObj[key]).join(yamls.YAML_SEPARATOR)
-      this.setState({ yamlObj, templateYamlStr })
-    } */
-    // test only ---end
 
-    // console.log('graph.toJSON()', JSON.stringify(this.graph.toJSON()))
+    if (id === 'Application') {
+      resource.attributes._app_stack_input.input.app_name.label = `应用-${resource.cid}`
+      this.graph2Yaml()
+    }
   }
 
   graph2Yaml = () => {
