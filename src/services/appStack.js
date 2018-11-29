@@ -22,6 +22,13 @@ export const createAppstack = ({ name, body }) => request({
     body,
   },
 })
+export const updateAppstack = ({ name, body }) => request({
+  url: `${paasApiUrl}/appstacks/templates/${name}`,
+  options: {
+    method: 'PUT',
+    body,
+  },
+})
 export const deployAppstack = ({ cluster, name, body }) => request({
   url: `${paasApiUrl}${CLUSTERS}/${cluster}/appstacks/${name}`,
   options: {

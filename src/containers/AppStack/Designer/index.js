@@ -602,7 +602,11 @@ inputs: []`,
       body.content = this._generateStackContent()
       try {
         await dispatch({
-          type: 'appStack/fetchCreateAppstack',
+          type: (
+            this.editMode
+              ? 'appStack/fetchUpdateAppstack'
+              : 'appStack/fetchCreateAppstack'
+          ),
           payload: {
             name: body.name,
             body,
@@ -632,7 +636,7 @@ inputs: []`,
   }
 
   render() {
-    const { form } = this.props
+    const { form, templateDetail } = this.props
     const { getFieldDecorator } = form
     const {
       yamlDockSize, yamlDockVisible, paperScale, yamlEditorTabKey,
@@ -729,7 +733,9 @@ inputs: []`,
               适应屏幕
               </Button>
               <Button icon="save" onClick={() => this.setState({ saveStackModal: true })}>
-              保存并提交
+                {
+                  this.editMode ? '保存更新' : '保存并提交'
+                }
               </Button>
               <Button icon="smile" onClick={this.deployTest}>
                 <span>部署<sup>test</sup></span>
@@ -860,6 +866,7 @@ inputs: []`,
               label="堆栈名称"
             >
               {getFieldDecorator('name', {
+                initialValue: templateDetail && templateDetail.name,
                 rules: [
                   {
                     required: true,
@@ -868,7 +875,7 @@ inputs: []`,
                   },
                 ],
               })(
-                <Input placeholder="请输入堆栈名称" />
+                <Input disabled={this.editMode} placeholder="请输入堆栈名称" />
               )}
             </FormItem>
             <FormItem
@@ -876,7 +883,7 @@ inputs: []`,
               label="堆栈描述"
             >
               {getFieldDecorator('description', {
-                //
+                initialValue: templateDetail && templateDetail.description,
               })(
                 <Input.TextArea placeholder="请输入堆栈描述" />
               )}

@@ -12,6 +12,7 @@
 
 import {
   createAppstack,
+  updateAppstack,
   deployAppstack,
   appStacksListRequest,
   templateListRequest,
@@ -40,6 +41,12 @@ export default {
   effects: {
     * fetchCreateAppstack({ payload: { name, body } }, { call }) {
       const res = yield call(createAppstack, {
+        name, body,
+      })
+      return res
+    },
+    * fetchUpdateAppstack({ payload: { name, body } }, { call }) {
+      const res = yield call(updateAppstack, {
         name, body,
       })
       return res
