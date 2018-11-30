@@ -32,15 +32,18 @@
     line-height: 120px;
     button {
       margin-left: @padding-base;
+      &:hover {
+        .stopIcon {
+          background: @primary-color !important;
+        }
+      }
     }
     .stopIcon {
       display: inline-block;
       width: 8px;
       height: 8px;
       margin-right: @padding-base;
-      &:hover {
-        background: @primary-color !important;
-      }
+      transition: all .2s ease-in;
     }
   }
 }

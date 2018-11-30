@@ -47,26 +47,7 @@ class StackElements extends React.Component {
   }
   render() {
     const { columns } = this.state
-    const mockData = [
-      {
-        elementType: '1',
-        resourceName: '测试名称',
-        standards: '123',
-        creationTime: '2018-11-23T07:33:41Z',
-      },
-      {
-        elementType: '1',
-        resourceName: '测试名称',
-        standards: '123',
-        creationTime: '2018-11-23T07:33:41Z',
-      },
-      {
-        elementType: '1',
-        resourceName: '测试名称',
-        standards: '123',
-        creationTime: '2018-11-23T07:33:41Z',
-      },
-    ]
+    const mockData = []
     return <div id="stackElements">
       <div className={styles.operation}>
         <div className={styles.operationLeft}>

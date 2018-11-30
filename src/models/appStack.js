@@ -87,8 +87,12 @@ export default {
       }
     },
     * fetchAppStackTemplateDelete({ payload: { name } }, { call }) {
-      const res = yield call(templateDeleteRequest, name)
-      return res
+      try {
+        const res = yield call(templateDeleteRequest, name)
+        return res
+      } catch (e) {
+        // do nothing
+      }
     },
     * fetchAppStackTemplateDetail({ payload: { name } }, { call, put }) {
       try {
@@ -129,16 +133,29 @@ export default {
       }
     },
     * stackStart({ payload: { cluster, name } }, { call }) {
-      const res = yield call(appStacksStartRequest, { cluster, name })
-      return res
+      try {
+        const res = yield call(appStacksStartRequest, { cluster, name })
+        return res
+      } catch (e) {
+        // do nothing
+      }
     },
     * stackStop({ payload: { cluster, name } }, { call }) {
-      const res = yield call(appStacksStopRequest, { cluster, name })
-      return res
+      try {
+        const res = yield call(appStacksStopRequest, { cluster, name })
+        return res
+      } catch (e) {
+        // do nothing
+      }
     },
     * stackDelete({ payload: { cluster, name } }, { call }) {
-      const res = yield call(appStacksDeleteRequest, { cluster, name })
-      return res
+      try {
+        const res = yield call(appStacksDeleteRequest, { cluster, name })
+        return res
+      } catch (e) {
+        // do nothing
+      }
+
     },
   },
 }

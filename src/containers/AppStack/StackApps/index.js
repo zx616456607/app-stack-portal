@@ -75,21 +75,28 @@ class StackApps extends React.Component {
                         <StackIcon className={styles.stackIcon}/>
                       </div>
                       <div className={styles.itemInfo}>
-                        <h2>
-                          <Ellipsis lines={1}>
-                            {v.name}
+                        <div className={styles.itemName}>
+                          <h2>
+                            <Ellipsis lines={1}>
+                              {v.name}
+                            </Ellipsis>
+                          </h2>
+                          <Link to={`/app-stack/appStackDetail/${v.name}`}>
+                            <Button type="primary">管理应用堆栈</Button>
+                          </Link>
+                        </div>
+                        <div className={styles.description}>
+                          <Ellipsis lines={2}>
+                            {v.description || '--'}
                           </Ellipsis>
-                        </h2>
-                        <Link to={`/app-stack/appStackDetail/${v.name}`}>
-                          <Button type="primary">管理应用堆栈</Button>
-                        </Link>
 
+                        </div>
                       </div>
                     </div>
                     <div className={styles.itemBottom}>
                       <div>
                         <h5>应用</h5>
-                        <span>
+                        <span className={styles.itemCount}>
                           <Ellipsis>
                             {`${v.appCount}`}
                           </Ellipsis>
@@ -97,7 +104,7 @@ class StackApps extends React.Component {
                       </div>
                       <div>
                         <h5>服务</h5>
-                        <span>
+                        <span className={styles.itemCount}>
                           <Ellipsis>
                             {`${v.serviceCount}`}
                           </Ellipsis>
@@ -105,7 +112,7 @@ class StackApps extends React.Component {
                       </div>
                       <div>
                         <h5>容器</h5>
-                        <span>
+                        <span className={styles.itemCount}>
                           <Ellipsis>
                             {`${v.containerCount}`}
                           </Ellipsis>

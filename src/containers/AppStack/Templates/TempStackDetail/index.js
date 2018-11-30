@@ -17,6 +17,7 @@ import { Link } from 'react-router-dom'
 import { connect } from 'dva'
 import Loader from '@tenx-ui/loader'
 import styles from './style/index.less'
+import Ellipsis from '@tenx-ui/ellipsis'
 const FormItem = Form.Item
 const { TextArea } = Input
 const Panel = Collapse.Panel
@@ -51,10 +52,13 @@ class TempStackDetail extends React.Component {
       {
         title: '参数名称',
         dataIndex: 'name',
+        width: '25%',
+        render: text => <Ellipsis lines={1}>{text}</Ellipsis>,
       },
       {
         title: '参数类型',
         dataIndex: 'label',
+        width: '25%',
       },
       {
         title: '参数值',
@@ -62,10 +66,13 @@ class TempStackDetail extends React.Component {
         render: text => {
           return <Input defaultValue={text} style={{ width: 100 }}/>
         },
+        width: '25%',
       },
       {
         title: '参数描述',
         dataIndex: 'description',
+        width: '25%',
+        render: text => <Ellipsis lines={1}>{text}</Ellipsis>,
       },
     ],
 
@@ -81,12 +88,15 @@ class TempStackDetail extends React.Component {
     const { match, loading, templateDetail, form } = this.props
     const { getFieldDecorator } = form
     const templateDetailLoading = loading.effects['appStack/fetchAppStackTemplateDetail']
-
     const { column } = this.state
     let paramsConfig = []
     if (templateDetail) {
-      const { inputs } = JSON.parse(templateDetail.content)
-      paramsConfig = inputs
+      try {
+        const { inputs } = JSON.parse(templateDetail.content)
+        paramsConfig = inputs
+      } catch (e) {
+        // do nothing
+      }
     }
     return <QueueAnim
       id="tempStackDetail"
@@ -144,13 +154,13 @@ class TempStackDetail extends React.Component {
                       Object.keys(paramsConfig).map(k => {
                         const item = paramsConfig[k].input
                         const data = []
-                        Object.keys(item).forEach(k => {
+                        Object.keys(item).forEach(j => {
                           data.push({
-                            name: k,
-                            label: item[k].label,
-                            value: item[k].default,
-                            description: item[k].description,
-                            key: k,
+                            name: j,
+                            label: item[j].label,
+                            value: item[j].default,
+                            description: item[j].description,
+                            key: j,
                           })
                         })
                         return <Panel header={`标签: ${k}`} key={k} style={panelStyle}>

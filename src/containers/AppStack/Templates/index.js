@@ -12,12 +12,13 @@
 
 import React from 'react'
 import QueueAnim from 'rc-queue-anim'
-import { Card, Button, Menu, Dropdown, Icon, Modal, notification, Tooltip } from 'antd'
+import { Card, Button, Menu, Dropdown, Icon, notification, Tooltip } from 'antd'
 import { connect } from 'dva'
 import { Link } from 'react-router-dom'
 import styles from './style/index.less'
 import Loader from '@tenx-ui/loader'
 import Ellipsis from '@tenx-ui/ellipsis'
+import * as modal from '@tenx-ui/modal'
 import { StackTemplate as StackTemplateIcon } from '@tenx-ui/icon'
 import { calcuDate } from '../../../utils/helper';
 
@@ -35,10 +36,6 @@ import { calcuDate } from '../../../utils/helper';
   }),
 }))
 class Templates extends React.Component {
-  state = {
-    delModal: false,
-    stackName: '',
-  }
   componentDidMount() {
     const { getAppStackTemplate } = this.props
     const query = {
@@ -48,40 +45,39 @@ class Templates extends React.Component {
     getAppStackTemplate(query)
   }
   menu = name => <Menu>
-    <Menu.Item onClick={() => {
-      this.setState({
-        delModal: true,
-        stackName: name,
-      })
-    }
+    <Menu.Item onClick={() => { this.delTemplate(name) }
     }>
       <span>删除</span>
     </Menu.Item>
   </Menu>
-  delTemplate = async () => {
+  delTemplate = async name => {
     const { deleteAppStackTemplate, getAppStackTemplate } = this.props
-    const { stackName } = this.state
-    const res = await deleteAppStackTemplate(stackName)
-    if (res.code === 200) {
-      const query = {
-        from: 0,
-        size: 0,
-      }
-      getAppStackTemplate(query)
-    } else {
-      notification.error({
-        message: '删除失败',
-      })
-    }
-    this.setState({
-      delModal: false,
+    modal.confirm({
+      modalTitle: '删除堆栈模板',
+      title: '确认删除该堆栈模板吗？',
+      content: '',
+      okText: '确认删除',
+      onOk: () => {
+        deleteAppStackTemplate(name).then(res => {
+          if (res && res.code === 200) {
+            const query = {
+              from: 0,
+              size: 0,
+            }
+            getAppStackTemplate(query)
+            notification.success({ message: '删除成功' })
+          } else {
+            notification.success({ message: '删除失败' })
+          }
+        })
+      },
+      onCancel() {
+      },
     })
   }
   render() {
     const { loading, appStack } = this.props
-    const { delModal } = this.state
     const templateLoading = loading.effects['appStack/fetchAppStackTemplate']
-    const delLoading = loading.effects['appStack/fetchAppStackTemplateDelete']
     const { templateList } = appStack
     let appStackTemps = []
     if (templateList) appStackTemps = templateList
@@ -123,9 +119,11 @@ class Templates extends React.Component {
                             {v.name}
                           </Ellipsis>
                         </h2>
-                        <Ellipsis lines={2}>
-                          {v.description || '--'}
-                        </Ellipsis>
+                        <div className={styles.description}>
+                          <Ellipsis lines={2}>
+                            {v.description || '--'}
+                          </Ellipsis>
+                        </div>
                       </div>
                     </div>
                     <div className={styles.itemBottom}>
@@ -150,15 +148,6 @@ class Templates extends React.Component {
             </div>
         }
       </div>
-      <Modal
-        title="删除堆栈模板"
-        visible={delModal}
-        onCancel={() => this.setState({ delModal: false })}
-        onOk={this.delTemplate}
-        confirmLoading={delLoading}
-      >
-        确定删除堆栈模板吗？
-      </Modal>
     </QueueAnim>
   }
 }
