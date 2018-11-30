@@ -384,7 +384,7 @@ class Preview extends React.Component<PreviewProps, PreviewState> {
         </div>
         {
           previewNode === false &&
-          <div>yaml格式有错误</div>
+          <div className={styles.errorInfo}>yaml格式有错误</div>
         }
         {
           previewNode !== false &&  (previewNode as any[] ).map((nodeInfo, index) =>
