@@ -297,7 +297,7 @@ inputs: []`,
       const parentInputLabel = element.attributes._app_stack_input.app_name.label
       newEmbeds.forEach(embedId => {
         const currentElement = this.graph.getCell(embedId)
-        const childInput = currentElement.attributes._app_stack_input
+        const childInput = currentElement.attributes._app_stack_input || {}
         Object.keys(childInput).forEach(key => {
           childInput[key].label = parentInputLabel
         })
