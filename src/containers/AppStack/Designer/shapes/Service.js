@@ -32,7 +32,9 @@ const options = {
     apiVersion: 'v1',
     kind: 'Service',
     metadata: {
-      annotations: {},
+      annotations: {
+        example: 'example',
+      },
       labels: {
         'system/appName': {
           get_input: 'app_name',

@@ -376,7 +376,14 @@ inputs: []`,
     } = this.props
     const _initGraph = _graph => {
       this.graph.fromJSON(_graph)
-      this.graph2Yaml()
+      const { idShortIdMap } = this.state
+      this.graph.getCells().forEach(cell => {
+        const _shortId = this._idShort(cell.id)
+        cell._shortId = this._idShort(cell.id)
+        idShortIdMap[_shortId] = cell.id
+        idShortIdMap[cell.id] = _shortId
+      })
+      this.setState({ idShortIdMap }, this.graph2Yaml)
       // [embed-label-handle-part-1] init embeds map
       _graph.cells.forEach(({ id, embeds }) => {
         if (embeds && embeds.length > 0) {
