@@ -169,7 +169,7 @@ interface SampleNodeProps extends SubscriptionAPI {
 }
 
 class SampleNodeInner extends React.Component<SampleNodeProps, any> {
-  checkAppManageDeployment = (yamlJson: any[]):
+  checkAppManageType = (yamlJson: any[], type = 'Deployment'):
   { DMatchIndex: number, SMathIndex: number } | boolean  => {
     const deploymentIndex = [] as number[]
     const serviceIndex = [] as number[]
@@ -178,7 +178,7 @@ class SampleNodeInner extends React.Component<SampleNodeProps, any> {
     yamlJson.forEach((node, index) => {
       const { kind } = node
       const name = getDeepValue(node, [ 'metadata', 'name' ])
-      if ( kind === 'Deployment' ) {
+      if ( kind === type ) {
         deploymentIndex.push(index)
         deploymentNameArray.push(name)
       }
@@ -192,12 +192,12 @@ class SampleNodeInner extends React.Component<SampleNodeProps, any> {
       return false
     }
     if (deploymentIndex.length === 0) {
-      notification.warn({ message: '插入失败, 不存在可用的deployment',  description: '' })
+      notification.warn({ message: `插入失败, 不存在可用的${type.toLocaleLowerCase()}`,  description: '' })
       return false
     }
     let matchDeploymentIndex: number | undefined = undefined
     let matchServiceIndex: number | undefined = undefined
-    deploymentNameArray.some((name, index) => {
+    deploymentNameArray.some((name, index) => { // 这段代码只适用于 只有一对deployment和service出现的情况
        return serviceNameArray.some((sName, sIndex) => {
         if (name === sName) {
           matchDeploymentIndex = index
@@ -215,16 +215,67 @@ class SampleNodeInner extends React.Component<SampleNodeProps, any> {
     return { DMatchIndex: deploymentIndex[matchDeploymentIndex],
             SMathIndex: serviceIndex[matchServiceIndex] }
   }
+  dumpArray = (yamlJson: any[]): yamlString => {
+    const yamlStringArray = yamlJson.map(( node ) => {
+      return yaml.dump(node)
+    })
+    return yamlStringArray.join(`---\n`)
+  }
+  checkManagePvc = (yamlJson: any[]): boolean | number[] => {
+    const mathPVCArray: number[] = []
+    yamlJson.forEach(({ kind }, index) => {
+      if (kind === 'PersistentVolumeClaim') {
+        mathPVCArray.push(index)
+      }
+    })
+    if ( mathPVCArray.length === 0 ) {
+      notification.warn({ message: '插入失败, 没有可插入的 PVC 资源', description: '' })
+      return false
+    }
+    return mathPVCArray
+  }
   onClickNode = (dataNodeOne: Node) => {
-    const { id, comments } = dataNodeOne
+    const { id, content } = dataNodeOne
+    const yamlJson = analyzeYamlBase(this.props.YamlString) as any[]
     if (id === 1) {
-      const yamlJson = analyzeYamlBase(this.props.YamlString)
-      const resIndex = this.checkAppManageDeployment(yamlJson)
+      const resIndex = this.checkAppManageType(yamlJson)
       if (resIndex === false) {
         return
       }
-      // const { DMatchIndex  } = resIndex as { DMatchIndex: number, SMathIndex: number }
-      // const { metadata } = yamlJson[DMatchIndex]
+      const { DMatchIndex  } = resIndex as { DMatchIndex: number, SMathIndex: number }
+      const { metadata = {} } = yamlJson[DMatchIndex]
+      const { labels = {}, name } = metadata
+      const insertLables = {
+        'system/appName': '',
+        'system/svcName': name,
+      }
+      const newLabels = Object.assign( {}, labels, insertLables)
+      metadata.labels = newLabels
+      const newPayload = { yamlValue: this.dumpArray(yamlJson) }
+      this.props.dispatch({ type: 'createNative/updateYamlValue', payload: newPayload })
+    }
+    if (id === 2) { // 共享存储纳管pvc
+      const resIndexArray = this.checkManagePvc(yamlJson)
+      if ( resIndexArray === false) {
+        return
+      }
+      yamlJson.forEach((node, index) => {
+        if ((resIndexArray as number[] ).includes(index)) {
+          const { labels = {} } = node.metadata
+          const contentObj = yaml.load(content)
+          const newLabels = Object.assign({}, labels, contentObj.metadata.labels)
+          node.metadata.labels = newLabels
+        }
+      })
+      const newPayload = { yamlValue: this.dumpArray(yamlJson) }
+      this.props.dispatch({ type: 'createNative/updateYamlValue', payload: newPayload })
+    }
+    if (id === 4) {
+      const resIndex = this.checkAppManageType(yamlJson)
+      if (resIndex === false) {
+        return
+      }
+      const { DMatchIndex  } = resIndex as { DMatchIndex: number, SMathIndex: number }
     }
   }
   render() {
@@ -283,10 +334,20 @@ interface PreviewState {
 }
 
 class Preview extends React.Component<PreviewProps, PreviewState> {
+  timer: any
   jumpTo = (row: number) => {
     const Ace = this.props.aceEditor
     Ace.gotoLine(row, 0, true)
     Ace.scrollToLine(row, true, true, () => {})
+  }
+  shouldComponentUpdate() { // 连续提交不断刷新组件的问题
+    if (this.timer) {
+      clearTimeout(this.timer)
+    }
+    this.timer = setTimeout(() => {
+      this.forceUpdate()
+    }, 800);
+    return false
   }
   onClick = (index, length) => {
     this.props.aceEditor.gotoLine(1, 0, true)
@@ -316,18 +377,21 @@ class Preview extends React.Component<PreviewProps, PreviewState> {
   }
   render() {
     const previewNode = analyzeYamlPreview1(this.props.value)
-    const previewNodeLenght = previewNode.length
     return(
       <div className={styles.Preview}>
         <div className={styles.SampleHeader}>
           概览
         </div>
         {
-          analyzeYamlPreview1(this.props.value).map((nodeInfo, index) =>
+          previewNode === false &&
+          <div className={styles.errorInfo}>yaml格式有错误</div>
+        }
+        {
+          previewNode !== false &&  (previewNode as any[] ).map((nodeInfo, index) =>
           <div
             className={styles.previewNode}
             key={nodeInfo[1]}
-            onClick={() => this.onClick(index, previewNodeLenght)}
+            onClick={() => this.onClick(index, previewNode.length)}
           >
             <div className={styles.resourceIcon} >
             {
@@ -335,7 +399,7 @@ class Preview extends React.Component<PreviewProps, PreviewState> {
                 title={nodeInfo[0]}
                 getPopupContainer={() => this.props.editorNode}
               >
-                {selectIcon(nodeInfo[0])}
+                {selectIcon(nodeInfo[0] || '')}
               </Tooltip>}
             </div>
             <div>{nodeInfo[1]}</div>
@@ -360,30 +424,36 @@ class Preview extends React.Component<PreviewProps, PreviewState> {
   }
 };
 
-function analyzeYamlBase(value: yamlString): any[] {
+function analyzeYamlBase(value: yamlString): any[] | boolean {
   const singaleValue = compact(value.split(`---`))
   const objValue = singaleValue
   .map((ivalue) => {
     let res = []
     try {
       res = yaml.load(ivalue)
+      return res
     } catch (error) {
       console.warn(error)
-    } finally {
-      return res
+      throw error
     }
   })
   .filter((node = []) => node.length !== 0)
   return objValue
 }
 function analyzeYamlPreview1(value: yamlString) {
-  const res = analyzeYamlBase(value)
+  let res
+  try {
+    res = analyzeYamlBase(value)
+  } catch (error) {
+    return false
+  }
+  return (res as any[])
   .map((node) => {
-    const { kind, metadata: { name = '-' } = {} } = node
+    const kind = getDeepValue(node, ['kind'])
+    const name = getDeepValue(node, ['metadata', 'name'])
     const manageFlag = manage(kind, node)
     return [kind, name, manageFlag]
   })
-  return res
 }
 
 function manage(type: string, node: any) {
