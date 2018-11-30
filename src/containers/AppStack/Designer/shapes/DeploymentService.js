@@ -33,7 +33,7 @@ const options = {
       apiVersion: 'extensions/v1beta1',
       kind: 'Deployment',
       metadata: {
-        annotation: {
+        annotations: {
           'sidecar.istio.io/inject': 'false',
         },
         name: {
@@ -136,6 +136,10 @@ const options = {
       apiVersion: 'v1',
       kind: 'Service',
       metadata: {
+        annotations: {
+          'system/lbgroup': 'none',
+          'system/schemaPortname': 'port-name-1/tcp',
+        },
         labels: {
           'system/appName': {
             get_input: 'app_name',
@@ -151,7 +155,7 @@ const options = {
       spec: {
         ports: [
           {
-            name: 'port_name_1',
+            name: 'port-name-1',
             port: {
               get_input: 'service_port',
             },

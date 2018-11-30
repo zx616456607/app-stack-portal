@@ -32,6 +32,9 @@ const options = {
     apiVersion: 'v1',
     kind: 'Service',
     metadata: {
+      annotations: {
+        example: 'example',
+      },
       labels: {
         'system/appName': {
           get_input: 'app_name',
@@ -47,7 +50,7 @@ const options = {
     spec: {
       ports: [
         {
-          name: 'port_name_1',
+          name: 'port-name-1',
           port: {
             get_input: 'service_port',
           },

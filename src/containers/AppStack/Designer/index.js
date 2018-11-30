@@ -36,9 +36,12 @@ import styles from './style/index.less'
 // import * as yamls from './yamls'
 import './shapes'
 
+const isProd = process.env.NODE_ENV === 'production'
+
 const TabPane = Tabs.TabPane
 const FormItem = Form.Item
 
+const SIDER_WIDTH = isProd ? 0 : 200
 const PAPER_SCALE_MAX = 5
 const PAPER_SCALE_MIN = 0.1
 const PAPER_SCALE_STEP = 0.1
@@ -294,7 +297,7 @@ inputs: []`,
       const parentInputLabel = element.attributes._app_stack_input.app_name.label
       newEmbeds.forEach(embedId => {
         const currentElement = this.graph.getCell(embedId)
-        const childInput = currentElement.attributes._app_stack_input
+        const childInput = currentElement.attributes._app_stack_input || {}
         Object.keys(childInput).forEach(key => {
           childInput[key].label = parentInputLabel
         })
@@ -373,7 +376,14 @@ inputs: []`,
     } = this.props
     const _initGraph = _graph => {
       this.graph.fromJSON(_graph)
-      this.graph2Yaml()
+      const { idShortIdMap } = this.state
+      this.graph.getCells().forEach(cell => {
+        const _shortId = this._idShort(cell.id)
+        cell._shortId = this._idShort(cell.id)
+        idShortIdMap[_shortId] = cell.id
+        idShortIdMap[cell.id] = _shortId
+      })
+      this.setState({ idShortIdMap }, this.graph2Yaml)
       // [embed-label-handle-part-1] init embeds map
       _graph.cells.forEach(({ id, embeds }) => {
         if (embeds && embeds.length > 0) {
@@ -466,7 +476,7 @@ inputs: []`,
     this.paper.scale(1, 1)
     const options = {
       position: {
-        x: ev.clientX - this.paperDom.offsetLeft - 200 - 16,
+        x: ev.clientX - this.paperDom.offsetLeft - SIDER_WIDTH - 16,
         y: ev.clientY - this.paperDom.offsetParent.offsetTop,
       },
     }

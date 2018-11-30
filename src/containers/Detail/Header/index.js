@@ -99,13 +99,13 @@ class DetailHeader extends React.PureComponent {
     }
     return (
       <span>
-        <span>{replicaset}</span>
         {
           type && name &&
-          <span>, <Link
+          <span><Link
             onClick={() => this.iframeCb(`/app-stack/${type}`)}
-            to={`/${type}/${name}`}>{name}</Link></span>
+            to={`/${type}/${name}`}>{name}</Link>/</span>
         }
+        <span>{replicaset}</span>
       </span>
     )
   }
