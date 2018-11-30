@@ -8,7 +8,7 @@
  * @date Tuesday October 30th 2018
  */
 import request from '../utils/request'
-import { paasApiUrl } from '../utils/config'
+import { paasApiUrl, meshApi } from '../utils/config'
 // import { encodeImageFullname } from '../utils/helper'
 import queryString from 'query-string'
 
@@ -96,4 +96,9 @@ interface LoadSampleProps {
 
 export const loadSample = ({ cluster }: LoadSampleProps) => request({
   url: `${paasApiUrl}/clusters/${cluster}/native/samples`,
+})
+
+// 查询项目是否开启了istio
+export const checkProjectIstio = ({ cluster }: LoadSampleProps) => request({
+  url: `${meshApi}/servicemesh/clusters/${cluster}/paas/status`,
 })

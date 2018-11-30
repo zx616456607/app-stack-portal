@@ -102,10 +102,15 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
         <Sider
           collapsed={this.state.collapsed}
           collapsedWidth={0}
-          width={300}
+          width={'30%'}
           className={styles.sider}
         >
-          <Tool aceEditor={this.Ace} value={this.props.value} editorNode={this.editorNode}/>
+          <Tool
+            aceEditor={this.Ace}
+            value={this.props.value}
+            editorNode={this.editorNode}
+            collapsed={this.state.collapsed}
+          />
         </Sider>
         </Layout>
         { this.state.Exportvisible &&
