@@ -18,10 +18,11 @@ import { Editor as AceEditor } from 'brace'
 import { yamlString } from './editorType'
 import yaml from 'js-yaml'
 import compact from 'lodash/compact'
-import { AppStack1 as AppStack1Icon , Cronjob as CronjobIcon, Deployment as DeploymentIcon,
+import { Hpa as HpaIcon , Cronjob as CronjobIcon, Deployment as DeploymentIcon,
   Statefulset as StatefulsetIcon, Job as JobIcon, Pod as PodIcon, Service as ServiceIcon,
   Secret as SecretIcon, Pvc as PvcIcon, Configmap as ConfigmapIcon,
 } from '@tenx-ui/icon'
+import { getDeepValue } from '../../utils/helper';
 
 const Option = Select.Option;
 
@@ -30,6 +31,7 @@ export interface ToolProps extends SubscriptionAPI, RouteComponentProps {
   aceEditor: AceEditor
   value: yamlString
   editorNode: HTMLDivElement
+  collapsed: boolean
 }
 interface ToolState {
   sampleInfo: {
@@ -65,12 +67,17 @@ class Tool extends React.Component<ToolProps, ToolState> {
         <PanelGroup direction="column" borderColor="#252525">
           <Sample
             sampleInfo={this.state.sampleInfo}
+            cluster={this.props.cluster}
+            dispatch={this.props.dispatch}
           />
+          {
+            !this.props.collapsed ?
           <Preview
             aceEditor={this.props.aceEditor}
             value={this.props.value}
             editorNode={this.props.editorNode}
-          />
+          /> : <div/>
+          }
         </PanelGroup>
       </div>
     )
@@ -83,27 +90,39 @@ function mapStateToProps(state) {
 }
 export default connect(mapStateToProps)(withRouter(Tool))
 
-interface SampleProps extends RouteComponentProps {
+interface SampleProps extends RouteComponentProps, SubscriptionAPI {
+  cluster: string
   sampleInfo: {
     [index: string]: Array<Node>,
   }
 }
 interface SampleState {
   value: string[],
+  istioEnable: boolean
 }
 class SampleInner extends React.Component<SampleProps, SampleState> {
   state = {
     value : [] as string[],
+    istioEnable: false,
   }
   handleChange = (value) => {
     this.setState({ value })
   }
-  componentDidMount = () => {
+  async componentDidMount() {
     const { location: { search }  } = this.props
     const config = queryString.parse(search)
     this.setState({ value: config.type })
+    const payload = { cluster: this.props.cluster }
+    const istioEnable =
+     await this.props.dispatch({ type: 'createNative/checkProjectIstio', payload })
+    this.setState({ istioEnable: (istioEnable as boolean) })
   }
   render() {
+    const selectArray = Object.entries(this.props.sampleInfo)
+    .filter(([key]) => this.state.value.includes(key))
+    .map(([_, value]) => value)
+    .reduce((current, next) => current.concat(next), [])
+    const uniqSelectArray = uniqById(selectArray)
     return(
       <div className={styles.Sample}>
         <div className={styles.SampleHeader}>
@@ -126,11 +145,13 @@ class SampleInner extends React.Component<SampleProps, SampleState> {
           }
         </Select>
         }{
-          Object.entries(this.props.sampleInfo)
-          .filter(([key]) => this.state.value.includes(key))
-          .map(([_, value]) => value)
-          .reduce((current, next) => current.concat(next), [])
-          .map((node, index) => <SampleNode key={node.id} dataNode={node} index={index + 1}/>)
+          uniqSelectArray
+          .map((node, index) => <SampleNode
+            key={node.id}
+            dataNode={node}
+            index={index + 1}
+            istioEnable={this.state.istioEnable}
+          />)
         }
         </div>
       </div>
@@ -140,41 +161,118 @@ class SampleInner extends React.Component<SampleProps, SampleState> {
 
 const Sample = withRouter(SampleInner)
 
-interface SampleNodeProps {
+interface SampleNodeProps extends SubscriptionAPI {
   dataNode: Node | undefined,
   index: number,
+  istioEnable: boolean
+  YamlString: yamlString
 }
 
-const SampleNode = ({
-  dataNode,
-  index,
-}: SampleNodeProps,
-) => {
-  return (
-    <React.Fragment>
-      {
-        dataNode !== undefined &&
-        <div className={styles.SampleNode}>
-          <div className={styles.nodeTitle}>
-            <div>{`${index}. ${dataNode.opt_name}`}</div>
-            {
-              dataNode.opt_type === 2  &&
-              <div className={styles.insert}><Icon type="form" />插入</div>
-            }{
-              dataNode.opt_type === 1  &&
-              <div className={styles.insert}><Icon type="form" />使用</div>
-            }{
-              dataNode.opt_type === 0  &&
-              <div className={styles.info}>( 未开启服务网格 )</div>
-            }
-          </div>
-          <div className={styles.comments}>{dataNode.comments}</div>
-        </div>
+class SampleNodeInner extends React.Component<SampleNodeProps, any> {
+  checkAppManageDeployment = (yamlJson: any[]):
+  { DMatchIndex: number, SMathIndex: number } | boolean  => {
+    const deploymentIndex = [] as number[]
+    const serviceIndex = [] as number[]
+    const deploymentNameArray = [] as string[]
+    const serviceNameArray = [] as string[]
+    yamlJson.forEach((node, index) => {
+      const { kind } = node
+      const name = getDeepValue(node, [ 'metadata', 'name' ])
+      if ( kind === 'Deployment' ) {
+        deploymentIndex.push(index)
+        deploymentNameArray.push(name)
       }
-    </React.Fragment>
-  )
+      if ( kind === 'Service') {
+        serviceIndex.push(index)
+        serviceNameArray.push(name)
+      }
+    })
+    if (serviceIndex.length === 0) {
+      notification.warn({ message: '插入失败, 不存在可用的service',  description: '' })
+      return false
+    }
+    if (deploymentIndex.length === 0) {
+      notification.warn({ message: '插入失败, 不存在可用的deployment',  description: '' })
+      return false
+    }
+    let matchDeploymentIndex: number | undefined = undefined
+    let matchServiceIndex: number | undefined = undefined
+    deploymentNameArray.some((name, index) => {
+       return serviceNameArray.some((sName, sIndex) => {
+        if (name === sName) {
+          matchDeploymentIndex = index
+          matchServiceIndex = sIndex
+          return true
+        }
+        return false
+      })
+    })
+    if (matchDeploymentIndex === undefined || matchServiceIndex === undefined) {
+      notification.warn({ message: '插入失败, 没有同名的deployment 和 service 资源',
+      description: '' })
+      return false
+    }
+    return { DMatchIndex: deploymentIndex[matchDeploymentIndex],
+            SMathIndex: serviceIndex[matchServiceIndex] }
+  }
+  onClickNode = (dataNodeOne: Node) => {
+    const { id, comments } = dataNodeOne
+    if (id === 1) {
+      const yamlJson = analyzeYamlBase(this.props.YamlString)
+      const resIndex = this.checkAppManageDeployment(yamlJson)
+      if (resIndex === false) {
+        return
+      }
+      // const { DMatchIndex  } = resIndex as { DMatchIndex: number, SMathIndex: number }
+      // const { metadata } = yamlJson[DMatchIndex]
+    }
+  }
+  render() {
+    const dataNode = this.props.dataNode || {} as Node
+    const { istioEnable, index }  = this.props
+    let inserNodeFlage = false
+    let explainFlage = false
+    if (dataNode.opt_type === 2) {
+      if (dataNode.id !== 5) {
+        inserNodeFlage = true
+      }
+      if (dataNode.id === 5 && istioEnable) {
+        inserNodeFlage = true
+      }
+      if (dataNode.id === 5 && !istioEnable) {
+        explainFlage = true
+      }
+    }
+    return (
+      <React.Fragment>
+        {
+          dataNode !== undefined &&
+          <div className={styles.SampleNode}>
+            <div className={styles.nodeTitle}>
+              <div>{`${index}. ${dataNode.opt_name}`}</div>
+              <div onClick={() => this.onClickNode(dataNode)}>
+              {
+                inserNodeFlage &&
+                <div className={styles.insert}><Icon type="form" />插入</div>
+              }{
+                explainFlage &&
+                <div className={styles.info}>（未开启服务网格）</div>
+              }
+              </div>
+            </div>
+            <div className={styles.comments}>{dataNode.comments}</div>
+          </div>
+        }
+      </React.Fragment>
+    )
+  }
 }
 
+function mapStateToPropsNode(state) {
+  const YamlString = getDeepValue(state, [ 'createNative', 'yamlValue' ])
+  return { YamlString }
+}
+const SampleNode = connect(mapStateToPropsNode)(SampleNodeInner)
 interface PreviewProps {
   aceEditor: AceEditor
   value: yamlString
@@ -241,21 +339,20 @@ class Preview extends React.Component<PreviewProps, PreviewState> {
               </Tooltip>}
             </div>
             <div>{nodeInfo[1]}</div>
-            {
-              nodeInfo[2] &&
-              <div className={styles.IconWrap}>
-                <div className="BorderIcon">
-                  <Tooltip
-                    title={'已被平台纳管'}
-                    getPopupContainer={(node) => this.props.editorNode}
-                  >
-                    <div>
-                      管
-                    </div>
-                  </Tooltip>
-                </div>
+            <div className={styles.IconWrap}>
+            { nodeInfo[2] &&
+              <div className="BorderIcon">
+                <Tooltip
+                  title={'已被平台纳管'}
+                  getPopupContainer={(node) => this.props.editorNode}
+                >
+                  <div>
+                    管
+                  </div>
+                </Tooltip>
               </div>
             }
+            </div>
           </div>)
         }
       </div>
@@ -263,7 +360,7 @@ class Preview extends React.Component<PreviewProps, PreviewState> {
   }
 };
 
-function analyzeYamlPreview1(value: yamlString) {
+function analyzeYamlBase(value: yamlString): any[] {
   const singaleValue = compact(value.split(`---`))
   const objValue = singaleValue
   .map((ivalue) => {
@@ -277,26 +374,42 @@ function analyzeYamlPreview1(value: yamlString) {
     }
   })
   .filter((node = []) => node.length !== 0)
-  .map((node) => {
-    const { kind, metadata: { name = '-', labels = '-' } = {} } = node
-    const manageFlag = manage(kind, labels)
-    return [kind, name, manageFlag]
-  })
   return objValue
 }
-
-interface Label {
-  [index: string]: string
+function analyzeYamlPreview1(value: yamlString) {
+  const res = analyzeYamlBase(value)
+  .map((node) => {
+    const { kind, metadata: { name = '-' } = {} } = node
+    const manageFlag = manage(kind, node)
+    return [kind, name, manageFlag]
+  })
+  return res
 }
-function manage(type: string, labels: Label[]) {
-  // TODO: 这块还没做
-  // switch (type) {
-  //   case '':
-  //     break;
-  //   default:
-  //     break;
-  // }
-  return true
+
+function manage(type: string, node: any) {
+  if (type === 'Deployment') {
+    const labels = getDeepValue(node, [ 'metadata', 'labels' ]) || {}
+    const systemAppName = labels['system/appName']
+    const systemSvcName = labels['system/svcName']
+    if (systemAppName !== undefined && systemSvcName !== undefined) {
+      return true
+    }
+  }
+  if (type === 'PersistentVolumeClaim') {
+    const labels = getDeepValue(node, [ 'metadata', 'labels' ]) || {}
+    const storageType = labels['system/storageType']
+    if (storageType !== undefined) {
+      return true
+    }
+  }
+  if (type === 'HorizontalPodAutoscaler') {
+    const labels = getDeepValue(node, [ 'metadata', 'labels' ]) || {}
+    const strategyName = labels.strategyName
+    if ( strategyName !== undefined ) {
+      return true
+    }
+  }
+  return false
 }
 
 // 渲染组件
@@ -305,14 +418,28 @@ function manage(type: string, labels: Label[]) {
 function selectIcon(type: string = '') {
   const newtype = type.toLocaleLowerCase()
   if ( newtype === 'configmap' ) { return <ConfigmapIcon /> }
+  if ( newtype === 'horizontalpodautoscaler' ) { return <HpaIcon /> }
   if ( newtype === 'cronjob' ) { return <CronjobIcon /> }
   if ( newtype === 'deployment' ) { return <DeploymentIcon />}
   if ( newtype === 'job') { return <JobIcon/> }
   if ( newtype === 'pod' ) { return <PodIcon /> }
   if ( newtype === 'cronjob' ) { return <CronjobIcon /> }
-  if ( newtype === 'pvc' ) { return <PvcIcon />}
+  if ( newtype === 'persistentvolumeclaim' ) { return <PvcIcon />}
   if ( newtype === 'secret') { return <SecretIcon/> }
   if ( newtype === 'service' ) { return <ServiceIcon />}
   if ( newtype === 'statefulset') { return <StatefulsetIcon/> }
   return <Icon type="question-circle" />
+}
+
+// 根据id去掉重复项
+function uniqById (nodes: Node[]) {
+  const idArray = [] as number[]
+  const nodeArray = [] as Node[]
+  nodes.forEach((node) => {
+    if (!idArray.includes(node.id)) {
+      idArray.push(node.id)
+      nodeArray.push(node)
+    }
+  })
+  return nodeArray
 }
