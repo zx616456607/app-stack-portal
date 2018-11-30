@@ -137,7 +137,8 @@ const options = {
       kind: 'Service',
       metadata: {
         annotations: {
-          example: 'example',
+          'system/lbgroup': 'none',
+          'system/schemaPortname': 'port-name-1/tcp',
         },
         labels: {
           'system/appName': {
