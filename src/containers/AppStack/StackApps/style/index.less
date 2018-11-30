@@ -58,15 +58,21 @@
       }
     }
     .itemInfo {
-      width: 60%;
-      display: flex;
-      justify-content: flex-start;
-      align-items: center;
-      vertical-align: top;
-      margin-left: 2%;
-      h2 {
-        width: 100px;
-        font-weight: normal;
+      width: 65%;
+      margin-left: 1%;
+      .itemName {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        h2 {
+          width: 100px;
+          font-weight: normal;
+          margin-right: 4px;
+        }
+      }
+      .description {
+        margin-top: 10px;
+        color: @font-color-3;
       }
     }
   }
@@ -87,6 +93,13 @@
         border-left: 1px solid @border-color-split;
         border-right: 1px solid @border-color-split;
       }
+    }
+    h5 {
+      color: @font-color-3;
+    }
+    .itemCount {
+      color: @font-color-3;
+      font-size: 18px;
     }
   }
 }

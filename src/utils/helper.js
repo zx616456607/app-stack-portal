@@ -573,6 +573,7 @@ function appNameCheck(name, itemName, existNameFlag) {
   return 'success';
 }
 
+
 export {
   delay,
   getType,
