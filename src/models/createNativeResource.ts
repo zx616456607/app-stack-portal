@@ -17,7 +17,9 @@ import {
   loadStackDetail,
   loadStackList,
   loadSample,
+  checkProjectIstio,
 } from '../services/createNativeResource'
+import { getDeepValue } from '../utils/helper';
 
 interface YamlValuePar {
   payload: {
@@ -28,7 +30,7 @@ interface YamlValuePar {
 export default {
   namespace: 'createNative',
   state: {
-    yamlValue: '',
+    yamlValue: ``,
   },
   reducers: {
     updateYamlValue(state, { payload: { yamlValue = '' } = {} }: YamlValuePar) {
@@ -67,6 +69,11 @@ export default {
     * loadSample({ payload }, { call }) {
       const res = yield call(loadSample, payload)
       return res
+    },
+    * checkProjectIstio({ payload }, { call }) {
+      const res = yield call(checkProjectIstio, payload)
+      const istioEnable = getDeepValue(res, [ 'istioEnabled' ]) || false
+      return istioEnable
     },
   },
 }

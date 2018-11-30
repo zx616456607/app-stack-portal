@@ -24,6 +24,12 @@ const userPortalApi = {
   prefix: '/api/v2',
 }
 
+const meshApi = {
+  protocol: 'http',
+  host: '192.168.1.59:65532',
+  prefix: '/api/v3',
+}
+
 module.exports = {
   // name: '时速云',
   prefix: 'app-stack',
@@ -32,6 +38,7 @@ module.exports = {
   CORS: [],
   paasApi,
   paasApiUrl: `${paasApi.protocol}://${paasApi.host}${paasApi.prefix}`,
+  meshApi: `${meshApi.protocol}://${meshApi.host}${meshApi.prefix}`,
   userPortalApi,
   userPortalApiUrl: `${userPortalApi.protocol}://${userPortalApi.host}${userPortalApi.prefix}`,
 }
