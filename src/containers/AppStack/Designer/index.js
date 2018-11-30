@@ -145,6 +145,7 @@ inputs: []`,
     yamlEditorTabKey: 'template',
     saveStackModal: false,
     saveStackBtnLoading: false,
+    idShortIdMap: {},
   }
 
   editMode = this.props.match.path === '/app-stack/designer/:name/edit'
@@ -290,10 +291,10 @@ inputs: []`,
       const currentOldEmbeds = this.embedsMap[id] || []
 
       // [embed-label-handle-part-2] change child input label to app_name label when isEmbedding
-      const parentInputLabel = element.attributes._app_stack_input.input.app_name.label
+      const parentInputLabel = element.attributes._app_stack_input.app_name.label
       newEmbeds.forEach(embedId => {
         const currentElement = this.graph.getCell(embedId)
-        const childInput = currentElement.attributes._app_stack_input.input
+        const childInput = currentElement.attributes._app_stack_input
         Object.keys(childInput).forEach(key => {
           childInput[key].label = parentInputLabel
         })
@@ -302,7 +303,7 @@ inputs: []`,
       const movedOutEmbeds = currentOldEmbeds.filter(embed => newEmbeds.indexOf(embed) < 0)
       movedOutEmbeds.forEach(embedId => {
         const currentElement = this.graph.getCell(embedId)
-        const childInput = currentElement.attributes._app_stack_input.input
+        const childInput = currentElement.attributes._app_stack_input
         Object.keys(childInput).forEach(key => {
           childInput[key].label = '其他配置'
         })
@@ -436,6 +437,8 @@ inputs: []`,
     }
   }
 
+  _idShort = id => id.split('-')[0]
+
   onResourceDrop = ev => {
     ev.preventDefault();
     // console.warn('onDrop ev', ev)
@@ -479,15 +482,22 @@ inputs: []`,
 
     const resource = new joint.shapes.devs[id](options)
     this.graph.addCells([ resource ])
-    this.graph2Yaml()
 
     this.paper.translate(tx, ty)
     this.paper.scale(paperScale, paperScale)
 
+    const { idShortIdMap } = this.state
+    const _shortId = this._idShort(resource.id)
+    resource._shortId = _shortId
+    idShortIdMap[_shortId] = resource.id
+    idShortIdMap[resource.id] = _shortId
+    this.setState({ idShortIdMap })
+
     if (id === 'Application') {
-      resource.attributes._app_stack_input.input.app_name.label = `应用-${resource.cid}`
-      this.graph2Yaml()
+      resource.attributes._app_stack_input.app_name.label = `应用-${_shortId}`
     }
+
+    this.graph2Yaml()
   }
 
   graph2Yaml = () => {
@@ -496,12 +506,12 @@ inputs: []`,
       inputs: {},
     }
     this.graph.getCells().forEach(cell => {
-      const { cid, attributes: { _app_stack_template, _app_stack_input } } = cell
+      const { _shortId, attributes: { _app_stack_template, _app_stack_input } } = cell
       if (_app_stack_template) {
-        yamlObj.nodes[cid] = _app_stack_template
+        yamlObj.nodes[_shortId] = _app_stack_template
       }
       if (_app_stack_input) {
-        yamlObj.inputs[cid] = _app_stack_input
+        yamlObj.inputs[_shortId] = _app_stack_input
       }
     })
     this.setState({
@@ -523,8 +533,9 @@ inputs: []`,
         yamlObj = { inputs: yamlParser.safeLoad(inputYamlStr) }
       }
       this.setState({ yamlObj })
+      const { idShortIdMap } = this.state
       Object.keys(yamlObj.nodes || yamlObj.inputs).forEach(key => {
-        const cell = this.graph.getCell(key)
+        const cell = this.graph.getCell(idShortIdMap[key])
         if (yamlObj.nodes) {
           cell.attributes._app_stack_template = yamlObj.nodes[key]
         }

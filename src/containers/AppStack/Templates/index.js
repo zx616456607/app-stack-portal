@@ -139,7 +139,7 @@ class Templates extends React.Component {
                           <Button style={{ marginRight: 8 }}>设计</Button>
                         </Link>
                         <span>
-                          <Link to={`/app-stack/tempStackDetail/${v.name}`}>
+                          <Link to={`/app-stack/templates/${v.name}/deploy`}>
                             <Button type="primary">部署</Button>
                           </Link>
                         </span>

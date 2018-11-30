@@ -30,12 +30,10 @@ const options = {
   },
   // _app_stack_template: {},
   _app_stack_input: {
-    input: {
-      app_name: {
-        label: '扩展资源',
-        description: '应用名称',
-        default: '',
-      },
+    app_name: {
+      label: '扩展资源',
+      description: '应用名称',
+      default: '',
     },
   },
 }

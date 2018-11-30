@@ -132,47 +132,45 @@ const options = {
     },
   },
   _app_stack_input: {
-    input: {
-      deployment_name: {
-        label: '原生资源',
-        description: '服务名称',
-        default: '',
-      },
-      app_name: {
-        label: '扩展资源',
-        description: '应用名称',
-        default: '',
-      },
-      replicas: {
-        label: '原生资源',
-        description: '实例数量',
-        default: 1,
-      },
-      image_addr: {
-        label: '原生资源',
-        description: '镜像地址',
-        default: '',
-      },
-      iamge_pullPolicy: {
-        label: '原生资源',
-        description: '镜像获取策略',
-        default: 'Always',
-      },
-      container_name: {
-        label: '原生资源',
-        description: '容器名称',
-        default: 'container-1',
-      },
-      container_port: {
-        label: '原生资源',
-        description: '容器端口',
-        default: 80,
-      },
-      port_protocol: {
-        label: '原生资源',
-        description: '端口协议',
-        default: 80,
-      },
+    deployment_name: {
+      label: '原生资源',
+      description: '服务名称',
+      default: '',
+    },
+    app_name: {
+      label: '扩展资源',
+      description: '应用名称',
+      default: '',
+    },
+    replicas: {
+      label: '原生资源',
+      description: '实例数量',
+      default: 1,
+    },
+    image_addr: {
+      label: '原生资源',
+      description: '镜像地址',
+      default: '192.168.1.52/public/hello-world',
+    },
+    iamge_pullPolicy: {
+      label: '原生资源',
+      description: '镜像获取策略',
+      default: 'Always',
+    },
+    container_name: {
+      label: '原生资源',
+      description: '容器名称',
+      default: 'container-1',
+    },
+    container_port: {
+      label: '原生资源',
+      description: '容器端口',
+      default: 80,
+    },
+    port_protocol: {
+      label: '原生资源',
+      description: '端口协议',
+      default: 'TCP',
     },
   },
 }

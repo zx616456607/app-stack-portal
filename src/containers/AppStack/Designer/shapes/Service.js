@@ -67,32 +67,30 @@ const options = {
     },
   },
   _app_stack_input: {
-    input: {
-      app_name: {
-        default: '扩展资源',
-        label: '',
-        description: '应用名称',
-      },
-      service_port: {
-        label: '原生资源',
-        description: '服务端口',
-        default: '',
-      },
-      service_protocol: {
-        label: '原生资源',
-        description: '服务协议',
-        default: '',
-      },
-      service_targetPort: {
-        label: '原生资源',
-        description: '目标端口',
-        default: '',
-      },
-      deployment_name: {
-        label: '原生资源',
-        description: '目标deployment',
-        default: '',
-      },
+    app_name: {
+      default: '扩展资源',
+      label: '',
+      description: '应用名称',
+    },
+    service_port: {
+      label: '原生资源',
+      description: '服务端口',
+      default: '',
+    },
+    service_protocol: {
+      label: '原生资源',
+      description: '服务协议',
+      default: '',
+    },
+    service_targetPort: {
+      label: '原生资源',
+      description: '目标端口',
+      default: '',
+    },
+    deployment_name: {
+      label: '原生资源',
+      description: '目标deployment',
+      default: '',
     },
   },
 }

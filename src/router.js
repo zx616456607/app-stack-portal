@@ -150,8 +150,8 @@ function RouterConfig({ history, app }) {
       ],
     },
     {
-      path: '/app-stack/tempStackDetail/:name',
-      component: () => import('./containers/AppStack/Templates/TempStackDetail'),
+      path: '/app-stack/templates/:name/deploy',
+      component: () => import('./containers/AppStack/Templates/Deploy'),
       models: () => [
         import('./models/appStack'),
       ],

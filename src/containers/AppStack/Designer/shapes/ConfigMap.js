@@ -42,12 +42,10 @@ const options = {
     },
   },
   _app_stack_input: {
-    input: {
-      configMap_name: {
-        label: '原生资源',
-        description: '服务配置名称',
-        default: '',
-      },
+    configMap_name: {
+      label: '原生资源',
+      description: '服务配置名称',
+      default: '',
     },
   },
 }
