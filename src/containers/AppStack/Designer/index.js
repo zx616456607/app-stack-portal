@@ -36,9 +36,12 @@ import styles from './style/index.less'
 // import * as yamls from './yamls'
 import './shapes'
 
+const isProd = process.env.NODE_ENV === 'production'
+
 const TabPane = Tabs.TabPane
 const FormItem = Form.Item
 
+const SIDER_WIDTH = isProd ? 0 : 200
 const PAPER_SCALE_MAX = 5
 const PAPER_SCALE_MIN = 0.1
 const PAPER_SCALE_STEP = 0.1
@@ -466,7 +469,7 @@ inputs: []`,
     this.paper.scale(1, 1)
     const options = {
       position: {
-        x: ev.clientX - this.paperDom.offsetLeft - 200 - 16,
+        x: ev.clientX - this.paperDom.offsetLeft - SIDER_WIDTH - 16,
         y: ev.clientY - this.paperDom.offsetParent.offsetTop,
       },
     }
