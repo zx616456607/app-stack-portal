@@ -32,7 +32,7 @@ const options = {
     apiVersion: 'extensions/v1beta1',
     kind: 'Deployment',
     metadata: {
-      annotation: {
+      annotations: {
         'sidecar.istio.io/inject': 'false',
       },
       name: {
