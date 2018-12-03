@@ -32,6 +32,7 @@ export interface ToolProps extends SubscriptionAPI, RouteComponentProps {
   value: yamlString
   editorNode: HTMLDivElement
   collapsed: boolean
+  editorWarn: any[]
 }
 interface ToolState {
   sampleInfo: {
@@ -65,19 +66,23 @@ class Tool extends React.Component<ToolProps, ToolState> {
     return(
       <div className={styles.toolWrap}>
         <PanelGroup direction="column" borderColor="#252525">
+          {
+            !this.props.collapsed ?
           <Sample
             sampleInfo={this.state.sampleInfo}
             cluster={this.props.cluster}
             dispatch={this.props.dispatch}
-          />
-          {
+            editorWarn={this.props.editorWarn}
+          /> : <div/>
+          }{
             !this.props.collapsed ?
           <Preview
             aceEditor={this.props.aceEditor}
             value={this.props.value}
             editorNode={this.props.editorNode}
-          /> : <div/>
-          }
+            dispatch={this.props.dispatch}
+            history={this.props.history}
+          /> : <div/>}
         </PanelGroup>
       </div>
     )
@@ -86,7 +91,8 @@ class Tool extends React.Component<ToolProps, ToolState> {
 
 function mapStateToProps(state) {
   const { app: { cluster = '' } = {} } = state
-  return { cluster }
+  const editorWarn = getDeepValue(state, ['createNative', 'editorWarn' ])
+  return { cluster, editorWarn }
 }
 export default connect(mapStateToProps)(withRouter(Tool))
 
@@ -95,11 +101,13 @@ interface SampleProps extends RouteComponentProps, SubscriptionAPI {
   sampleInfo: {
     [index: string]: Array<Node>,
   }
+  editorWarn: any[]
 }
 interface SampleState {
   value: string[],
   istioEnable: boolean
 }
+
 class SampleInner extends React.Component<SampleProps, SampleState> {
   state = {
     value : [] as string[],
@@ -111,7 +119,10 @@ class SampleInner extends React.Component<SampleProps, SampleState> {
   async componentDidMount() {
     const { location: { search }  } = this.props
     const config = queryString.parse(search)
-    this.setState({ value: config.type })
+    const filterResource = [ 'Deployment', 'StatefulSet', 'Job', 'CronJob' ]
+    if (filterResource.includes(config.type)) {
+      this.setState({ value: config.type })
+    }
     const payload = { cluster: this.props.cluster }
     const istioEnable =
      await this.props.dispatch({ type: 'createNative/checkProjectIstio', payload })
@@ -151,6 +162,7 @@ class SampleInner extends React.Component<SampleProps, SampleState> {
             dataNode={node}
             index={index + 1}
             istioEnable={this.state.istioEnable}
+            editorWarn={this.props.editorWarn}
           />)
         }
         </div>
@@ -165,7 +177,8 @@ interface SampleNodeProps extends SubscriptionAPI {
   dataNode: Node | undefined,
   index: number,
   istioEnable: boolean
-  YamlString: yamlString
+  YamlString: yamlString,
+  editorWarn: any[]
 }
 
 class SampleNodeInner extends React.Component<SampleNodeProps, any> {
@@ -208,7 +221,7 @@ class SampleNodeInner extends React.Component<SampleNodeProps, any> {
       })
     })
     if (matchDeploymentIndex === undefined || matchServiceIndex === undefined) {
-      notification.warn({ message: '插入失败, 没有同名的deployment 和 service 资源',
+      notification.warn({ message: `插入失败, 没有同名的${type} 和 service 资源`,
       description: '' })
       return false
     }
@@ -236,6 +249,12 @@ class SampleNodeInner extends React.Component<SampleNodeProps, any> {
   }
   onClickNode = (dataNodeOne: Node) => {
     const { id, content } = dataNodeOne
+    let contentObj
+    try {
+      contentObj = yaml.load(content)
+    } catch (error) {
+      console.warn(error)
+    }
     const yamlJson = analyzeYamlBase(this.props.YamlString) as any[]
     if (id === 1) {
       const resIndex = this.checkAppManageType(yamlJson)
@@ -253,8 +272,9 @@ class SampleNodeInner extends React.Component<SampleNodeProps, any> {
       metadata.labels = newLabels
       const newPayload = { yamlValue: this.dumpArray(yamlJson) }
       this.props.dispatch({ type: 'createNative/updateYamlValue', payload: newPayload })
+      return
     }
-    if (id === 2) { // 共享存储纳管pvc
+    if (id === 2 || id === 3) { // 存储纳管pvc
       const resIndexArray = this.checkManagePvc(yamlJson)
       if ( resIndexArray === false) {
         return
@@ -262,20 +282,42 @@ class SampleNodeInner extends React.Component<SampleNodeProps, any> {
       yamlJson.forEach((node, index) => {
         if ((resIndexArray as number[] ).includes(index)) {
           const { labels = {} } = node.metadata
-          const contentObj = yaml.load(content)
           const newLabels = Object.assign({}, labels, contentObj.metadata.labels)
           node.metadata.labels = newLabels
         }
       })
       const newPayload = { yamlValue: this.dumpArray(yamlJson) }
       this.props.dispatch({ type: 'createNative/updateYamlValue', payload: newPayload })
+      return
     }
     if (id === 4) {
-      const resIndex = this.checkAppManageType(yamlJson)
-      if (resIndex === false) {
-        return
-      }
-      const { DMatchIndex  } = resIndex as { DMatchIndex: number, SMathIndex: number }
+      // TODO: 目前需求还不明确 需等产品和后端讨论好了, 再写这里
+      // const resIndex = this.checkAppManageType(yamlJson, 'HorizontalPodAutoscaler')
+      // if (resIndex === false) {
+      //   return
+      // }
+      // const { DMatchIndex  } = resIndex as { DMatchIndex: number, SMathIndex: number }
+      // const { metadata = {} } = yamlJson[DMatchIndex]
+      // const { labels = {}, name } = metadata
+      // const insertLables = {}
+      // const newLabels = Object.assign( {}, labels, insertLables)
+      // metadata.labels = newLabels
+      // const newPayload = { yamlValue: this.dumpArray(yamlJson) }
+      // this.props.dispatch({ type: 'createNative/updateYamlValue', payload: newPayload })
+      return
+    }
+    if (id === 10 || id === 11 || id === 9 || id === 12) {
+      const newPayload = { yamlValue: content }
+      this.props.dispatch({ type: 'createNative/updateYamlValue', payload: newPayload })
+    }
+    if (id === 5) {
+      yamlJson.forEach((singleValue) => {
+        const annotations = getDeepValue(singleValue, [ 'metadata', 'annotations' ]) || {}
+        const newAnnotations = Object.assign({}, annotations, contentObj.metadata.annotations )
+        singleValue.metadata.annotations = newAnnotations
+      })
+      const newPayload = { yamlValue: this.dumpArray(yamlJson) }
+      this.props.dispatch({ type: 'createNative/updateYamlValue', payload: newPayload })
     }
   }
   render() {
@@ -294,6 +336,7 @@ class SampleNodeInner extends React.Component<SampleNodeProps, any> {
         explainFlage = true
       }
     }
+    const disable = (this.props.editorWarn || []).length === 0
     return (
       <React.Fragment>
         {
@@ -304,7 +347,7 @@ class SampleNodeInner extends React.Component<SampleNodeProps, any> {
               <div onClick={() => this.onClickNode(dataNode)}>
               {
                 inserNodeFlage &&
-                <div className={styles.insert}><Icon type="form" />插入</div>
+                <div className={disable ? styles.insert : styles.disable}><Icon type="form" />插入</div>
               }{
                 explainFlage &&
                 <div className={styles.info}>（未开启服务网格）</div>
@@ -324,7 +367,7 @@ function mapStateToPropsNode(state) {
   return { YamlString }
 }
 const SampleNode = connect(mapStateToPropsNode)(SampleNodeInner)
-interface PreviewProps {
+interface PreviewProps extends SubscriptionAPI {
   aceEditor: AceEditor
   value: yamlString
   editorNode: HTMLDivElement
@@ -375,17 +418,33 @@ class Preview extends React.Component<PreviewProps, PreviewState> {
       }
     }
   }
+  analyzeYamlPreview1 = (value: yamlString) => {
+    let res
+    try {
+      res = analyzeYamlBase(value)
+    } catch (error) {
+      const { reason } = error
+      const npayload = { type: 'add', message: ['yamlBasegrammar', reason] }
+      // this.props.dispatch({ type: 'createNative/patchWarn', payload: npayload })
+      return false
+    }
+    const payload = { type: 'delete', message: ['yamlBasegrammar', ''] }
+    // this.props.dispatch({ type: 'createNative/patchWarn', payload })
+    return (res as any[])
+    .map((node) => {
+      const kind = getDeepValue(node, ['kind'])
+      const name = getDeepValue(node, ['metadata', 'name'])
+      const manageFlag = manage(kind, node)
+      return [kind, name, manageFlag]
+    })
+  }
   render() {
-    const previewNode = analyzeYamlPreview1(this.props.value)
+    const previewNode = this.analyzeYamlPreview1(this.props.value)
     return(
       <div className={styles.Preview}>
         <div className={styles.SampleHeader}>
           概览
         </div>
-        {
-          previewNode === false &&
-          <div className={styles.errorInfo}>yaml格式有错误</div>
-        }
         {
           previewNode !== false &&  (previewNode as any[] ).map((nodeInfo, index) =>
           <div
@@ -424,7 +483,7 @@ class Preview extends React.Component<PreviewProps, PreviewState> {
   }
 };
 
-function analyzeYamlBase(value: yamlString): any[] | boolean {
+export function analyzeYamlBase(value: yamlString): any[] | boolean {
   const singaleValue = compact(value.split(`---`))
   const objValue = singaleValue
   .map((ivalue) => {
@@ -439,21 +498,6 @@ function analyzeYamlBase(value: yamlString): any[] | boolean {
   })
   .filter((node = []) => node.length !== 0)
   return objValue
-}
-function analyzeYamlPreview1(value: yamlString) {
-  let res
-  try {
-    res = analyzeYamlBase(value)
-  } catch (error) {
-    return false
-  }
-  return (res as any[])
-  .map((node) => {
-    const kind = getDeepValue(node, ['kind'])
-    const name = getDeepValue(node, ['metadata', 'name'])
-    const manageFlag = manage(kind, node)
-    return [kind, name, manageFlag]
-  })
 }
 
 function manage(type: string, node: any) {
