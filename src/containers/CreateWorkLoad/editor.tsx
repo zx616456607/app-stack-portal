@@ -20,6 +20,7 @@ import TenxEditor from '@tenx-ui/editor'
 import '@tenx-ui/editor/assets/index.css'
 import { Editor as AceEditor } from 'brace'
 import Tool from './tool'
+import PanelGroup from 'react-panelgroup'
 
 const {  Sider, Content } = Layout
 interface EditorProps extends SubscriptionAPI {
@@ -28,6 +29,7 @@ interface EditorProps extends SubscriptionAPI {
   createOrEditNative: () => void;
   editflag: boolean;
   setYamlValue: ( yamlValue: yamlString ) => void;
+  editorWarn: any[];
 }
 
 interface EditorState {
@@ -80,19 +82,39 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
           saveOnClick={() => this.setState({ Exportvisible: true })}
           fullScreen={this.state.fullScreen}
           toggleFullScreen={this.toggleFullScreen}
-          onSiderClick={() => this.setState({ collapsed: !this.state.collapsed })}
+          onSiderClick={() => {
+            this.setState({ collapsed: !this.state.collapsed }, () => this.Ace.resize())
+          }}
         />
         <Layout
           style={{ height: this.state.fullScreen ? 'calc( 100vh - 30px )' : 'calc( 100vh - 152px )' }}
         >
         <Content>
+        <div
+         style={{ height: this.state.fullScreen ? 'calc( 100vh - 78px )' : 'calc( 100vh - 200px )' }}
+        >
+        <PanelGroup
+          direction="column"
+          borderColor="#252525"
+          panelWidths={[
+            { resize: 'stretch' },
+            { size: 60, resize: 'dynamic' },
+          ]}
+          onUpdate={() => this.Ace.resize()}
+        >
         <TenxEditor
           titleDisplay={false}
           onChange={this.props.onBeforeChange}
           value={this.props.value}
           onLoad={(ace) => this.Ace = (ace as AceEditor)}
-          height={this.state.fullScreen ? 'calc( 100vh - 78px )' : 'calc( 100vh - 200px )'}
         />
+        <div className={styles.warnZoon}>{
+          this.props.editorWarn.map(([key, vale]) => {
+            return <div key={key} className={key}><Icon type="close-circle" />{vale}</div>
+          })
+        }</div>
+        </PanelGroup>
+        </div>
         <EditorBottom
           onCancelClick={() => history.back()}
           onSavelick={this.props.createOrEditNative}
@@ -159,14 +181,6 @@ const EditorHeader = ({
       className={styles.editHeader}
       ref={headRef}
     >
-      <Tooltip title={'辅助工具'}>
-      <Icon
-        type="tool"
-        theme="outlined"
-        onClick={onSiderClick}
-        className={styles.editIcon}
-      />
-      </Tooltip>
       <Tooltip title={'导入编排'}>
       <Icon
         type="plus"
@@ -180,6 +194,14 @@ const EditorHeader = ({
         type="save"
         theme="outlined"
         onClick={saveOnClick}
+        className={styles.editIcon}
+      />
+      </Tooltip>
+      <Tooltip title={'辅助工具'}>
+      <Icon
+        type="tool"
+        theme="outlined"
+        onClick={onSiderClick}
         className={styles.editIcon}
       />
       </Tooltip>

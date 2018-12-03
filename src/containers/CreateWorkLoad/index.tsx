@@ -18,10 +18,13 @@ import { connect, SubscriptionAPI } from 'dva'
 import yaml from 'js-yaml'
 import { yamlString } from './editorType'
 import Editor from './editor'
+import { getDeepValue } from '../../utils/helper';
+import { analyzeYamlBase } from './tool'
 
 interface CreateWorkLoadProps extends RouteComponentProps, SubscriptionAPI {
   cluster: string,
   yamlValue: yamlString,
+  editorWarn: any[],
 }
 
 interface CreateWorkLoadState {
@@ -32,6 +35,16 @@ class CreateWorkLoad extends React.Component<CreateWorkLoadProps, CreateWorkLoad
     editflag: false, // 默认是创建
   }
   onBeforeChange = ( value: string ) => {
+    try {
+      analyzeYamlBase(value)
+    } catch (error) {
+      const { reason } = error
+      const npayload = { type: 'add', message: ['yamlBasegrammar', reason] }
+      this.props.dispatch({ type: 'createNative/patchWarn', payload: npayload })
+      return false
+    }
+    const payload = { type: 'delete', message: ['yamlBasegrammar', ''] }
+    this.props.dispatch({ type: 'createNative/patchWarn', payload })
     this.props.dispatch({ type: 'createNative/updateYamlValue', payload: { yamlValue: value } })
   }
   async componentDidMount() {
@@ -114,6 +127,7 @@ class CreateWorkLoad extends React.Component<CreateWorkLoadProps, CreateWorkLoad
           dispatch={this.props.dispatch}
           history={this.props.history}
           setYamlValue={this.setYamlValue}
+          editorWarn={this.props.editorWarn}
         />
         </div>
       </QueueAnim>
@@ -124,6 +138,7 @@ class CreateWorkLoad extends React.Component<CreateWorkLoadProps, CreateWorkLoad
 
 function mapStateToProps(state) {
   const { app: { cluster = '' } = {}, createNative: { yamlValue = '' } = {} } = state
-  return { cluster, yamlValue }
+  const editorWarn = getDeepValue(state, ['createNative', 'editorWarn' ])
+  return { cluster, yamlValue, editorWarn }
 }
 export default withRouter(connect(mapStateToProps)(CreateWorkLoad))

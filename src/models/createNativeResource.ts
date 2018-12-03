@@ -31,10 +31,31 @@ export default {
   namespace: 'createNative',
   state: {
     yamlValue: ``,
+    editorWarn: [],
   },
   reducers: {
     updateYamlValue(state, { payload: { yamlValue = '' } = {} }: YamlValuePar) {
       return { ...state, yamlValue }
+    },
+    patchWarn(state, { payload: { type, message } }) {
+      if (type === 'add') {
+        const { editorWarn = [] } = state
+        const keyArray = editorWarn.map(([ikey]) => ikey) || []
+        const [key] = message
+        if (keyArray.includes(key) ) {
+          return state
+        }
+        const newEditorWarn = [ ...editorWarn, message ] || []
+        return { ...state, editorWarn: newEditorWarn }
+      }
+      if (type === 'delete') {
+        const { editorWarn = [] } = state
+        const [key] = message
+        const newEditorWarn = editorWarn.forEach(([ikey]) => {
+          return ikey !== key
+        }) || [];
+        return { ...state, editorWarn: newEditorWarn }
+      }
     },
   },
   effects: {

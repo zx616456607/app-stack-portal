@@ -59,4 +59,26 @@
 }
 .sider {
   background-color: #333;
+  display: block !important;
+}
+.warnZoon {
+  border: 1px solid #252525;
+  background-color: #282828;
+  overflow-y: auto;
+  width: 100%;
+  padding: @padding-base;
+  > div {
+    height: 20px;
+    line-height: 20px;
+    vertical-align: middle;
+    font-size: 12px;
+  }
+  :global {
+    .yamlBasegrammar {
+      color: @error-color;
+      i {
+        padding-right: @padding-base;
+      }
+    }
+  }
 }
