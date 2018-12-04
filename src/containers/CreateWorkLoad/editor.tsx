@@ -18,6 +18,8 @@ import ImportComposeFile from './importComposeFile'
 import { SubscriptionAPI } from 'dva'
 import TenxEditor from '@tenx-ui/editor'
 import '@tenx-ui/editor/assets/index.css'
+import 'brace/mode/yaml'
+import 'brace/theme/monokai'
 import { Editor as AceEditor } from 'brace'
 import Tool from './tool'
 import PanelGroup from 'react-panelgroup'
@@ -109,6 +111,7 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
           onChange={this.props.onBeforeChange}
           value={this.props.value}
           onLoad={(ace) => this.Ace = (ace as AceEditor)}
+          mode={'yaml'}
         />
         <div className={styles.warnZoon}>{
           this.props.editorWarn.map(([key, vale]) => {

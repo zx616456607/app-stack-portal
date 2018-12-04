@@ -2,6 +2,8 @@ import React from 'react'
 import TenxEditor from '@tenx-ui/editor'
 import '@tenx-ui/editor/assets/index.css'
 import styles from './style/index.less'
+import 'brace/mode/yaml'
+import 'brace/theme/monokai'
 export default class StackYaml extends React.PureComponent {
   state = {
     menus: [ '堆栈编排', 'K8s资源编排' ],
@@ -50,6 +52,7 @@ export default class StackYaml extends React.PureComponent {
           headerExtraContent={header()}
           value={yamlValue}
           readOnly={true}
+          modal={'yaml'}
         />
       </div>
     )

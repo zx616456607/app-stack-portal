@@ -17,6 +17,8 @@ import TenxEditor from '@tenx-ui/editor'
 import '@tenx-ui/editor/assets/index.css'
 import yaml from 'js-yaml'
 import { connect } from 'dva'
+import 'brace/mode/yaml'
+import 'brace/theme/monokai'
 
 const dvaStates = ({ nativeDetail: { detailData, type } }) => ({ data: detailData, type })
 
@@ -32,6 +34,7 @@ export default class YamlTab extends React.PureComponent {
           value={yaml.dump(value)}
           readOnly={true}
           onChange={yamlStr => this.setState({ yamlStr })}
+          model={'yaml'}
         />
       </div>
     )

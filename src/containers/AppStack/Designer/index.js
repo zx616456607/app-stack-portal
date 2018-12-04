@@ -19,6 +19,8 @@ import 'jointjs/dist/joint.css'
 import graphlib from 'graphlib'
 import TenxEditor from '@tenx-ui/editor'
 import '@tenx-ui/editor/assets/index.css'
+import 'brace/mode/yaml'
+import 'brace/theme/chrome'
 import { confirm } from '@tenx-ui/modal'
 import {
   Button, notification, Slider, Icon, Row, Col, Tabs, Modal, Form, Input,
