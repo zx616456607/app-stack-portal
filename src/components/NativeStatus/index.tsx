@@ -22,6 +22,7 @@ export interface Status {
   replicas?: number | undefined
   failureReason?: string | undefined
   startTime?: string | undefined
+  restartCountTotal?: number | undefined
 }
 
 export interface NativeStatusProps {
@@ -187,6 +188,7 @@ class JobPodsStatus extends React.Component<JobPodsStatusProps, JobPodsStatusSta
 }
 
 const timeKey = [ 'Running' ]
+const restartKey = [ 'Abnormal' ]
 class PodStatus extends React.Component<JobPodsStatusProps, JobPodsStatusState> {
   timer: any
   state = {
@@ -205,7 +207,7 @@ class PodStatus extends React.Component<JobPodsStatusProps, JobPodsStatusState> 
     clearInterval(this.timer)
   }
   render () {
-    const { startTime } = this.props.status
+    const { startTime, restartCountTotal } = this.props.status
     if (progressKey.includes(this.props.phase)) {
       return <div style={{ width: 120 }}><Progress
         percent={this.state.percent}
@@ -221,6 +223,14 @@ class PodStatus extends React.Component<JobPodsStatusProps, JobPodsStatusState> 
       >
         {`已运行${moment().from(startTime, true)}`}
       </div>)
+    }
+    if (restartKey.includes(this.props.phase)) {
+      return (
+        <div
+          className={styles.podInfo}
+        >
+          {`已重启${restartCountTotal}次`}
+        </div>)
     }
     return (
       null

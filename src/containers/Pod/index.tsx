@@ -56,9 +56,9 @@ function getColumns(self): Array<any> {
     dataIndex: 'status',
     key: 'status',
     render: (status) => {
-      const { phase, startTime } = status
+      const { phase, startTime, restartCountTotal } = status
       return <NativeStatus
-        status={{ startTime }}
+        status={{ startTime, restartCountTotal }}
         phase={phase}
         type={'Pod'}
       />
@@ -91,7 +91,7 @@ function getColumns(self): Array<any> {
     key: 'operation',
     render: (_, record) => {
       return (
-        <div className="actionBox commonData">
+        <div className="actionBox commonData" onClick={(e) => e.stopPropagation()}>
         <Dropdown.Button
           overlay={
             <Menu onClick={e => self.onMenuChange(e.key, _.key, self, record)}>

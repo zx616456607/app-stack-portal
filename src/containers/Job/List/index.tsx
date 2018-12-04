@@ -99,7 +99,7 @@ function getColumns(self): Array<any> {
         </Menu>
       );
       return (
-        <div className="actionBox commonData">
+        <div className="actionBox commonData" onClick={(e) => e.stopPropagation()}>
         <Dropdown.Button
           overlay={dropdown}
           type="ghost"

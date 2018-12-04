@@ -34,6 +34,7 @@ export function getPodStatus(podYaml) {
       return {
         phase: 'Abnormal',
         startTime,
+        restartCountTotal,
       }
     }
   }
