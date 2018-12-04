@@ -34,7 +34,6 @@ export default class YamlTab extends React.PureComponent {
           value={yaml.dump(value)}
           readOnly={true}
           onChange={yamlStr => this.setState({ yamlStr })}
-          model={'yaml'}
         />
       </div>
     )

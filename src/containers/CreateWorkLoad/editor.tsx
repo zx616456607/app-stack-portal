@@ -111,7 +111,6 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
           onChange={this.props.onBeforeChange}
           value={this.props.value}
           onLoad={(ace) => this.Ace = (ace as AceEditor)}
-          mode={'yaml'}
         />
         <div className={styles.warnZoon}>{
           this.props.editorWarn.map(([key, vale]) => {

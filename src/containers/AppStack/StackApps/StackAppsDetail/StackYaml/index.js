@@ -52,7 +52,6 @@ export default class StackYaml extends React.PureComponent {
           headerExtraContent={header()}
           value={yamlValue}
           readOnly={true}
-          modal={'yaml'}
         />
       </div>
     )
