@@ -25,6 +25,7 @@ interface CreateWorkLoadProps extends RouteComponentProps, SubscriptionAPI {
   cluster: string,
   yamlValue: yamlString,
   editorWarn: any[],
+  namespace: string
 }
 
 interface CreateWorkLoadState {
@@ -34,18 +35,48 @@ class CreateWorkLoad extends React.Component<CreateWorkLoadProps, CreateWorkLoad
   state = {
     editflag: false, // 默认是创建
   }
-  onBeforeChange = ( value: string ) => {
+  timer: any
+  analyzeNamespace = (res) => {
+    const flag =  res.every(element => {
+      const inameSpace = getDeepValue(element, ['metadata', 'namespace'])
+      if (inameSpace === null) { return true }
+      return inameSpace === this.props.namespace
+    });
+    if (flag === false) {
+      const npayload = { type: 'add', message: ['analyzeNamespace', ''] }
+      this.props.dispatch({ type: 'createNative/patchWarn', payload: npayload })
+    }
+    if (flag === true) {
+      const npayload = { type: 'delete', message: ['analyzeNamespace', ''] }
+      this.props.dispatch({ type: 'createNative/patchWarn', payload: npayload })
+    }
+  }
+  analyze = (value) => {
+    let res: any[] = []
     try {
-      analyzeYamlBase(value)
+      res = (analyzeYamlBase(value) as any[])
     } catch (error) {
       const { reason } = error
       const npayload = { type: 'add', message: ['yamlBasegrammar', reason] }
       this.props.dispatch({ type: 'createNative/patchWarn', payload: npayload })
       return false
     }
+    this.analyzeNamespace(res)
     const payload = { type: 'delete', message: ['yamlBasegrammar', ''] }
     this.props.dispatch({ type: 'createNative/patchWarn', payload })
+  }
+  onBeforeChange = ( value: string ) => {
+    if (this.timer) {
+      clearTimeout(this.timer)
+    }
+    this.timer = setTimeout(() => {
+      this.analyze(value)
+    }, 800);
     this.props.dispatch({ type: 'createNative/updateYamlValue', payload: { yamlValue: value } })
+  }
+  componentWillUnmount() {
+    const payload = { type: 'delete', message: ['all', ''] }
+    this.props.dispatch({ type: 'createNative/patchWarn', payload })
   }
   async componentDidMount() {
     const { location: { search }  } = this.props
@@ -63,6 +94,7 @@ class CreateWorkLoad extends React.Component<CreateWorkLoadProps, CreateWorkLoad
     } catch (e) {
       notification.warn({ message: '获取详情失败', description: '' })
     }
+    await this.analyze(this.props.yamlValue)
   }
   setYamlValue = (value: yamlString) => {
     this.props.dispatch({ type: 'createNative/updateYamlValue', payload: { yamlValue: value } })
@@ -139,6 +171,7 @@ class CreateWorkLoad extends React.Component<CreateWorkLoadProps, CreateWorkLoad
 function mapStateToProps(state) {
   const { app: { cluster = '' } = {}, createNative: { yamlValue = '' } = {} } = state
   const editorWarn = getDeepValue(state, ['createNative', 'editorWarn' ])
-  return { cluster, yamlValue, editorWarn }
+  const namespace = getDeepValue(state, ['app', 'project'])
+  return { cluster, yamlValue, editorWarn, namespace }
 }
 export default withRouter(connect(mapStateToProps)(CreateWorkLoad))

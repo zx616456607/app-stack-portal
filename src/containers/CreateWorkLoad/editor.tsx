@@ -21,7 +21,9 @@ import '@tenx-ui/editor/assets/index.css'
 import { Editor as AceEditor } from 'brace'
 import Tool from './tool'
 import PanelGroup from 'react-panelgroup'
-
+import AnalyzeNameSpace from './analyzeNameSpace'
+import { Import as ImportIcon } from '@tenx-ui/icon'
+import '@tenx-ui/icon/assets/index.css'
 const {  Sider, Content } = Layout
 interface EditorProps extends SubscriptionAPI {
   onBeforeChange: (value: yamlString) => void;
@@ -87,18 +89,18 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
           }}
         />
         <Layout
-          style={{ height: this.state.fullScreen ? 'calc( 100vh - 30px )' : 'calc( 100vh - 152px )' }}
+          style={{ height: this.state.fullScreen ? 'calc( 100vh - 30px )' : 'calc( 100vh - 102px )' }}
         >
         <Content>
         <div
-         style={{ height: this.state.fullScreen ? 'calc( 100vh - 78px )' : 'calc( 100vh - 200px )' }}
+         style={{ height: this.state.fullScreen ? 'calc( 100vh - 78px )' : 'calc( 100vh - 150px )' }}
         >
         <PanelGroup
           direction="column"
           borderColor="#252525"
           panelWidths={[
             { resize: 'stretch' },
-            { size: 60, resize: 'dynamic' },
+            { size: 60, minSize: 0, resize: 'dynamic' },
           ]}
           onUpdate={() => this.Ace.resize()}
         >
@@ -110,7 +112,16 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
         />
         <div className={styles.warnZoon}>{
           this.props.editorWarn.map(([key, vale]) => {
-            return <div key={key} className={key}><Icon type="close-circle" />{vale}</div>
+            if (key === 'yamlBasegrammar') {
+              return <div key={key} className={key}><Icon type="close-circle" />{vale}</div>
+            }
+            if (key === 'analyzeNamespace') {
+              return <AnalyzeNameSpace
+                key={key}
+                fullScreen={this.state.fullScreen}
+                innerNode={this.innerNode}
+              />
+            }
           })
         }</div>
         </PanelGroup>
@@ -182,9 +193,7 @@ const EditorHeader = ({
       ref={headRef}
     >
       <Tooltip title={'导入编排'}>
-      <Icon
-        type="plus"
-        theme="outlined"
+      <ImportIcon
         onClick={plusOnclick}
         className={styles.editIcon}
       />

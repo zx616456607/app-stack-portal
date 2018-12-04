@@ -51,7 +51,10 @@ export default {
       if (type === 'delete') {
         const { editorWarn = [] } = state
         const [key] = message
-        const newEditorWarn = editorWarn.forEach(([ikey]) => {
+        if (key === 'all') {
+          return { ...state,  editorWarn: [] }
+        }
+        const newEditorWarn = editorWarn.filter(([ikey]) => {
           return ikey !== key
         }) || [];
         return { ...state, editorWarn: newEditorWarn }
