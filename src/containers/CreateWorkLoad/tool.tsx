@@ -20,9 +20,10 @@ import yaml from 'js-yaml'
 import compact from 'lodash/compact'
 import { Hpa as HpaIcon , Cronjob as CronjobIcon, Deployment as DeploymentIcon,
   Statefulset as StatefulsetIcon, Job as JobIcon, Pod as PodIcon, Service as ServiceIcon,
-  Secret as SecretIcon, Pvc as PvcIcon, Configmap as ConfigmapIcon,
+  Secret as SecretIcon, Pvc as PvcIcon, Configmap as ConfigmapIcon, Insert as InsertIcon,
 } from '@tenx-ui/icon'
 import { getDeepValue } from '../../utils/helper';
+import classnames from 'classnames'
 
 const Option = Select.Option;
 
@@ -228,12 +229,6 @@ class SampleNodeInner extends React.Component<SampleNodeProps, any> {
     return { DMatchIndex: deploymentIndex[matchDeploymentIndex],
             SMathIndex: serviceIndex[matchServiceIndex] }
   }
-  dumpArray = (yamlJson: any[]): yamlString => {
-    const yamlStringArray = yamlJson.map(( node ) => {
-      return yaml.dump(node)
-    })
-    return yamlStringArray.join(`---\n`)
-  }
   checkManagePvc = (yamlJson: any[]): boolean | number[] => {
     const mathPVCArray: number[] = []
     yamlJson.forEach(({ kind }, index) => {
@@ -270,7 +265,7 @@ class SampleNodeInner extends React.Component<SampleNodeProps, any> {
       }
       const newLabels = Object.assign( {}, labels, insertLables)
       metadata.labels = newLabels
-      const newPayload = { yamlValue: this.dumpArray(yamlJson) }
+      const newPayload = { yamlValue: dumpArray(yamlJson) }
       this.props.dispatch({ type: 'createNative/updateYamlValue', payload: newPayload })
       return
     }
@@ -286,7 +281,7 @@ class SampleNodeInner extends React.Component<SampleNodeProps, any> {
           node.metadata.labels = newLabels
         }
       })
-      const newPayload = { yamlValue: this.dumpArray(yamlJson) }
+      const newPayload = { yamlValue: dumpArray(yamlJson) }
       this.props.dispatch({ type: 'createNative/updateYamlValue', payload: newPayload })
       return
     }
@@ -316,7 +311,7 @@ class SampleNodeInner extends React.Component<SampleNodeProps, any> {
         const newAnnotations = Object.assign({}, annotations, contentObj.metadata.annotations )
         singleValue.metadata.annotations = newAnnotations
       })
-      const newPayload = { yamlValue: this.dumpArray(yamlJson) }
+      const newPayload = { yamlValue: dumpArray(yamlJson) }
       this.props.dispatch({ type: 'createNative/updateYamlValue', payload: newPayload })
     }
   }
@@ -337,6 +332,7 @@ class SampleNodeInner extends React.Component<SampleNodeProps, any> {
       }
     }
     const disable = (this.props.editorWarn || []).length === 0
+    const disableButton = classnames({ [styles.disableButton]: !disable })
     return (
       <React.Fragment>
         {
@@ -344,10 +340,10 @@ class SampleNodeInner extends React.Component<SampleNodeProps, any> {
           <div className={styles.SampleNode}>
             <div className={styles.nodeTitle}>
               <div>{`${index}. ${dataNode.opt_name}`}</div>
-              <div onClick={() => this.onClickNode(dataNode)}>
+              <div className={disableButton} onClick={() => this.onClickNode(dataNode)}>
               {
                 inserNodeFlage &&
-                <div className={disable ? styles.insert : styles.disable}><Icon type="form" />插入</div>
+                <div className={disable ? styles.insert : styles.disable}><InsertIcon/>插入</div>
               }{
                 explainFlage &&
                 <div className={styles.info}>（未开启服务网格）</div>
@@ -363,7 +359,7 @@ class SampleNodeInner extends React.Component<SampleNodeProps, any> {
 }
 
 function mapStateToPropsNode(state) {
-  const YamlString = getDeepValue(state, [ 'createNative', 'yamlValue' ])
+  const YamlString = getDeepValue(state, [ 'createNative', 'yamlValue' ]) || ''
   return { YamlString }
 }
 const SampleNode = connect(mapStateToPropsNode)(SampleNodeInner)
@@ -484,7 +480,7 @@ class Preview extends React.Component<PreviewProps, PreviewState> {
 };
 
 export function analyzeYamlBase(value: yamlString): any[] | boolean {
-  const singaleValue = compact(value.split(`---`))
+  const singaleValue = compact((value || '').split(`---`))
   const objValue = singaleValue
   .map((ivalue) => {
     let res = []
@@ -556,4 +552,11 @@ function uniqById (nodes: Node[]) {
     }
   })
   return nodeArray
+}
+
+export function dumpArray(yamlJson: any[]): yamlString {
+  const yamlStringArray = yamlJson.map(( node ) => {
+    return yaml.dump(node)
+  })
+  return yamlStringArray.join(`---\n`)
 }

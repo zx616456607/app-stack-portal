@@ -61,7 +61,9 @@
 }
 .disable {
   color: @font-color-3;
-  pointer-events: none;
+  i {
+    padding-right: @padding-base;
+  }
 }
 .info {
   color: red;
@@ -102,4 +104,8 @@
   color: @error-color;
   text-align: center;
   line-height: 40px;
+}
+
+.disableButton {
+  pointer-events: none;
 }
