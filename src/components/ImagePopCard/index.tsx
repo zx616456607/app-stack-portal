@@ -30,23 +30,29 @@ export default class ImagePopCard extends React.Component<ImagePopCardProps, Ima
       show: !show,
     })
   }
+  onClick = (e) => {
+    e.stopPropagation()
+  }
   render() {
     return (
       <div className="ImagePopCard">
       {
         this.props.addressList.length === 0 ?
         <span>-</span> :
+        <div onClick={this.onClick}>
         <Popover
           placement="right"
           content={<CopyList addressList={this.props.addressList}/>}
           trigger="click"
           onVisibleChange={this.showPop}
           arrowPointAtCenter
+          getTooltipContainer={(node) => node as HTMLElement}
         // getTooltipContainer=
         // {(triggerNode) => triggerNode}
         >
-          <span className={styles.checkAddress}>查看镜像地址</span>
+        <span className={styles.checkAddress} >查看镜像地址</span>
         </Popover>
+        </div>
       }
     </div>
     )
