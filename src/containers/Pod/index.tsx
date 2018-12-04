@@ -219,7 +219,11 @@ class Pod extends React.Component<PodProps, PodState> {
       const PodList = data.map((PodNode) => {
         const containerTemplateArray = getDeepValue(PodNode,
           ['spec', 'template', 'spec', 'containers']) || [];
-        const imageArray = containerTemplateArray.map(({ image }) => image)
+        const containersForD = getDeepValue(PodNode, ['spec', 'containers']) || []
+        const containersForS = getDeepValue(PodNode, ['spec', 'initContainers']) || []
+        const newContainerTemplateArray =
+        [].concat(containerTemplateArray, containersForD, containersForS)
+        const imageArray = newContainerTemplateArray.map(({ image }) => image)
         return {
           key: PodNode.metadata.name,
           name: PodNode.metadata.name,
