@@ -39,7 +39,7 @@ export default class Pods extends React.PureComponent {
     const self = this
     confirm({
       modalTitle: `${text}操作`,
-      title: `您是否确定要${text}容器 ${name}?`,
+      title: `您是否确定要${text} ${name}?`,
       async onOk() {
         const { dispatch, refreshPodList } = self.props
         const res = await dispatch({
