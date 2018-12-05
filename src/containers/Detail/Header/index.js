@@ -262,10 +262,10 @@ class DetailHeader extends React.PureComponent {
                   popoverItem(getDeepValue(data, 'metadata.labels'.split('.')) || {}, '标签')
                 }</div>
                 <div className={styles.normal}>{
-                  popoverItem(getDeepValue(data, 'spec.selector.matchLabels'.split('.')) || {}, 'pod selector')
+                  popoverItem(getDeepValue(data, 'spec.selector.matchLabels'.split('.')) || {}, '实例选择器')
                 }</div>
                 <div className={styles.normal}>{
-                  popoverItem(getDeepValue(data, 'spec.template.spec.nodeSelector'.split('.')) || {}, 'node selector')
+                  popoverItem(getDeepValue(data, 'spec.template.spec.nodeSelector'.split('.')) || {}, '节点选择器')
                 }</div>
               </React.Fragment>
               }
@@ -279,10 +279,10 @@ class DetailHeader extends React.PureComponent {
                     popoverItem(getDeepValue(data, 'metadata.labels'.split('.')) || {}, '标签')
                   }</div>
                   <div className={styles.normal}>{
-                    popoverItem(getDeepValue(data, 'spec.selector.matchLabels'.split('.')) || {}, 'pod selector')
+                    popoverItem(getDeepValue(data, 'spec.selector.matchLabels'.split('.')) || {}, '实例选择器')
                   }</div>
                   <div className={styles.normal}>{
-                    popoverItem(getDeepValue(data, 'spec.template.spec.nodeSelector'.split('.')) || {}, 'node selector')
+                    popoverItem(getDeepValue(data, 'spec.template.spec.nodeSelector'.split('.')) || {}, '节点选择器')
                   }</div>
 
                 </React.Fragment>
@@ -290,7 +290,7 @@ class DetailHeader extends React.PureComponent {
               {
                 type === 'Pod' &&
                 <React.Fragment>
-                  <div className={styles.normal}>owner: { this.renderPodOwner(data) }
+                  <div className={styles.normal}>上级资源: { this.renderPodOwner(data) }
                   </div>
                   <div className={styles.normal}>{
                     popoverItem(getDeepValue(data, 'metadata.annotations'.split('.')) || {}, '注释')
@@ -299,7 +299,7 @@ class DetailHeader extends React.PureComponent {
                     popoverItem(getDeepValue(data, 'metadata.labels'.split('.')) || {}, '标签')
                   }</div>
                   <div className={styles.normal}>{
-                    popoverItem(getDeepValue(data, 'spec.nodeSelector'.split('.')) || {}, 'node selector')
+                    popoverItem(getDeepValue(data, 'spec.nodeSelector'.split('.')) || {}, '节点选择器')
                   }</div>
 
                 </React.Fragment>
