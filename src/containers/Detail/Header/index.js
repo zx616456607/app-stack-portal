@@ -103,9 +103,11 @@ class DetailHeader extends React.PureComponent {
           type && name &&
           <span><Link
             onClick={() => this.iframeCb(`/app-stack/${type}`)}
-            to={`/${type}/${name}`}>{name}</Link>/</span>
+            to={`/${type}/${name}`}>
+            <Ellipsis length={15}>{name}</Ellipsis>
+          </Link>/</span>
         }
-        <span>{replicaset}</span>
+        <Ellipsis length={15}>{replicaset}</Ellipsis>
       </span>
     )
   }
@@ -147,7 +149,9 @@ class DetailHeader extends React.PureComponent {
     if (!data.metadata) return <div/>
     return (
       <div className={styles.all}>
-        <div className={styles.name}>{getDeepValue(data, 'metadata.name'.split('.')) || '--'}</div>
+        <div className={styles.name}>
+          <Ellipsis length={50}>{getDeepValue(data, 'metadata.name'.split('.')) || '--'}</Ellipsis>
+        </div>
         <div className={classnames({
           [styles.container]: true,
           [styles.cronJob]: type === 'CronJob',
