@@ -20,6 +20,7 @@ import { yamlString } from './editorType'
 import Editor from './editor'
 import { getDeepValue } from '../../utils/helper';
 import { analyzeYamlBase } from './tool'
+import { confirm } from '@tenx-ui/modal'
 
 interface CreateWorkLoadProps extends RouteComponentProps, SubscriptionAPI {
   cluster: string,
@@ -83,6 +84,18 @@ class CreateWorkLoad extends React.Component<CreateWorkLoadProps, CreateWorkLoad
     const config = queryString.parse(search)
     const editflag = config.edit || false
     this.setState({ editflag })
+    if (editflag === false && this.props.yamlValue !== '') {
+      confirm({
+        modalTitle: '打开未保存的yaml',
+        title: '您有未保存的yaml，是否要打开未保存的yaml？',
+        width: 420,
+        onOk() {
+        },
+        onCancel: () => {
+          this.props.dispatch({ type: 'createNative/updateYamlValue', payload: { yamlValue: '' } })
+        },
+      })
+    }
     if (!config.name || !config.type) { return } // 如果参数不全, 直接返回
     const payload = { cluster: this.props.cluster, type: config.type, name: config.name }
     try {
@@ -114,7 +127,10 @@ class CreateWorkLoad extends React.Component<CreateWorkLoadProps, CreateWorkLoad
         }
         await this.props.dispatch({ type: 'createNative/createNativeResource', payload })
         notification.success({ message: '创建成功', description: '' })
-        setTimeout( () => history.back(), 600)
+        setTimeout( () => {
+          this.props.dispatch({ type: 'createNative/updateYamlValue', payload: { yamlValue: '' } })
+          history.back()
+        }, 600)
       } catch (e) {
         const { code, reason } = e.response
         if (code === 409 && reason === 'AlreadyExists') {
@@ -136,7 +152,10 @@ class CreateWorkLoad extends React.Component<CreateWorkLoadProps, CreateWorkLoad
         }
         await this.props.dispatch({ type: 'createNative/updateNativeResource', payload })
         notification.success({ message: '更新成功', description: '' })
-        setTimeout( () => history.back(), 600)
+        setTimeout( () => {
+          this.props.dispatch({ type: 'createNative/updateYamlValue', payload: { yamlValue: '' } })
+          history.back()
+        }, 600)
       } catch (e) {
         const { code, reason } = e.response
         if (code === 500) {
