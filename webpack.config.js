@@ -12,11 +12,28 @@
 const webpack = require('webpack')
 const tsImportPluginFactory = require('ts-import-plugin')
 const { site } = require('./config')
-// const env = process.env
+const env = process.env
 
 module.exports = webpackConfig => {
-  // const production = env.NODE_ENV === 'production'
-
+  const production = env.NODE_ENV === 'production'
+  if (production) {
+    webpackConfig.entry = {
+      main: [
+        './src/index.js',
+      ],
+      vendor: [
+        '@antv/data-set',
+        'bizcharts',
+        'brace',
+        'classnames',
+        'rc-queue-anim',
+      ],
+    }
+  }
+  webpackConfig.plugins.push(new webpack.optimize.CommonsChunkPlugin({
+    name: [ 'vendor' ],
+    minChunks: Infinity,
+  }))
   webpackConfig.module.rules.forEach(rule => {
     // add babel-import-plugin TypeScript Implement support
     if (String(rule.test).indexOf('ts|tsx') > -1) {
