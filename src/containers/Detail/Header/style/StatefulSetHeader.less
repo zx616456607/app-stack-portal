@@ -12,38 +12,35 @@
 
 @import '~@/assets/style/core/index.less';
 
-.all {
+.container {
   height: 174px;
   width: 100%;
   background-color: @component-background;
   border-radius: @border-radius-base;
   margin-bottom: 20px;
+  box-sizing: border-box;
   display: flex;
-  flex-direction: column;
-  justify-content: center;
-  .name {
-    font-size: 20px;
-    color: @font-color;
-    margin-left: 170px;
-    margin-bottom: @padding-base;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 0 40px 0 32px;
+  .leftIcon {
+    font-size: 50px;
+    color: @primary-color;
+    align-self: center;
+    margin-right: @padding-small;
   }
-  .container {
-    box-sizing: border-box;
+  .left {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 40px;
-    .left {
+    flex-direction: column;
+    align-items: flex-start;
+    flex-grow: 2;
+    .name {
+      font-size: 20px;
+      color: @font-color;
+    }
+    .content {
       display: flex;
-      align-items: flex-end;
-      .leftIcon {
-        font-size: 50px;
-        color: @primary-color;
-        align-self: center;
-        cursor: pointer;
-      }
       .firstColumn {
-        margin-left: @padding-large;
         .title {
           font-size: 20px;
           color: @font-color;
@@ -60,11 +57,11 @@
         }
       }
     }
-    .rightButtons {
-      display: flex;
-      .loginTerminal {
-        margin-right: @padding-base;
-      }
+  }
+  .rightButtons {
+    display: flex;
+    .loginTerminal {
+      margin-right: @padding-base;
     }
   }
 }
@@ -97,4 +94,7 @@
 }
 .placehold {
   visibility: hidden;
+}
+.upResource {
+  display: flex;
 }
