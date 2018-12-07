@@ -25,8 +25,8 @@ const userPortalApi = {
 }
 
 const meshApi = {
-  protocol: 'http',
-  host: '192.168.1.59:65532',
+  protocol: '<SERVICEMESH_API_PROTOCOL>',
+  host: '<SERVICEMESH_API_HOST>',
   prefix: '/api/v3',
 }
 
