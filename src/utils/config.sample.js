@@ -25,8 +25,8 @@ const userPortalApi = {
 }
 
 const meshApi = {
-  protocol: '<TENX_API_EXTERNAL_PROTOCOL>',
-  host: '<TENX_API_EXTERNAL_HOST>',
+  protocol: '<SERVICEMESH_API_PROTOCOL>',
+  host: '<SERVICEMESH_API_HOST>',
   prefix: '/api/v3',
 }
 
