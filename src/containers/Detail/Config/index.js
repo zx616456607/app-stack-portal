@@ -181,7 +181,7 @@ class Config extends React.PureComponent {
     ;(getDeepValue(data, 'spec.volumes'.split('.')) || []).filter(v => v.persistentVolumeClaim).map(
       v => (vObj[v.name] = v.persistentVolumeClaim.claimName)
     )
-    const ann = getDeepValue(data, 'metadata.annotations'.split('.'))
+    const ann = getDeepValue(data, 'metadata.annotations'.split('.')) || {}
     if (!Object.keys(vObj).length) return {}
     ;(getDeepValue(data, `spec.containers.${i}.volumeMounts`.split('.')) || []).map(mount => {
       if (vObj[mount.name]) {
