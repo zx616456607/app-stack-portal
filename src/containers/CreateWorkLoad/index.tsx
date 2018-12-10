@@ -78,6 +78,12 @@ class CreateWorkLoad extends React.Component<CreateWorkLoadProps, CreateWorkLoad
   componentWillUnmount() {
     const payload = { type: 'delete', message: ['all', ''] }
     this.props.dispatch({ type: 'createNative/patchWarn', payload })
+    const { location: { search }  } = this.props
+    const config = queryString.parse(search)
+    const editflag = config.edit || false
+    if (editflag) {
+      this.props.dispatch({ type: 'createNative/updateYamlValue', payload: { yamlValue: '' } })
+    }
   }
   async componentDidMount() {
     const { location: { search }  } = this.props
