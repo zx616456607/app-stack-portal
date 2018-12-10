@@ -38,12 +38,13 @@ class PodsContainer extends React.PureComponent {
   }
 }
 
-const mapStateToProps = ({ nativeDetail: { pods, type }, loading }) => {
+const mapStateToProps = ({ nativeDetail: { pods, type }, loading, app: { cluster } }) => {
   return {
     data: pods || [],
     cron: type === 'CronJob',
     type,
     loading,
+    cluster,
   }
 }
 

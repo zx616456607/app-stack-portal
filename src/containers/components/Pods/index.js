@@ -67,6 +67,32 @@ export default class Pods extends React.PureComponent {
       this.redistributionPod(name)
     }
   }
+  onDeleteCronJob = data => {
+    const _this = this
+    const name = getDeepValue(data, 'metadata.name'.split('.'))
+    if (!name) return
+    confirm({
+      modalTitle: '删除操作',
+      title: `您是否确定删除 ${name}`,
+      content: '',
+      async onOk() {
+        const res = await _this.props
+          .dispatch({
+            type: 'nativeDetail/deleteNativeResourceList',
+            payload: {
+              cluster: _this.props.cluster,
+              type: 'Job',
+              name,
+            },
+          }).catch(() => notification.warn({ message: '删除操作失败', description: '' }))
+        if (res && res.status === 'Success') {
+          notification.success({ message: '删除成功' })
+          _this.props.refreshPodList()
+        }
+      },
+      onCancel() {},
+    })
+  }
   getImages(item) {
     const images = []
     item.spec.containers && item.spec.containers.map(container => images.push(container.image))
@@ -153,7 +179,7 @@ export default class Pods extends React.PureComponent {
       title: '操作',
       width: '15%',
       key: 'action',
-      render: () => <Button type="primary">
+      render: data => <Button type="primary" onClick={() => this.onDeleteCronJob(data)}>
         删除
       </Button>,
     })
