@@ -27,6 +27,9 @@ class PodsContainer extends React.PureComponent {
     dispatch({
       type: 'nativeDetail/fetchPodsList',
     }).catch(() => notification.warn({ message: '获取 Pods 失败' }))
+    dispatch({
+      type: 'nativeDetail/fetchNativeDetail',
+    }).catch(() => notification.warn({ message: '获取应用详情出错' }))
   }
   render() {
     return (
