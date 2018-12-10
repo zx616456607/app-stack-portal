@@ -95,7 +95,7 @@ export default class Pods extends React.PureComponent {
       width: '10%',
       key: 'status',
       render: data => {
-        const { phase, availableReplicas, replicas } = getStatus(data, 'Pod')
+        const { phase, availableReplicas, replicas } = getStatus(data, cron ? 'Job' : 'Pod')
         return <NativeStatus type={'Pod'} phase={phase} status={{ availableReplicas, replicas }} hidePodInfo />
       },
     }]
