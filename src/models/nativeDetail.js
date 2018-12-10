@@ -20,6 +20,7 @@ import {
   getPodDetail,
   redistributionPod,
   getPodEvent,
+  deleteNativeResourceList,
 } from '../services/nativeDetail'
 import {
   formatMonitorName,
@@ -249,6 +250,10 @@ export default {
         body,
         force,
       })
+      return res
+    },
+    * deleteNativeResourceList({ payload }, { call }) {
+      const res = yield call(deleteNativeResourceList, payload)
       return res
     },
   },
