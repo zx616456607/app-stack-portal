@@ -51,5 +51,8 @@ export const operationNativeResource =
   options: {
     method: 'PATCH',
     body: options,
+    headers: {
+      'Content-Type': 'application/strategic-merge-patch+json',
+    },
   },
 })
