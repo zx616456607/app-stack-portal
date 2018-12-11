@@ -99,7 +99,7 @@ class DetailHeader extends React.PureComponent {
     }
     return (
       <span className={styles.upResource}>
-        <span>上级资源: &nbsp;</span>
+        <span className={styles.upLabel}>上级资源: &nbsp;</span>
         {type && name && (
           <React.Fragment>
             <Link
