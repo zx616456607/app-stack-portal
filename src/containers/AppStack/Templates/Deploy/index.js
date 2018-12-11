@@ -157,6 +157,15 @@ class StackTemplateDeploy extends React.Component {
           templateInputs[inputObj.label].push(inputObj)
         })
       })
+      // sort inputs: move input without default value to the front
+      Object.keys(templateInputs).forEach(key => {
+        templateInputs[key].sort((inputA, inputB) => {
+          const order = (inputA.default !== '' && inputB.default === '')
+            ? 1
+            : 0
+          return order
+        })
+      })
       this.setState({ templateContent, templateInputs })
     } catch (error) {
       console.warn(error)
