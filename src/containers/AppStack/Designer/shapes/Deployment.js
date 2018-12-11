@@ -143,6 +143,7 @@ const options = {
       default: '',
     },
     replicas: {
+      type: 'number',
       label: '原生资源',
       description: '实例数量',
       default: 1,

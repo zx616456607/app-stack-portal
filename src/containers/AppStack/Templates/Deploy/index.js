@@ -13,7 +13,7 @@
 import React from 'react'
 import QueueAnim from 'rc-queue-anim'
 import {
-  Card, Form, Input, Collapse, Table, Button, notification,
+  Card, Form, Input, Collapse, Table, Button, notification, InputNumber,
 } from 'antd'
 import { Link } from 'react-router-dom'
 import { connect } from 'dva'
@@ -77,7 +77,7 @@ class StackTemplateDeploy extends React.Component {
       render: (value, input) => {
         const { form } = this.props
         const { getFieldDecorator } = form
-        const { key, _shortId, description } = input
+        const { key, _shortId, description, type } = input
         return <FormItem>
           {
             getFieldDecorator(`${_shortId}-${key}`, {
@@ -88,7 +88,11 @@ class StackTemplateDeploy extends React.Component {
                   message: `请填写${description}`,
                 },
               ],
-            })(<Input placeholder={description} />)
+            })(
+              type === 'number'
+                ? <InputNumber placeholder={description} style={{ width: '100%' }} />
+                : <Input placeholder={description} />
+            )
           }
         </FormItem>
       },
@@ -98,6 +102,39 @@ class StackTemplateDeploy extends React.Component {
       dataIndex: 'description',
     },
   ]
+
+  _findInputKind = (nodes, input) => {
+    if (!nodes) {
+      return 'Application'
+    }
+    if (!Array.isArray(nodes)) {
+      return nodes.kind
+    }
+    const _checkInputIsExistByKey = node => {
+      let isExist = false
+      const _checkClosures = _node => {
+        Object.entries(_node).forEach(([ , value ]) => {
+          if (!value) {
+            return
+          }
+          if (value.get_input === input.key) {
+            isExist = true
+            return
+          }
+          if (typeof value === 'object') {
+            return _checkClosures(value)
+          }
+        })
+      }
+      _checkClosures(node)
+      return isExist
+    }
+    for (let i = 0; i < nodes.length; i++) {
+      if (_checkInputIsExistByKey(nodes[i])) {
+        return nodes[i].kind
+      }
+    }
+  }
 
   async componentDidMount() {
     const { appStackTemplateDetail, match } = this.props
@@ -114,7 +151,8 @@ class StackTemplateDeploy extends React.Component {
           }
           inputObj.key = key
           inputObj._shortId = _shortId
-          inputObj.kind = nodes[_shortId] && nodes[_shortId].kind || 'Application'
+          inputObj.kind = this._findInputKind(nodes[_shortId], inputObj)
+          // inputObj.kind = nodes[_shortId] && nodes[_shortId].kind || 'Application'
           templateInputs[inputObj.label] = templateInputs[inputObj.label] || []
           templateInputs[inputObj.label].push(inputObj)
         })
@@ -143,6 +181,9 @@ class StackTemplateDeploy extends React.Component {
       const k8sManifest = []
       const _relaceInput2Value = (template, id, parentId) => {
         Object.entries(template).forEach(([ key, value ]) => {
+          if (!value) {
+            return
+          }
           if (value.get_input) {
             template[key] = values[`${id}-${value.get_input}`]
             if (template[key] === undefined) {
@@ -150,7 +191,7 @@ class StackTemplateDeploy extends React.Component {
             }
             return
           }
-          if (value && typeof value === 'object') {
+          if (typeof value === 'object') {
             _relaceInput2Value(value, id, parentId)
           }
         })
@@ -163,7 +204,6 @@ class StackTemplateDeploy extends React.Component {
           }
           _app_stack_template.forEach(template => {
             _relaceInput2Value(template, _shortId, this._idShort(parent))
-            // k8sManifest.push(yamlParser.safeDump(template))
             addAppStackLabelsForResource(values.stackName, template)
             // remove undefined value
             k8sManifest.push(JSON.parse(JSON.stringify(template)))
