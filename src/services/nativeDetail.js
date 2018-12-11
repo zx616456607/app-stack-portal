@@ -80,7 +80,14 @@ const redistributionPod = ({ cluster, body, force }) => request({
     body,
   },
 })
-
+// 删除k8s原生资源列表
+const deleteNativeResourceList = ({ cluster, type, name }) =>
+  request({
+    url: `${paasApiUrl}/clusters/${cluster}/native/${type}/${name}`,
+    options: {
+      method: 'DELETE',
+    },
+  })
 export {
   getNativeDetail,
   getPodsList,
@@ -91,4 +98,5 @@ export {
   getPodDetail,
   redistributionPod,
   getPodEvent,
+  deleteNativeResourceList,
 }
