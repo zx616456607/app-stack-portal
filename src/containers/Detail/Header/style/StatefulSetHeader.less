@@ -40,6 +40,7 @@
     }
     .content {
       display: flex;
+      width: 100%;
       .firstColumn {
         .title {
           font-size: 20px;
@@ -51,6 +52,7 @@
         }
       }
       .secondColumn {
+        flex-grow: 2;
         margin-left: @padding-large;
         .normal {
           margin-top: @padding-base;
@@ -62,6 +64,11 @@
     display: flex;
     .loginTerminal {
       margin-right: @padding-base;
+    }
+  }
+  :global {
+    .ellipsis {
+      white-space: nowrap;
     }
   }
 }
@@ -97,4 +104,7 @@
 }
 .upResource {
   display: flex;
+  .upLabel {
+    white-space: nowrap;
+  }
 }

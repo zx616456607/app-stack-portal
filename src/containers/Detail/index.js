@@ -110,12 +110,12 @@ class NativeDetail extends React.PureComponent {
     }
     if (type !== 'Pod') {
       res.push({
-        path: `/${type}/:id/alarm`,
-        component: require('./Alarm').default,
-        tabName: '告警',
-        tabKey: 'alarm',
-        tabDisabled: true,
-      }, {
+      //   path: `/${type}/:id/alarm`,
+      //   component: require('./Alarm').default,
+      //   tabName: '告警',
+      //   tabKey: 'alarm',
+      //   tabDisabled: true,
+      // }, {
         path: `/${type}/:id/log`,
         component: require('./Log').default,
         tabName: '日志',
