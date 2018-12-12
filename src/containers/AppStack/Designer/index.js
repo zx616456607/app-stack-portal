@@ -150,6 +150,8 @@ inputs: []`,
     saveStackModal: false,
     saveStackBtnLoading: false,
     idShortIdMap: {},
+    undoList: [],
+    redoList: [],
   }
 
   editMode = this.props.match.path === '/app-stack/designer/:name/edit'
@@ -278,10 +280,25 @@ inputs: []`,
     })
     this.navigatorPaper.scale(0.1, 0.1);
 
-    // 可以做 redo undo
-    // this.graph.on('change', function(cell) {
-    //   console.log('cell', cell)
-    // })
+    // the events of graph => redo undo support
+    const _addUndoList = () => {
+      const _graph = this.graph.toJSON()
+      clearTimeout(this.graphChangeTimeout)
+      this.graphChangeTimeout = setTimeout(() => {
+        const { undoList } = this.state
+        undoList.push(_graph)
+        this.setState({ undoList, redoList: [] })
+      }, 300)
+    }
+    this.graph.on('change', () => {
+      _addUndoList()
+    })
+    this.graph.on('add', () => {
+      _addUndoList()
+    })
+    this.graph.on('remove', () => {
+      _addUndoList()
+    })
 
     // 可以做 自适应
     this.graph.on('change:embeds', (element, newEmbeds) => {
@@ -307,7 +324,7 @@ inputs: []`,
       const movedOutEmbeds = currentOldEmbeds.filter(embed => newEmbeds.indexOf(embed) < 0)
       movedOutEmbeds.forEach(embedId => {
         const currentElement = this.graph.getCell(embedId)
-        const childInput = currentElement.attributes._app_stack_input
+        const childInput = currentElement.attributes._app_stack_input || {}
         Object.keys(childInput).forEach(key => {
           childInput[key].label = '其他配置'
         })
@@ -377,6 +394,8 @@ inputs: []`,
     } = this.props
     const _initGraph = _graph => {
       this.graph.fromJSON(_graph)
+      // add init graph to undoList
+      this.setState({ undoList: [ _graph ] })
       const { idShortIdMap } = this.state
       this.graph.getCells().forEach(cell => {
         const _shortId = this._idShort(cell.id)
@@ -686,12 +705,32 @@ inputs: []`,
     this.setState({ yamlEditorTabKey: yamlTabKey })
   }
 
+  undo = () => {
+    const { undoList, redoList } = this.state
+    const pop = undoList.pop()
+    redoList.push(pop)
+    this.setState({ undoList, redoList })
+    const current = undoList[undoList.length - 1]
+    this.graph.fromJSON(current || { cells: [] })
+  }
+
+  redo = () => {
+    const { undoList, redoList } = this.state
+    if (redoList.length === 0) {
+      return
+    }
+    const pop = redoList.pop()
+    undoList.push(pop)
+    this.setState({ undoList, redoList })
+    this.graph.fromJSON(pop)
+  }
+
   render() {
     const { form, templateDetail } = this.props
     const { getFieldDecorator } = form
     const {
       yamlDockSize, yamlDockVisible, paperScale, yamlEditorTabKey,
-      saveStackModal, saveStackBtnLoading,
+      saveStackModal, saveStackBtnLoading, undoList, redoList,
     } = this.state
     const FormItemLayout = {
       labelCol: {
@@ -759,8 +798,21 @@ inputs: []`,
           <div className={styles.graph}>
             <div className={styles.toolBtns}>
               <Button.Group>
-                <Button icon="arrow-left" />
-                <Button icon="arrow-right" />
+                <Button
+                  icon="undo"
+                  disabled={
+                    // if editMode, fist undo is init graph, so can not be undo
+                    this.editMode
+                      ? undoList.length <= 1
+                      : undoList.length === 0
+                  }
+                  onClick={this.undo}
+                />
+                <Button
+                  icon="redo"
+                  disabled={redoList.length === 0}
+                  onClick={this.redo}
+                />
               </Button.Group>
               <Button icon="delete" onClick={this.clearGraph}>
               清空设计
