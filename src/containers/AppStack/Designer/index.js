@@ -35,6 +35,7 @@ import {
   ConfigmapC as ConfigmapIcon,
 } from '@tenx-ui/icon'
 import styles from './style/index.less'
+import './style/joint-custom.less'
 import './shapes'
 import Hotkeys from 'react-hot-keys'
 

@@ -1,5 +1,5 @@
 import React from 'react'
 
-const Event = () => <h1>Event</h1>
+const Events = () => <h1>Events</h1>
 
-export default Event
+export default Events

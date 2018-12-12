@@ -1,0 +1,131 @@
+/**
+ * Licensed Materials - Property of tenxcloud.com
+ * (C) Copyright 2018 TenxCloud. All Rights Reserved.
+ */
+
+/**
+ * style of AppStack
+ *
+ * @author zhangpc
+ * @date 2018-11-16
+ */
+ @import '../../../../assets/style/core/index.less';
+
+:global {
+  #app-stack-paper {
+    .joint-type-devs {
+      text {
+        font-family: "Source Sans Pro", sans-serif;
+      }
+      .body {
+        fill: #fff;
+        stroke: @primary-color;
+        &:hover {
+          stroke-width: 2px;
+        }
+      }
+      .label {
+        fill: @font-color-2;
+        font-size: @font-size-base;
+      }
+      .port-body {
+        stroke: @primary-color;
+        &:hover {
+          opacity: 1;
+          stroke-width: 2px;
+          fill: @primary-color;
+        }
+      }
+      .port-label {
+        display: none;
+      }
+      &.joint-type-devs-application {
+        .body {
+          stroke-dasharray: 6;
+          fill: rgba(45, 183, 245, .1);
+        }
+      }
+    }
+
+    /* links */
+    .joint-link {
+      .connection {
+        stroke: @primary-color;
+        stroke-width: 1px;
+      }
+
+      .marker-arrowheads .marker-arrowhead,
+      .marker-vertex-group .marker-vertex,
+      .marker-vertex-group .marker-vertex:hover {
+        fill: rgba(45, 183, 245, .5);
+      }
+
+      .marker-arrowheads .marker-arrowhead:hover {
+        fill: @primary-color;
+      }
+
+      .link-tools .link-tool .tool-remove circle {
+        fill: @warning-color;
+      }
+    }
+
+    /* highlighting */
+
+    .highlighted-parent {
+      &.joint-type-devs-application {
+        .body {
+          transition: stroke .5s;
+          fill: rgba(45, 183, 245, .3);
+        }
+      }
+      .label {
+        transition: fill .5s;
+      }
+      .joint-highlight-stroke {
+        stroke-width: 6px;
+        pointer-events: none;
+      }
+    }
+  }
+  #app-stack-paper-navigator {
+    .joint-type-devs .body {
+      fill: @primary-color;
+      stroke: @border-color-base;
+    }
+    .joint-type-devs .label {
+      display: none;
+    }
+    .joint-type-devs .port-body {
+      stroke: @primary-color;
+      fill: @primary-color;
+    }
+    .joint-type-devs .port-label {
+      display: none;
+    }
+    .joint-type-devs .joint-port {
+      display: none;
+    }
+    .joint-type-devs.joint-type-devs-service .body {
+      stroke: @border-color-base;
+    }
+    .joint-type-devs.joint-type-devs-service .label {
+      display: none;
+    }
+    /* links */
+    .joint-link .connection {
+      stroke: @primary-color;
+      stroke-width: 4px;
+    }
+    .joint-link .marker-arrowheads .marker-arrowhead,
+    .joint-link .marker-vertex-group .marker-vertex,
+    .joint-link .marker-vertex-group .marker-vertex:hover {
+      fill: @primary-color;
+    }
+    .joint-link .marker-arrowheads .marker-arrowhead:hover {
+      fill: @primary-color;
+    }
+    .joint-link .link-tools .link-tool .tool-remove circle {
+      fill: @primary-color;
+    }
+  }
+}

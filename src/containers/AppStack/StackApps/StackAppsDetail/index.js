@@ -16,8 +16,6 @@ import { Stack as StackIcon, Circle as CircleIcon } from '@tenx-ui/icon'
 import { connect } from 'dva'
 import styles from './style/index.less'
 import * as modal from '@tenx-ui/modal'
-// import StackElements from './StackElements'
-// import StackYaml from './StackYaml'
 import Loader from '@tenx-ui/loader'
 import { getServiceStatus } from '../../../../utils/helper'
 import { Switch, Route, routerRedux } from 'dva/router'
@@ -266,7 +264,7 @@ class StackAppsDetail extends React.Component {
       </Card>
       <Card hoverable key="content" className={styles.detailContent}>
         {
-          contentLoading ?
+          contentLoading === undefined || contentLoading ?
             <div className={styles.loading}>
               <Loader
                 spinning={true}
@@ -281,7 +279,7 @@ class StackAppsDetail extends React.Component {
                 {
                   childRoutes.map(rt =>
                     <TabPane
-                      tab={<div className={styles.tabs}>{rt.tabName}</div>}
+                      tab={rt.tabName}
                       key={rt.tabKey}
                       disabled={rt.tabDisabled}
                     />
