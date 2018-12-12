@@ -35,7 +35,6 @@ import {
   ConfigmapC as ConfigmapIcon,
 } from '@tenx-ui/icon'
 import styles from './style/index.less'
-// import * as yamls from './yamls'
 import './shapes'
 
 const isProd = process.env.NODE_ENV === 'production'
@@ -538,11 +537,11 @@ inputs: []`,
       return
     }
     try {
-      let yamlObj
+      let { yamlObj = {} } = this.state
       if (templateYamlStr) {
         yamlObj = yamlParser.safeLoad(templateYamlStr)
       } else {
-        yamlObj = { inputs: yamlParser.safeLoad(inputYamlStr) }
+        yamlObj.inputs = yamlParser.safeLoad(inputYamlStr)
       }
       this.setState({ yamlObj })
       const { idShortIdMap } = this.state
@@ -570,42 +569,6 @@ inputs: []`,
     this.setState({ inputYamlStr })
     clearTimeout(this.yaml2GraphTimeout)
     this.yaml2GraphTimeout = setTimeout(() => this.yaml2Graph(null, inputYamlStr), 300);
-  }
-
-  deployTest = async () => {
-    const { templateYamlStr, yamlObj } = this.state
-    if (!yamlObj || Object.keys(yamlObj).length !== 3) {
-      return notification.info({
-        message: '请完成设计后再点击创建',
-      })
-    }
-    this.setState({ createBtnLoading: true })
-    const { cluster, dispatch } = this.props
-    try {
-      const name = `test-${Math.floor(Math.random() * 10000)}`
-      const res = await dispatch({
-        type: 'appStack/fetchDeployAppstack',
-        payload: {
-          name,
-          cluster,
-          body: {
-            conent: JSON.stringify(this.graph.toJSON()),
-            k8sManifest: templateYamlStr,
-          },
-        },
-      })
-      console.warn('res', res)
-      notification.success({
-        message: '创建成功',
-      })
-    } catch (error) {
-      console.warn('error', error)
-      notification.warn({
-        message: '创建失败',
-      })
-    } finally {
-      this.setState({ createBtnLoading: false })
-    }
   }
 
   handlePaperScale = type => {

@@ -143,6 +143,13 @@ class StackTemplateDeploy extends React.Component {
       const { templateDetail } = this.props
       const templateContent = JSON.parse(templateDetail.content)
       const { inputs, nodes } = templateContent
+      if (!nodes) {
+        notification.warn({
+          message: '解析堆栈异常',
+          description: '未找到节点',
+        })
+        return
+      }
       const templateInputs = {}
       Object.entries(inputs).forEach(([ _shortId, input ], index) => {
         Object.entries(input).forEach(([ key, inputObj ]) => {
