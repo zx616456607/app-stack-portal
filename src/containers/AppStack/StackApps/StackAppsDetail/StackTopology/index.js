@@ -15,6 +15,7 @@ import * as joint from 'jointjs'
 import 'jointjs/dist/joint.css'
 import '../../../Designer/shapes'
 import '../../../Designer/style/joint-custom.less'
+import styles from './style/index.less'
 
 @connect(state => {
   const { appStack } = state
@@ -68,7 +69,7 @@ export default class StackTopology extends React.Component {
   }
 
   render() {
-    return <div>
+    return <div className={styles.stackTopology}>
       <div id="app-stack-paper">
       loading...
       </div>
