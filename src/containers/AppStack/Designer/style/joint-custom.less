@@ -88,28 +88,42 @@
     }
   }
   #app-stack-paper-navigator {
-    .joint-type-devs .body {
-      fill: @primary-color;
-      stroke: @border-color-base;
+    .joint-element, [magnet=true]:not(.joint-element) {
+      cursor: auto;
     }
-    .joint-type-devs .label {
-      display: none;
+    .joint-link {
+      .connection-wrap {
+        cursor: auto;
+      }
     }
-    .joint-type-devs .port-body {
-      stroke: @primary-color;
-      fill: @primary-color;
-    }
-    .joint-type-devs .port-label {
-      display: none;
-    }
-    .joint-type-devs .joint-port {
-      display: none;
-    }
-    .joint-type-devs.joint-type-devs-service .body {
-      stroke: @border-color-base;
-    }
-    .joint-type-devs.joint-type-devs-service .label {
-      display: none;
+    .joint-type-devs {
+      .body {
+        fill: #fff;
+        stroke: @primary-color;
+        stroke-width: 4px;
+      }
+      .label {
+        display: none;
+      }
+      .port-body {
+        stroke: @primary-color;
+        fill: @primary-color;
+      }
+      .port-label {
+        display: none;
+      }
+      .joint-port {
+        display: none;
+      }
+      &.joint-type-devs-application .body {
+        fill: rgba(45, 183, 245, .3);
+      }
+      &.joint-type-devs-service .body {
+        stroke: @primary-color;
+      }
+      &.joint-type-devs-service .label {
+        display: none;
+      }
     }
     /* links */
     .joint-link .connection {
