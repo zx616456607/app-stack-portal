@@ -36,6 +36,7 @@ import {
 } from '@tenx-ui/icon'
 import styles from './style/index.less'
 import './shapes'
+import Hotkeys from 'react-hot-keys'
 
 const isProd = process.env.NODE_ENV === 'production'
 
@@ -454,13 +455,24 @@ inputs: []`,
     }
   }
 
-  onKeyDown = e => {
-    // console.log('e.key', e.key)
-    switch (e.key) {
-      case 'Delete':
-      case 'Backspace':
+  onKeyDown = keyName => {
+    switch (keyName) {
+      case 'delete':
+      case 'backspace':
         this.activeElement && this.activeElement.remove()
         this.graph2Yaml()
+        break
+      case 'ctrl+z':
+      case 'command+z': {
+        if (this.isUndoDisabled()) {
+          break
+        }
+        this.undo()
+        break
+      }
+      case 'ctrl+shift+z':
+      case 'command+shift+z':
+        this.redo()
         break
       default:
         break
@@ -707,6 +719,9 @@ inputs: []`,
 
   undo = () => {
     const { undoList, redoList } = this.state
+    if (undoList.length === 0) {
+      return
+    }
     const pop = undoList.pop()
     redoList.push(pop)
     this.setState({ undoList, redoList })
@@ -725,12 +740,20 @@ inputs: []`,
     this.graph.fromJSON(pop)
   }
 
+  isUndoDisabled = () => {
+    // if editMode, fist undo is init graph, so can not be undo
+    const { undoList } = this.state
+    return this.editMode
+      ? undoList.length <= 1
+      : undoList.length === 0
+  }
+
   render() {
     const { form, templateDetail } = this.props
     const { getFieldDecorator } = form
     const {
       yamlDockSize, yamlDockVisible, paperScale, yamlEditorTabKey,
-      saveStackModal, saveStackBtnLoading, undoList, redoList,
+      saveStackModal, saveStackBtnLoading, redoList,
     } = this.state
     const FormItemLayout = {
       labelCol: {
@@ -745,257 +768,257 @@ inputs: []`,
         id="appStackDesigner"
         className={styles.appStackDesigner}
         onEnd={this.initDesigner}
-        onKeyDown={this.onKeyDown}
-        tabIndex="0"
       >
-        <div
-          key="designer"
-          className={styles.designer}
-          style={{
-            marginBottom: (yamlDockVisible ? yamlDockSize : 0),
-          }}
+        <Hotkeys
+          keyName="delete,backspace,ctrl+z,command+z,ctrl+shift+z,command+shift+z"
+          onKeyDown={this.onKeyDown}
+          key="hotkeys-wrapper"
+          tabIndex="0"
         >
-          <div className={styles.resourceList} key="resource">
-            {
-              RESOURCE_LIST.map(({ id, title, icon, enabled }) =>
-                <div
-                  draggable={enabled}
-                  key={id}
-                  onDragStart={ev => {
-                    // Add the target element's id to the data transfer object
-                    ev.dataTransfer.setData('text/plain', id)
-                    ev.dropEffect = 'move'
-                    // console.warn('onDrop ev', ev)
-                    // console.warn('ev.screenX', ev.screenX)
-                    // console.warn('ev.screenY', ev.screenY)
-                    // console.warn('ev.pageX', ev.pageX)
-                    // console.warn('ev.pageY', ev.pageY)
-                    // console.warn('ev.clientX', ev.clientX)
-                    // console.warn('ev.clientY', ev.clientY)
-                    // console.warn('ev.movementX', ev.movementX)
-                    // console.warn('ev.movementY', ev.movementY)
-                    // console.warn('ev.target', ev.target)
-                    // console.warn('ev.dropTarget', ev.dropTarget)
-                    // console.warn('ev.target offset', $(ev.target).offset())
-                    // console.warn('ev.target.offsetHeight', ev.target.offsetHeight)
-                    // console.warn('ev.target.offsetY', ev.target.offsetY)
-                  }}
-                  className={classnames({ [styles.enabled]: enabled })}
-                >
-                  <Row>
-                    <Col className={styles.resourceLeft} span={22}>
-                      {icon}
-                      <span>{title}</span>
-                    </Col>
-                    <Col span={2} className={styles.resourceRight}>
-                      <Icon type="drag" />
-                    </Col>
-                  </Row>
-                </div>
-              )
-            }
-          </div>
-          <div className={styles.graph}>
-            <div className={styles.toolBtns}>
-              <Button.Group>
-                <Button
-                  icon="undo"
-                  disabled={
-                    // if editMode, fist undo is init graph, so can not be undo
-                    this.editMode
-                      ? undoList.length <= 1
-                      : undoList.length === 0
-                  }
-                  onClick={this.undo}
-                />
-                <Button
-                  icon="redo"
-                  disabled={redoList.length === 0}
-                  onClick={this.redo}
-                />
-              </Button.Group>
-              <Button icon="delete" onClick={this.clearGraph}>
-              清空设计
-              </Button>
-              <Button icon="layout" onClick={this.layout} disabled>
-              自动布局
-              </Button>
-              <Button
-                icon="gateway"
-                onClick={() => {
-                  this.paper.scaleContentToFit({
-                    maxScale: 2,
-                    minScale: PAPER_SCALE_MIN,
-                  })
-                  const { sx } = this.paper.scale()
-                  this.setState({ paperScale: sx })
-                  // @Todo: 位置需要居中
-                }}
-                disabled
-              >
-              适应屏幕
-              </Button>
-              <Button icon="save" onClick={() => this.setState({ saveStackModal: true })}>
-                {
-                  this.editMode ? '保存更新' : '保存并提交'
-                }
-              </Button>
-              <Button
-                icon="deployment-unit"
-                onClick={() => this.setState({ yamlDockVisible: !yamlDockVisible })}
-              >
-              完善编排
-              </Button>
+          <div
+            key="designer"
+            className={styles.designer}
+            style={{
+              marginBottom: (yamlDockVisible ? yamlDockSize : 0),
+            }}
+          >
+            <div className={styles.resourceList} key="resource">
+              {
+                RESOURCE_LIST.map(({ id, title, icon, enabled }) =>
+                  <div
+                    draggable={enabled}
+                    key={id}
+                    onDragStart={ev => {
+                      // Add the target element's id to the data transfer object
+                      ev.dataTransfer.setData('text/plain', id)
+                      ev.dropEffect = 'move'
+                      // console.warn('onDrop ev', ev)
+                      // console.warn('ev.screenX', ev.screenX)
+                      // console.warn('ev.screenY', ev.screenY)
+                      // console.warn('ev.pageX', ev.pageX)
+                      // console.warn('ev.pageY', ev.pageY)
+                      // console.warn('ev.clientX', ev.clientX)
+                      // console.warn('ev.clientY', ev.clientY)
+                      // console.warn('ev.movementX', ev.movementX)
+                      // console.warn('ev.movementY', ev.movementY)
+                      // console.warn('ev.target', ev.target)
+                      // console.warn('ev.dropTarget', ev.dropTarget)
+                      // console.warn('ev.target offset', $(ev.target).offset())
+                      // console.warn('ev.target.offsetHeight', ev.target.offsetHeight)
+                      // console.warn('ev.target.offsetY', ev.target.offsetY)
+                    }}
+                    className={classnames({ [styles.enabled]: enabled })}
+                  >
+                    <Row>
+                      <Col className={styles.resourceLeft} span={22}>
+                        {icon}
+                        <span>{title}</span>
+                      </Col>
+                      <Col span={2} className={styles.resourceRight}>
+                        <Icon type="drag" />
+                      </Col>
+                    </Row>
+                  </div>
+                )
+              }
             </div>
-            <div className={styles.toolZoom}>
-              <Button
-                shape="circle"
-                size="small"
-                icon="zoom-in"
-                onClick={() => this.handlePaperScale('+')}
-              />
-              <Slider
-                value={paperScale}
-                min={PAPER_SCALE_MIN}
-                max={PAPER_SCALE_MAX}
-                step={PAPER_SCALE_STEP}
-                marks={{ 1: '1x' }}
-                onChange={scale => {
-                  this.paper.scale(scale, scale)
-                  this.setState({ paperScale: scale })
-                }}
-                tipFormatter={value => `${value}x`}
-                vertical
-              />
-              <Button
-                shape="circle"
-                size="small"
-                icon="zoom-out"
-                onClick={() => this.handlePaperScale('-')}
-              />
-            </div>
-            <div
-              id="app-stack-paper"
-              className={styles.paper}
-              key="paper"
-              onDragOver={ev => {
-                ev.preventDefault();
-                ev.dataTransfer.dropEffect = 'move'
-              }}
-              onDrop={this.onResourceDrop}
-            >
-              <div className="loading">loading ...</div>
-            </div>
-            <div
-              id="app-stack-paper-navigator"
-              className={styles.navigatorPaper}
-              key="navigator-paper"
-            >
-              <div className="loading">loading ...</div>
-            </div>
-          </div>
-        </div>
-        <Dock
-          fluid={false}
-          size={yamlDockSize}
-          isVisible={yamlDockVisible}
-          position="bottom"
-          dimMode="none"
-          onSizeChange={dockSize => {
-            if (dockSize < DOCK_DEFAULT_HEADER_SIZE) return
-            this.setState({ yamlDockSize: dockSize }, () => {
-              this.yarmlEditor.resize()
-            })
-          }}
-        >
-          <div className={styles.yamlEditor}>
-            <div className={styles.yamlEditorHeader}>
-              <Tabs
-                activeKey={yamlEditorTabKey}
-                onChange={this.onYamlTabChange}
-                tabBarExtraContent={<div className={styles.yamlEditorHeaderBtns}>
-                  <Button type="dashed" icon="search" />
+            <div className={styles.graph}>
+              <div className={styles.toolBtns}>
+                <Button.Group>
                   <Button
-                    type="dashed"
-                    icon="minus"
-                    onClick={() => this.setState({ yamlDockVisible: false })}
+                    icon="undo"
+                    disabled={this.isUndoDisabled()}
+                    onClick={this.undo}
                   />
-                  {/* <Button type="dashed" icon="arrows-alt" /> */}
-                </div>}
-              >
-                <TabPane tab="模版" key="template"></TabPane>
-                <TabPane tab="输入" key="input"></TabPane>
-                {/* <TabPane tab="输出" key="output"></TabPane> */}
-              </Tabs>
-            </div>
-            {
-              yamlEditorTabKey === 'template' &&
-              <TenxEditor
-                name="app_stack_template"
-                theme="chrome"
-                fontSize={12}
-                value={this.state.templateYamlStr}
-                onChange={this.onTemplateYamlChange}
-                onLoad={editor => {
-                  editor.$blockScrolling = Infinity
-                  this.yarmlEditor = editor
-                }}
-              />
-            }
-            {
-              yamlEditorTabKey === 'input' &&
-              <TenxEditor
-                name="app_stack_input"
-                theme="chrome"
-                fontSize={12}
-                value={this.state.inputYamlStr}
-                onChange={this.onInputYamlChange}
-                onLoad={editor => {
-                  editor.$blockScrolling = Infinity
-                  this.yarmlEditor = editor
-                }}
-              />
-            }
-          </div>
-        </Dock>
-        <Modal
-          title="保存堆栈模板"
-          okText="确认保存"
-          visible={saveStackModal}
-          confirmLoading={saveStackBtnLoading}
-          onOk={this.onStackSave}
-          onCancel={() => this.setState({ saveStackModal: false })}
-        >
-          <Form>
-            <FormItem
-              {...FormItemLayout}
-              label="堆栈名称"
-            >
-              {getFieldDecorator('name', {
-                initialValue: templateDetail && templateDetail.name,
-                rules: [
+                  <Button
+                    icon="redo"
+                    disabled={redoList.length === 0}
+                    onClick={this.redo}
+                  />
+                </Button.Group>
+                <Button icon="delete" onClick={this.clearGraph}>
+                清空设计
+                </Button>
+                <Button icon="layout" onClick={this.layout} disabled>
+                自动布局
+                </Button>
+                <Button
+                  icon="gateway"
+                  onClick={() => {
+                    this.paper.scaleContentToFit({
+                      maxScale: 2,
+                      minScale: PAPER_SCALE_MIN,
+                    })
+                    const { sx } = this.paper.scale()
+                    this.setState({ paperScale: sx })
+                    // @Todo: 位置需要居中
+                  }}
+                  disabled
+                >
+                适应屏幕
+                </Button>
+                <Button icon="save" onClick={() => this.setState({ saveStackModal: true })}>
                   {
-                    required: true,
-                    whitespace: true,
-                    message: '请输入堆栈名称',
-                  },
-                ],
-              })(
-                <Input disabled={this.editMode} placeholder="请输入堆栈名称" />
-              )}
-            </FormItem>
-            <FormItem
-              {...FormItemLayout}
-              label="堆栈描述"
-            >
-              {getFieldDecorator('description', {
-                initialValue: templateDetail && templateDetail.description,
-              })(
-                <Input.TextArea placeholder="请输入堆栈描述" />
-              )}
-            </FormItem>
-          </Form>
-        </Modal>
+                    this.editMode ? '保存更新' : '保存并提交'
+                  }
+                </Button>
+                <Button
+                  icon="deployment-unit"
+                  onClick={() => this.setState({ yamlDockVisible: !yamlDockVisible })}
+                >
+                完善编排
+                </Button>
+              </div>
+              <div className={styles.toolZoom}>
+                <Button
+                  shape="circle"
+                  size="small"
+                  icon="zoom-in"
+                  onClick={() => this.handlePaperScale('+')}
+                />
+                <Slider
+                  value={paperScale}
+                  min={PAPER_SCALE_MIN}
+                  max={PAPER_SCALE_MAX}
+                  step={PAPER_SCALE_STEP}
+                  marks={{ 1: '1x' }}
+                  onChange={scale => {
+                    this.paper.scale(scale, scale)
+                    this.setState({ paperScale: scale })
+                  }}
+                  tipFormatter={value => `${value}x`}
+                  vertical
+                />
+                <Button
+                  shape="circle"
+                  size="small"
+                  icon="zoom-out"
+                  onClick={() => this.handlePaperScale('-')}
+                />
+              </div>
+              <div
+                id="app-stack-paper"
+                className={styles.paper}
+                key="paper"
+                onDragOver={ev => {
+                  ev.preventDefault();
+                  ev.dataTransfer.dropEffect = 'move'
+                }}
+                onDrop={this.onResourceDrop}
+              >
+                <div className="loading">loading ...</div>
+              </div>
+              <div
+                id="app-stack-paper-navigator"
+                className={styles.navigatorPaper}
+                key="navigator-paper"
+              >
+                <div className="loading">loading ...</div>
+              </div>
+            </div>
+          </div>
+          <Dock
+            fluid={false}
+            size={yamlDockSize}
+            isVisible={yamlDockVisible}
+            position="bottom"
+            dimMode="none"
+            onSizeChange={dockSize => {
+              if (dockSize < DOCK_DEFAULT_HEADER_SIZE) return
+              this.setState({ yamlDockSize: dockSize }, () => {
+                this.yarmlEditor.resize()
+              })
+            }}
+          >
+            <div className={styles.yamlEditor}>
+              <div className={styles.yamlEditorHeader}>
+                <Tabs
+                  activeKey={yamlEditorTabKey}
+                  onChange={this.onYamlTabChange}
+                  tabBarExtraContent={<div className={styles.yamlEditorHeaderBtns}>
+                    <Button type="dashed" icon="search" />
+                    <Button
+                      type="dashed"
+                      icon="minus"
+                      onClick={() => this.setState({ yamlDockVisible: false })}
+                    />
+                    {/* <Button type="dashed" icon="arrows-alt" /> */}
+                  </div>}
+                >
+                  <TabPane tab="模版" key="template"></TabPane>
+                  <TabPane tab="输入" key="input"></TabPane>
+                  {/* <TabPane tab="输出" key="output"></TabPane> */}
+                </Tabs>
+              </div>
+              {
+                yamlEditorTabKey === 'template' &&
+                <TenxEditor
+                  name="app_stack_template"
+                  theme="chrome"
+                  fontSize={12}
+                  value={this.state.templateYamlStr}
+                  onChange={this.onTemplateYamlChange}
+                  onLoad={editor => {
+                    editor.$blockScrolling = Infinity
+                    this.yarmlEditor = editor
+                  }}
+                />
+              }
+              {
+                yamlEditorTabKey === 'input' &&
+                <TenxEditor
+                  name="app_stack_input"
+                  theme="chrome"
+                  fontSize={12}
+                  value={this.state.inputYamlStr}
+                  onChange={this.onInputYamlChange}
+                  onLoad={editor => {
+                    editor.$blockScrolling = Infinity
+                    this.yarmlEditor = editor
+                  }}
+                />
+              }
+            </div>
+          </Dock>
+          <Modal
+            title="保存堆栈模板"
+            okText="确认保存"
+            visible={saveStackModal}
+            confirmLoading={saveStackBtnLoading}
+            onOk={this.onStackSave}
+            onCancel={() => this.setState({ saveStackModal: false })}
+          >
+            <Form>
+              <FormItem
+                {...FormItemLayout}
+                label="堆栈名称"
+              >
+                {getFieldDecorator('name', {
+                  initialValue: templateDetail && templateDetail.name,
+                  rules: [
+                    {
+                      required: true,
+                      whitespace: true,
+                      message: '请输入堆栈名称',
+                    },
+                  ],
+                })(
+                  <Input disabled={this.editMode} placeholder="请输入堆栈名称" />
+                )}
+              </FormItem>
+              <FormItem
+                {...FormItemLayout}
+                label="堆栈描述"
+              >
+                {getFieldDecorator('description', {
+                  initialValue: templateDetail && templateDetail.description,
+                })(
+                  <Input.TextArea placeholder="请输入堆栈描述" />
+                )}
+              </FormItem>
+            </Form>
+          </Modal>
+        </Hotkeys>
       </QueueAnim>
     )
   }
