@@ -20,7 +20,7 @@ import Loader from '@tenx-ui/loader'
 import Ellipsis from '@tenx-ui/ellipsis'
 import * as modal from '@tenx-ui/modal'
 import { StackTemplate as StackTemplateIcon } from '@tenx-ui/icon'
-import { calcuDate } from '../../../utils/helper';
+import { calcuDate, formatDate } from '../../../utils/helper'
 
 @connect(state => {
   const { appStack, loading } = state
@@ -128,7 +128,7 @@ class Templates extends React.Component {
                     </div>
                     <div className={styles.itemBottom}>
                       <div className={styles.updateIcon}>
-                        <Tooltip title={`更新于${calcuDate(v.create_time)}`}>
+                        <Tooltip title={`更新于${formatDate(v.create_time)}`}>
                           <Icon type="clock-circle" /> {calcuDate(v.create_time)}
                         </Tooltip>
                       </div>

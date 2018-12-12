@@ -70,7 +70,7 @@ class StackApps extends React.Component {
                   <div className={styles.noData}>暂无数据</div>
                   :
                   appStackList.map(v => <Card hoverable key={v.name} className={styles.listItem}>
-                    <div className={styles.itemTop}>
+                    <Link to={`/app-stack/appStackDetail/${v.name}`} className={styles.itemTop}>
                       <div className={styles.itemImg}>
                         <StackIcon className={styles.stackIcon}/>
                       </div>
@@ -81,9 +81,6 @@ class StackApps extends React.Component {
                               {v.name}
                             </Ellipsis>
                           </h2>
-                          <Link to={`/app-stack/appStackDetail/${v.name}`}>
-                            <Button type="primary">管理应用堆栈</Button>
-                          </Link>
                         </div>
                         <div className={styles.description}>
                           <Ellipsis lines={2}>
@@ -92,7 +89,7 @@ class StackApps extends React.Component {
 
                         </div>
                       </div>
-                    </div>
+                    </Link>
                     <div className={styles.itemBottom}>
                       <div>
                         <h5>应用</h5>

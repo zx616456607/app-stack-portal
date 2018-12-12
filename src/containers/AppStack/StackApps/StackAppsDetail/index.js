@@ -16,12 +16,45 @@ import { Stack as StackIcon, Circle as CircleIcon } from '@tenx-ui/icon'
 import { connect } from 'dva'
 import styles from './style/index.less'
 import * as modal from '@tenx-ui/modal'
-import StackElements from './StackElements'
-import StackYaml from './StackYaml'
+// import StackElements from './StackElements'
+// import StackYaml from './StackYaml'
 import Loader from '@tenx-ui/loader'
-import { getServiceStatus } from '../../../../utils/helper';
+import { getServiceStatus } from '../../../../utils/helper'
+import { Switch, Route, routerRedux } from 'dva/router'
 
-const Tabpane = Tabs.TabPane
+const TabPane = Tabs.TabPane
+const childRoutes = [
+  {
+    path: '/app-stack/appStackDetail/:name',
+    component: require('./StackElements').default,
+    tabName: '堆栈元素',
+    tabKey: 'default',
+  },
+  {
+    path: '/app-stack/appStackDetail/:name/yaml',
+    component: require('./StackYaml').default,
+    tabName: 'YAML',
+    tabKey: 'yaml',
+  },
+  {
+    path: '/app-stack/appStackDetail/:name/stack-topology',
+    component: require('./StackTopology').default,
+    tabName: '堆栈拓补',
+    tabKey: 'stack-topology',
+  },
+  {
+    path: '/app-stack/appStackDetail/:name/resource-topology',
+    component: require('./ResourceTopology').default,
+    tabName: '资源拓补',
+    tabKey: 'resource-topology',
+  },
+  {
+    path: '/app-stack/appStackDetail/:name/events',
+    component: require('./Events').default,
+    tabName: '事件',
+    tabKey: 'events',
+  },
+]
 
 @connect(state => {
   const { appStack, loading, app } = state
@@ -45,6 +78,9 @@ const Tabpane = Tabs.TabPane
     type: 'appStack/stackDelete',
     payload: ({ cluster, name }),
   }),
+  goto: pathname => dispatch(routerRedux.push({
+    pathname,
+  })),
 
 }))
 class StackAppsDetail extends React.Component {
@@ -52,6 +88,24 @@ class StackAppsDetail extends React.Component {
     const { getStackDetail, cluster } = this.props
     const name = this.props.match.params.name
     getStackDetail({ cluster, name })
+  }
+  onTabChange = key => {
+    const name = this.props.match.params.name
+    let _pathname = `/app-stack/appStackDetail/${name}/${key}`
+    if (key === 'default') {
+      _pathname = _pathname.replace(/\/default$/, '')
+    }
+    this.props.goto(_pathname)
+  }
+  getActiveKey = pathname => {
+    let activeKey = 'default'
+    const pathList = pathname.split('/').filter(item => item !== '')
+    if (pathList.length > 3) {
+      const rtList = []
+      childRoutes.map(rt => rtList.push(rt.tabKey))
+      activeKey = rtList.includes(pathList[3]) ? pathList[3] : 'default'
+    }
+    return activeKey
   }
   convertStatus = () => {
     const runningList = []
@@ -179,10 +233,9 @@ class StackAppsDetail extends React.Component {
   }
   render() {
     const name = this.props.match.params.name
-    const { appStacksDetail, loading } = this.props
-    const stackYamlContent = appStacksDetail && appStacksDetail.appStack.spec.content
-    const k8sYamlContent = appStacksDetail && appStacksDetail.appStack.spec.k8sManifest
-    const yamlContent = { stackYamlContent, k8sYamlContent }
+    const {
+      loading, children, location: { pathname },
+    } = this.props
     const contentLoading = loading.effects['appStack/fetchAppStackDetail']
     const delLoading = loading.effects['appStack/stackDelete']
     const startLoading = loading.effects['appStack/stackStart']
@@ -220,22 +273,28 @@ class StackAppsDetail extends React.Component {
               />
             </div>
             :
-            <Tabs defaultActiveKey="element">
-              <Tabpane tab="堆栈元素" key="element">
-                <StackElements/>
-              </Tabpane>
-              <Tabpane tab="YAML" key="YAML">
-                <StackYaml
-                  data={yamlContent}
-                />
-              </Tabpane>
-              <Tabpane tab="堆栈拓补" key="topology">
-
-              </Tabpane>
-              <Tabpane tab="事件" key="event">
-
-              </Tabpane>
-            </Tabs>
+            <React.Fragment>
+              <Tabs
+                activeKey={this.getActiveKey(pathname)}
+                onChange={key => this.onTabChange(key)}
+              >
+                {
+                  childRoutes.map(rt =>
+                    <TabPane
+                      tab={<div className={styles.tabs}>{rt.tabName}</div>}
+                      key={rt.tabKey}
+                      disabled={rt.tabDisabled}
+                    />
+                  )
+                }
+              </Tabs>
+              {children}
+              <Switch>
+                {
+                  childRoutes.map((config, key) => <Route exact key={key} {...config} />)
+                }
+              </Switch>
+            </React.Fragment>
         }
       </Card>
     </div>

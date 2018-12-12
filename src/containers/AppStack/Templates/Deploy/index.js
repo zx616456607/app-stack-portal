@@ -233,7 +233,7 @@ class StackTemplateDeploy extends React.Component {
           cluster,
           description: values.description,
           body: {
-            conent: JSON.stringify(templateContent._graph),
+            content: JSON.stringify(templateContent),
             k8sManifest: k8sManifest.map(template => yamlParser.safeDump(template)).join('---\n'),
           },
         })
