@@ -20,6 +20,7 @@ import {
   appStacksStopRequest,
   appStacksDeleteRequest,
   appStacksDetailRequest,
+  appStacksEventsRequest,
   templateDetailRequest,
   templateDeleteRequest,
 } from '../services/appStack'
@@ -131,6 +132,18 @@ export default {
       } catch (e) {
         notification.error({ message: '获取堆栈详情失败', description: '' })
       }
+    },
+    * fetchAppStackEvents({ payload: { cluster, name } }, { call, put }) {
+      const res = yield call(appStacksEventsRequest, { cluster, name })
+      if (res.code === 200) {
+        yield put({
+          type: 'appStackDetail',
+          payload: {
+            appStackEvents: res.data,
+          },
+        })
+      }
+      return res
     },
     * stackStart({ payload: { cluster, name } }, { call }) {
       try {

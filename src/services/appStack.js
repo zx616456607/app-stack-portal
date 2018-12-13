@@ -84,3 +84,9 @@ export const appStacksDeleteRequest = ({ cluster, name }) => request({
     method: 'DELETE',
   },
 })
+export const appStacksEventsRequest = ({ cluster, name }) => request({
+  url: `${paasApiUrl}/clusters/${cluster}/appstacks/${name}/events`,
+  options: {
+    method: 'GET',
+  },
+})
