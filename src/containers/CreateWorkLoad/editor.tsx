@@ -47,7 +47,7 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
     fullScreen: false,
     Exportvisible: false,
     Importvisible: false,
-    collapsed: true,
+    collapsed: false,
   }
   editorNode: HTMLDivElement
   innerNode: HTMLDivElement
@@ -102,7 +102,7 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
           borderColor="#252525"
           panelWidths={[
             { resize: 'stretch' },
-            { size: 60, minSize: 0, resize: 'dynamic' },
+            { size: 80, minSize: 0, resize: 'dynamic' },
           ]}
           onUpdate={() => this.Ace.resize()}
         >
@@ -112,7 +112,9 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
           value={this.props.value}
           onLoad={(ace) => this.Ace = (ace as AceEditor)}
         />
-        <div className={styles.warnZoon}>{
+        <div className={styles.warnZoon}>
+        <div className={styles.errorInfo}>错误调试窗口</div>
+        {
           this.props.editorWarn.map(([key, vale]) => {
             if (key === 'yamlBasegrammar') {
               return <div key={key} className={key}><Icon type="close-circle" />{vale}</div>
@@ -195,33 +197,36 @@ const EditorHeader = ({
       ref={headRef}
     >
       <Tooltip title={'导入编排'}>
+      <div className={styles.editIcon} onClick={plusOnclick}>
       <ImportIcon
-        onClick={plusOnclick}
-        className={styles.editIcon}
       />
+      导入
+      </div>
       </Tooltip>
       <Tooltip title={'保存为编排文件'}>
+      <div className={styles.editIcon} onClick={saveOnClick}>
       <Icon
         type="save"
         theme="outlined"
-        onClick={saveOnClick}
-        className={styles.editIcon}
       />
+      保存
+      </div>
       </Tooltip>
       <Tooltip title={'辅助工具'}>
+      <div className={styles.editIcon}  onClick={onSiderClick}>
       <Icon
         type="tool"
         theme="outlined"
-        onClick={onSiderClick}
-        className={styles.editIcon}
       />
+      工具
+      </div>
       </Tooltip>
       <Tooltip title={fullScreen ? '退出全屏' : '全屏'}>
       <Icon
         type={fullScreen ? 'fullscreen-exit' : 'fullscreen'}
         theme="outlined"
         onClick={toggleFullScreen}
-        className={styles.editIcon}
+        className={styles.fullEditIcon}
       />
       </Tooltip>
     </div>
