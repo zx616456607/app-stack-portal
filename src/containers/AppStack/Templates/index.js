@@ -128,8 +128,8 @@ class Templates extends React.Component {
                     </div>
                     <div className={styles.itemBottom}>
                       <div className={styles.updateIcon}>
-                        <Tooltip title={`更新于${formatDate(v.create_time)}`}>
-                          <Icon type="clock-circle" /> {calcuDate(v.create_time)}
+                        <Tooltip title={`更新于${formatDate(v.last_update_time)}`}>
+                          <Icon type="clock-circle" /> {calcuDate(v.last_update_time)}
                         </Tooltip>
                       </div>
                       <div>
