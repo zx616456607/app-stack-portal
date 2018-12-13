@@ -14,7 +14,7 @@
 import React from 'react'
 import QueueAnim from 'rc-queue-anim'
 import { connect } from 'dva'
-import { Card, Button } from 'antd'
+import { Card, Button, notification } from 'antd'
 import { Link } from 'react-router-dom'
 import { Stack as StackIcon } from '@tenx-ui/icon'
 import Loader from '@tenx-ui/loader'
@@ -25,24 +25,29 @@ import styles from './style/index.less'
   const { appStack, loading, app } = state
   const { project, cluster } = app
   return { appStack, loading, project, cluster }
-}, dispatch => ({
-  getAppStackList: ({ cluster, query }) => dispatch({
-    type: 'appStack/fetchAppStackList',
-    payload: {
-      cluster,
-      query,
-    },
-  }),
-}))
+})
 class StackApps extends React.Component {
   state = {}
   componentDidMount() {
-    const { getAppStackList, cluster } = this.props
     const query = {
       from: 0,
       size: 0,
     }
-    getAppStackList({ cluster, query })
+    this.getAppStackList(query)
+  }
+  getAppStackList = query => {
+    const { dispatch, cluster } = this.props
+    try {
+      dispatch({
+        type: 'appStack/fetchAppStackList',
+        payload: {
+          cluster,
+          query,
+        },
+      })
+    } catch (e) {
+      notification.warn({ message: '获取堆栈列表失败', description: '' })
+    }
   }
   render() {
     const { loading, appStack } = this.props
