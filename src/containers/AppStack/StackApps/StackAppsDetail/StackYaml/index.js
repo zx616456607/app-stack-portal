@@ -64,6 +64,7 @@ export default class StackYaml extends React.PureComponent {
     return (
       <div style={{ height: 500 }} id="yamlEditor" className={styles.yamlEditor}>
         <TenxEditor
+          name="stack-yaml"
           headerExtraContent={header}
           value={yamlValue}
           readOnly={true}

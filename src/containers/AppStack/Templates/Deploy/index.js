@@ -21,6 +21,7 @@ import Loader from '@tenx-ui/loader'
 import yamlParser from 'js-yaml'
 import styles from './style/index.less'
 import { addAppStackLabelsForResource } from './utils'
+import cloneDeep from 'lodash/cloneDeep'
 
 const FormItem = Form.Item
 const { TextArea } = Input
@@ -191,9 +192,10 @@ class StackTemplateDeploy extends React.Component {
       if (err) {
         return
       }
+      const name = values.stackName
       this.setState({ btnLoading: true })
-      // _graph.cells
-      const { templateContent } = this.state
+      // should clone template content here
+      const templateContent = cloneDeep(this.state.templateContent)
       const k8sManifest = []
       const _relaceInput2Value = (template, id, parentId) => {
         Object.entries(template).forEach(([ key, value ]) => {
@@ -220,7 +222,7 @@ class StackTemplateDeploy extends React.Component {
           }
           _app_stack_template.forEach(template => {
             _relaceInput2Value(template, _shortId, this._idShort(parent))
-            addAppStackLabelsForResource(values.stackName, template)
+            addAppStackLabelsForResource(name, template)
             // remove undefined value
             k8sManifest.push(JSON.parse(JSON.stringify(template)))
           })
@@ -228,8 +230,8 @@ class StackTemplateDeploy extends React.Component {
       })
 
       try {
-        const res = await deployAppstack({
-          name: values.stackName,
+        await deployAppstack({
+          name,
           cluster,
           description: values.description,
           body: {
@@ -237,11 +239,10 @@ class StackTemplateDeploy extends React.Component {
             k8sManifest: k8sManifest.map(template => yamlParser.safeDump(template)).join('---\n'),
           },
         })
-        console.warn('res', res)
         notification.success({
           message: '启动应用堆栈成功',
         })
-        history.push('/app-stack')
+        history.push(`/app-stack/appStackDetail/${name}/events`)
       } catch (error) {
         console.warn('error', error)
         notification.warn({
