@@ -44,10 +44,23 @@
   color: @primary-color;
   .editIcon {
     padding: @padding-base;
+    color: #ccc;
+    &:hover {
+      color: @primary-color;
+    }
+    i {
+      padding-right: 4px;
+    }
     cursor: pointer;
   }
-  .editIcon:last-child {
+  .fullEditIcon {
     padding-right: @padding-small;
+    padding-left: 4px;
+    line-height: 12px;
+    color: #ccc;
+    &:hover {
+      color: @primary-color;
+    }
   }
 }
 .editLayout {
@@ -82,4 +95,8 @@
       }
     }
   }
+}
+.errorInfo {
+  color: #ccc;
+  font-size: 14px !important;
 }

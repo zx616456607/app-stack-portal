@@ -96,8 +96,10 @@ function getColumns(self): Array<any> {
           overlay={
             <Menu onClick={e => self.onMenuChange(e.key, _.key, self, record)}>
               <Menu.Item key="yaml"><div>查看/编辑Yaml</div></Menu.Item>
-              <Menu.Item key="delete"><div>&nbsp;&nbsp;强制删除&nbsp;&nbsp;</div></Menu.Item>
-              <Menu.Item key="re"><div>&nbsp;&nbsp;重新分配&nbsp;&nbsp;</div></Menu.Item>
+           <Menu.Item key="delete" disabled={record.status.phase === 'Succeeded'}>
+            <div>&nbsp;&nbsp;强制删除&nbsp;&nbsp;</div></Menu.Item>
+           <Menu.Item key="re" disabled={record.status.phase === 'Succeeded'}>
+           <div>&nbsp;&nbsp;重新分配&nbsp;&nbsp;</div></Menu.Item>
             </Menu>}
           type="ghost"
           onClick={async () => {
