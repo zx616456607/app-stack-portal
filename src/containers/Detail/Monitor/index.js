@@ -16,6 +16,7 @@ import React from 'react'
 import { connect } from 'dva'
 import { Spin } from 'antd'
 import cloneDeep from 'lodash/cloneDeep'
+import isEmpty from 'lodash/isEmpty'
 import Metric from '@tenx-ui/monitorChart'
 import '@tenx-ui/monitorChart/assets/index.css'
 import {
@@ -32,13 +33,14 @@ const sourceTypeArray = [
 
 const mapStateToProps = ({
   app: { cluster },
-  nativeDetail: { monitor, realTimeMonitor, type },
+  nativeDetail: { monitor, realTimeMonitor, type, pods },
 }) => {
   return {
     cluster,
     monitor,
     realTimeMonitor,
     type,
+    pods,
   }
 }
 
@@ -82,10 +84,26 @@ class Monitor extends React.PureComponent {
     })
   }
 
+  concatPodNames = () => {
+    const { pods } = this.props
+    if (isEmpty(pods)) {
+      return ''
+    }
+    const name = []
+    pods.forEach(pod => {
+      name.push(pod.metadata.name)
+    })
+    return name.join()
+  }
+
   getInstanceMetricsByType = type => {
     const { dispatch, cluster, match, type: monitorType } = this.props
     const { currentValue } = this.state
-    const { id } = match.params
+    let name = this.concatPodNames()
+    if (monitorType === 'Pod') {
+      const { id } = match.params
+      name = id
+    }
     const query = {
       type,
       ...this.formatTimeRange(currentValue),
@@ -94,9 +112,8 @@ class Monitor extends React.PureComponent {
       type: 'nativeDetail/fetchMonitor',
       payload: {
         cluster,
-        name: id,
+        name,
         query,
-        type: monitorType,
       },
     })
   }
@@ -120,12 +137,16 @@ class Monitor extends React.PureComponent {
 
   realTimeMonitorFunc = async query => {
     const { dispatch, cluster, match, type: monitorType } = this.props
-    const { id } = match.params
+    let name = this.concatPodNames()
+    if (monitorType === 'Pod') {
+      const { id } = match.params
+      name = id
+    }
     return dispatch({
       type: 'nativeDetail/fetchRealTimeMonitor',
       payload: {
         cluster,
-        name: id,
+        name,
         query,
         type: monitorType,
       },

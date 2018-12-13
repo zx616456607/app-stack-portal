@@ -60,7 +60,7 @@ class Tool extends React.Component<ToolProps, ToolState> {
     } catch (error) {
       notification.warn({ message: '获取 Sample 信息失败', description: '' })
     }
-    const { data } = res
+    const { data } = res || { data: {} }
     this.setState({ sampleInfo: data })
   }
   render() {
