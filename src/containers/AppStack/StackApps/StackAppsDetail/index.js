@@ -263,29 +263,28 @@ class StackAppsDetail extends React.Component {
         </div>
       </Card>
       <Card hoverable key="content" className={styles.detailContent}>
+        <Tabs
+          activeKey={this.getActiveKey(pathname)}
+          onChange={key => this.onTabChange(key)}
+        >
+          {
+            childRoutes.map(rt =>
+              <TabPane
+                tab={rt.tabName}
+                key={rt.tabKey}
+                disabled={rt.tabDisabled}
+              />
+            )
+          }
+        </Tabs>
         {
-          contentLoading === undefined || contentLoading ?
-            <div className={styles.loading}>
+          contentLoading === undefined || contentLoading
+            ? <div className={styles.loading}>
               <Loader
                 spinning={true}
               />
             </div>
-            :
-            <React.Fragment>
-              <Tabs
-                activeKey={this.getActiveKey(pathname)}
-                onChange={key => this.onTabChange(key)}
-              >
-                {
-                  childRoutes.map(rt =>
-                    <TabPane
-                      tab={rt.tabName}
-                      key={rt.tabKey}
-                      disabled={rt.tabDisabled}
-                    />
-                  )
-                }
-              </Tabs>
+            : <React.Fragment>
               {children}
               <Switch>
                 {

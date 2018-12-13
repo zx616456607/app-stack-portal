@@ -11,18 +11,34 @@
  */
 
 @import "../../../../../../assets/style/core/index.less";
- .operation {
-   display: flex;
-   justify-content: space-between;
-   .operationLeft {
-     display: flex;
-     align-items: center;
-     button {
-       margin-right: @padding-small;
-     }
-   }
-   .operationRight {
-     display: flex;
-     align-items: center;
-   }
- }
+.operation {
+  position: absolute;
+  z-index: 2;
+  display: flex;
+  justify-content: space-between;
+  .operationLeft {
+    display: flex;
+    align-items: center;
+    button {
+      margin-right: @padding-small;
+    }
+  }
+}
+.table {
+  :global {
+    .ant-table-pagination.ant-pagination {
+      margin: 8px 0 0 0;
+    }
+  }
+  .resourceLine {
+    :global {
+      @row-key-width: 36px;
+      .ant-col-8 {
+        width: @row-key-width;
+      }
+      .ant-col-16 {
+        width: ~"calc(100% - @{row-key-width})";
+      }
+    }
+  }
+}

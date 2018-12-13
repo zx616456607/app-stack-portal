@@ -11,61 +11,145 @@
  */
 
 import React from 'react'
-import { Button, Table, Input, Pagination } from 'antd'
+import { Button, Table, Input, notification, Row, Col } from 'antd'
 import styles from './style/index.less'
 import { connect } from 'react-redux'
-import { formatDate } from '../../../../../utils/helper';
+import { getDeepValue, cpuFormat, memoryFormat } from '../../../../../utils/helper'
+import TimeHover from '@tenx-ui/time-hover'
 
 const Search = Input.Search
 @connect(state => {
-  return state
-}, null)
+  const { appStack, loading, app } = state
+  const { cluster } = app
+  let { appStacksDetail } = appStack
+  let stackElements = []
+  if (appStacksDetail) {
+    const {
+      deployments = [],
+      services = [],
+      configMaps = [],
+    } = appStacksDetail
+    const appObj = {}
+    deployments.forEach(({ spec, metadata: { name, creationTimestamp, labels } }) => {
+      const appName = labels['system/appName']
+      appObj[appName] = {
+        kind: 'Application',
+        name: appName,
+        creationTimestamp,
+      }
+      stackElements.push({
+        kind: 'Deployment',
+        name,
+        creationTimestamp,
+        resource: <React.Fragment>
+          <Row className={styles.resourceLine}>
+            <Col span="8">CPU:</Col>
+            <Col span="16">{
+              cpuFormat(
+                getDeepValue(spec, 'template.spec.containers.0.resources.requests.memory'.split('.')),
+                getDeepValue(spec, 'template.spec.containers.0.resources'.split('.'))
+              ) || '-'
+            }</Col>
+          </Row>
+          <Row className={styles.resourceLine}>
+            <Col span="8">内存:</Col>
+            <Col span="16">{
+              memoryFormat(getDeepValue(spec, 'template.spec.containers.0.resources'.split('.'))) || '-'
+            }</Col>
+          </Row>
+        </React.Fragment>,
+      })
+    })
+    services.forEach(({ metadata: { name, creationTimestamp } }) => {
+      stackElements.push({
+        kind: 'Service',
+        name,
+        creationTimestamp,
+      })
+    })
+    configMaps.forEach(({ metadata: { name, creationTimestamp } }) => {
+      stackElements.push({
+        kind: 'ConfigMap',
+        name,
+        creationTimestamp,
+      })
+    })
+    stackElements = Object.keys(appObj).map(key => appObj[key]).concat(stackElements)
+  } else {
+    appStacksDetail = {}
+  }
+  return {
+    cluster,
+    loading,
+    appStacksDetail,
+    stackElements,
+  }
+})
 class StackElements extends React.Component {
+  name = this.props.match.params.name
+
+  columns = [
+    {
+      title: '元素类型',
+      dataIndex: 'kind',
+    },
+    {
+      title: '资源名称',
+      dataIndex: 'name',
+    },
+    {
+      title: '规格',
+      dataIndex: 'resource',
+      render: text => text || '-',
+    },
+    {
+      title: '创建时间',
+      dataIndex: 'creationTimestamp',
+      render: text => <TimeHover time={text} />,
+    },
+  ]
+
   state = {
-    columns: [
-      {
-        title: '元素类型',
-        dataIndex: 'elementType',
-      },
-      {
-        title: '资源名称',
-        dataIndex: 'resourceName',
-      },
-      {
-        title: '规格',
-        dataIndex: 'standards',
-      },
-      {
-        title: '创建时间',
-        dataIndex: 'creationTime',
-        render: text => formatDate(text),
-      },
-    ],
+    searchValue: '',
   }
-  search = () => {
-    // console.log(val);
+
+  refresh = async () => {
+    const { dispatch, cluster } = this.props
+    try {
+      await dispatch({
+        type: 'appStack/fetchAppStackDetail',
+        payload: { cluster, name: this.name },
+      })
+    } catch (error) {
+      notification.warn({
+        message: '刷新失败',
+      })
+    }
   }
+
+  search = searchValue => this.setState({ searchValue })
+
   render() {
-    const { columns } = this.state
-    const mockData = []
+    const { stackElements, loading } = this.props
+    const { searchValue } = this.state
+    const filterStackElements = stackElements.filter(({ name }) => name.indexOf(searchValue) > -1)
     return <div id="stackElements">
       <div className={styles.operation}>
         <div className={styles.operationLeft}>
-          <Button icon="sync">刷新</Button>
-          <Search onSearch={this.search} style={{ width: 200 }}/>
-        </div>
-        <div className={styles.operationRight}>
-          共计 {3} 条
-          <Pagination
-            total={20}
-            pageSize={10}
-            simple
-          />
+          <Button icon="sync" onClick={this.refresh}>刷新</Button>
+          <Search onSearch={this.search} placeholder="输入资源名称搜索" style={{ width: 200 }}/>
         </div>
       </div>
       <Table
-        columns={columns}
-        dataSource={mockData}
+        className={styles.table}
+        columns={this.columns}
+        dataSource={filterStackElements}
+        loading={loading.effects['appStack/fetchAppStackDetail']}
+        pagination={{
+          position: 'top',
+          simple: true,
+          pageSize: 10,
+        }}
       />
     </div>
   }
