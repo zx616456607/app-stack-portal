@@ -16,8 +16,11 @@ import styles from './style/index.less'
 import { connect } from 'react-redux'
 import { getDeepValue, cpuFormat, memoryFormat } from '../../../../../utils/helper'
 import TimeHover from '@tenx-ui/time-hover'
+import { Link } from 'react-router-dom'
 
 const Search = Input.Search
+const SUPPORT_WORK_LOAD = [ 'Deployment', 'Service', 'StatefulSet', 'Job', 'CronJob', 'Pod' ]
+
 @connect(state => {
   const { appStack, loading, app } = state
   const { cluster } = app
@@ -30,17 +33,19 @@ const Search = Input.Search
       configMaps = [],
     } = appStacksDetail
     const appObj = {}
-    deployments.forEach(({ spec, metadata: { name, creationTimestamp, labels } }) => {
+    deployments.forEach(({ spec, metadata: { name, creationTimestamp, labels, uid } }) => {
       const appName = labels['system/appName']
       appObj[appName] = {
         kind: 'Application',
         name: appName,
         creationTimestamp,
+        uid: appName,
       }
       stackElements.push({
         kind: 'Deployment',
         name,
         creationTimestamp,
+        uid,
         resource: <React.Fragment>
           <Row className={styles.resourceLine}>
             <Col span="8">CPU:</Col>
@@ -60,18 +65,20 @@ const Search = Input.Search
         </React.Fragment>,
       })
     })
-    services.forEach(({ metadata: { name, creationTimestamp } }) => {
+    services.forEach(({ metadata: { name, creationTimestamp, uid } }) => {
       stackElements.push({
         kind: 'Service',
         name,
         creationTimestamp,
+        uid,
       })
     })
-    configMaps.forEach(({ metadata: { name, creationTimestamp } }) => {
+    configMaps.forEach(({ metadata: { name, creationTimestamp, uid } }) => {
       stackElements.push({
         kind: 'ConfigMap',
         name,
         creationTimestamp,
+        uid,
       })
     })
     stackElements = Object.keys(appObj).map(key => appObj[key]).concat(stackElements)
@@ -96,6 +103,12 @@ class StackElements extends React.Component {
     {
       title: '资源名称',
       dataIndex: 'name',
+      render: (name, { kind }) => {
+        if (SUPPORT_WORK_LOAD.indexOf(kind) > -1) {
+          return <Link to={`/${kind}/${name}`}>{name}</Link>
+        }
+        return name
+      },
     },
     {
       title: '规格',
@@ -150,6 +163,7 @@ class StackElements extends React.Component {
           simple: true,
           pageSize: 10,
         }}
+        rowKey={row => row.uid}
       />
     </div>
   }
