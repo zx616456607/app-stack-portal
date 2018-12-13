@@ -24,7 +24,6 @@ import {
   templateDetailRequest,
   templateDeleteRequest,
 } from '../services/appStack'
-import { notification } from 'antd/lib/index';
 
 export default {
   namespace: 'appStack',
@@ -60,54 +59,38 @@ export default {
       return res
     },
     * fetchAppStackList({ payload: { cluster, query } }, { call, put }) {
-      try {
-        const res = yield call(appStacksListRequest, { cluster, query })
-        yield put({
-          type: 'appStackList',
-          payload: {
-            appStacks: res.data.appStacks,
-          },
-        })
-      } catch (e) {
-        notification.error({ message: '获取堆栈列表失败', description: '' })
-      }
+      const res = yield call(appStacksListRequest, { cluster, query })
+      yield put({
+        type: 'appStackList',
+        payload: {
+          appStacks: res.data.appStacks,
+        },
+      })
     },
     * fetchAppStackTemplate({ payload: { query } }, { call, put }) {
-      try {
-        const res = yield call(templateListRequest, { query })
-        if (res.code === 200) {
-          yield put({
-            type: 'appStackTemplateList',
-            payload: {
-              templateList: res.data.appStacks,
-            },
-          })
-        }
-      } catch (e) {
-        notification.error({ message: '获取堆栈模板列表失败', description: '' })
+      const res = yield call(templateListRequest, { query })
+      if (res.code === 200) {
+        yield put({
+          type: 'appStackTemplateList',
+          payload: {
+            templateList: res.data.appStacks,
+          },
+        })
       }
     },
     * fetchAppStackTemplateDelete({ payload: { name } }, { call }) {
-      try {
-        const res = yield call(templateDeleteRequest, name)
-        return res
-      } catch (e) {
-        // do nothing
-      }
+      const res = yield call(templateDeleteRequest, name)
+      return res
     },
     * fetchAppStackTemplateDetail({ payload: { name } }, { call, put }) {
-      try {
-        const res = yield call(templateDetailRequest, name)
-        if (res.code === 200) {
-          yield put({
-            type: 'appStackTemplateList',
-            payload: {
-              templateDetail: res.data,
-            },
-          })
-        }
-      } catch (e) {
-        notification.error({ message: '获取堆栈模板详情失败', description: '' })
+      const res = yield call(templateDetailRequest, name)
+      if (res.code === 200) {
+        yield put({
+          type: 'appStackTemplateList',
+          payload: {
+            templateDetail: res.data,
+          },
+        })
       }
     },
     * clearAppStackTemplateDetail(_, { put }) {
@@ -119,18 +102,14 @@ export default {
       })
     },
     * fetchAppStackDetail({ payload: { cluster, name } }, { call, put }) {
-      try {
-        const res = yield call(appStacksDetailRequest, { cluster, name })
-        if (res.code === 200) {
-          yield put({
-            type: 'appStackDetail',
-            payload: {
-              appStacksDetail: res.data,
-            },
-          })
-        }
-      } catch (e) {
-        notification.error({ message: '获取堆栈详情失败', description: '' })
+      const res = yield call(appStacksDetailRequest, { cluster, name })
+      if (res.code === 200) {
+        yield put({
+          type: 'appStackDetail',
+          payload: {
+            appStacksDetail: res.data,
+          },
+        })
       }
     },
     * fetchAppStackEvents({ payload: { cluster, name } }, { call, put }) {
@@ -146,29 +125,16 @@ export default {
       return res
     },
     * stackStart({ payload: { cluster, name } }, { call }) {
-      try {
-        const res = yield call(appStacksStartRequest, { cluster, name })
-        return res
-      } catch (e) {
-        // do nothing
-      }
+      const res = yield call(appStacksStartRequest, { cluster, name })
+      return res
     },
     * stackStop({ payload: { cluster, name } }, { call }) {
-      try {
-        const res = yield call(appStacksStopRequest, { cluster, name })
-        return res
-      } catch (e) {
-        // do nothing
-      }
+      const res = yield call(appStacksStopRequest, { cluster, name })
+      return res
     },
     * stackDelete({ payload: { cluster, name } }, { call }) {
-      try {
-        const res = yield call(appStacksDeleteRequest, { cluster, name })
-        return res
-      } catch (e) {
-        // do nothing
-      }
-
+      const res = yield call(appStacksDeleteRequest, { cluster, name })
+      return res
     },
   },
 }

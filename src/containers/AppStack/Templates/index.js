@@ -25,24 +25,25 @@ import { calcuDate, formatDate } from '../../../utils/helper'
 @connect(state => {
   const { appStack, loading } = state
   return { appStack, loading }
-}, dispatch => ({
-  getAppStackTemplate: query => dispatch({
-    type: 'appStack/fetchAppStackTemplate',
-    payload: { query },
-  }),
-  deleteAppStackTemplate: name => dispatch({
-    type: 'appStack/fetchAppStackTemplateDelete',
-    payload: { name },
-  }),
-}))
+})
 class Templates extends React.Component {
   componentDidMount() {
-    const { getAppStackTemplate } = this.props
     const query = {
       from: 0,
       size: 0,
     }
-    getAppStackTemplate(query)
+    this.getTemplates(query)
+  }
+  getTemplates = async query => {
+    const { dispatch } = this.props
+    try {
+      await dispatch({
+        type: 'appStack/fetchAppStackTemplate',
+        payload: { query },
+      })
+    } catch (e) {
+      notification.warn({ message: '获取堆栈模板列表失败', description: '' })
+    }
   }
   menu = name => <Menu>
     <Menu.Item onClick={() => { this.delTemplate(name) }
@@ -50,26 +51,33 @@ class Templates extends React.Component {
       <span>删除</span>
     </Menu.Item>
   </Menu>
-  delTemplate = async name => {
-    const { deleteAppStackTemplate, getAppStackTemplate } = this.props
+  delTemplate = name => {
     modal.confirm({
       modalTitle: '删除堆栈模板',
       title: '确认删除该堆栈模板吗？',
       content: '',
       okText: '确认删除',
-      onOk: () => {
-        deleteAppStackTemplate(name).then(res => {
+      onOk: async () => {
+        const { dispatch } = this.props
+        try {
+          const res = await dispatch({
+            type: 'appStack/fetchAppStackTemplateDelete',
+            payload: { name },
+          })
           if (res && res.code === 200) {
             const query = {
               from: 0,
               size: 0,
             }
-            getAppStackTemplate(query)
+            this.getTemplates(query)
             notification.success({ message: '删除成功' })
           } else {
-            notification.success({ message: '删除失败' })
+            notification.warn({ message: '删除失败' })
           }
-        })
+
+        } catch (e) {
+          notification.warn({ message: '删除失败' })
+        }
       },
       onCancel() {
       },

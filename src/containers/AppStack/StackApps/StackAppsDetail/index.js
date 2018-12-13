@@ -82,10 +82,14 @@ const childRoutes = [
 
 }))
 class StackAppsDetail extends React.Component {
-  componentDidMount() {
+  async componentDidMount() {
     const { getStackDetail, cluster } = this.props
     const name = this.props.match.params.name
-    getStackDetail({ cluster, name })
+    try {
+      await getStackDetail({ cluster, name })
+    } catch (e) {
+      notification.warn({ message: '获取堆栈详情失败', description: '' })
+    }
   }
   onTabChange = key => {
     const name = this.props.match.params.name
@@ -164,17 +168,20 @@ class StackAppsDetail extends React.Component {
       title: '该操作将启动堆栈内所有服务，待所有服务正常运行后，堆栈运行状态为正常',
       content: '确认启动该堆栈所有服务？',
       okText: '确认启动',
-      onOk: () => {
-        appStackStart({ cluster, name }).then(res => {
+      onOk: async () => {
+        try {
+          const res = await appStackStart({ cluster, name })
           if (res && res.code === 200) {
             this.setState({
               stopModal: false,
             })
             notification.success({ message: '启动成功' })
           } else {
-            notification.success({ message: '启动失败' })
+            notification.warn({ message: '启动失败' })
           }
-        })
+        } catch (e) {
+          notification.warn({ message: '启动失败' })
+        }
       },
       onCancel() {
       },
@@ -188,17 +195,20 @@ class StackAppsDetail extends React.Component {
       title: '该操作将停止堆栈内所有服务，待所有服务停止运行后，堆栈运行状态为未启动',
       content: '确认停止该堆栈所有服务？',
       okText: '确认停止',
-      onOk: () => {
-        appStackStop({ cluster, name }).then(res => {
+      onOk: async () => {
+        try {
+          const res = await appStackStop({ cluster, name })
           if (res && res.code === 200) {
             this.setState({
               stopModal: false,
             })
             notification.success({ message: '停止成功' })
           } else {
-            notification.success({ message: '停止失败' })
+            notification.warn({ message: '停止失败' })
           }
-        })
+        } catch (e) {
+          notification.warn({ message: '停止失败' })
+        }
       },
       onCancel() {
       },
@@ -212,8 +222,9 @@ class StackAppsDetail extends React.Component {
       title: '该操作将删除对应堆栈模板的所有内容，且无法恢复！',
       content: '确认执行删除操作？',
       okText: '确认删除',
-      onOk: () => {
-        appStackDelete({ cluster, name }).then(res => {
+      onOk: async () => {
+        try {
+          const res = await appStackDelete({ cluster, name })
           if (res && res.code === 200) {
             this.setState({
               delModal: false,
@@ -221,9 +232,11 @@ class StackAppsDetail extends React.Component {
             this.props.history.push('/app-stack')
             notification.success({ message: '删除成功' })
           } else {
-            notification.error({ message: '删除失败' })
+            notification.warn({ message: '删除失败' })
           }
-        })
+        } catch (e) {
+          notification.warn({ message: '删除失败' })
+        }
       },
       onCancel() {
       },
