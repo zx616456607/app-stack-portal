@@ -40,23 +40,10 @@ const getPodEvent = ({ cluster, name }) => request({
   url: `${paasApiUrl}${CLUSTERS}/${cluster}/events/instances/${name}/events`,
 })
 
-const getServiceMonitor = ({ cluster, name, query, project, type }) => {
+const getServiceMonitor = ({ cluster, name, query, project }) => {
   query.source = METRICS_DEFAULT_SOURCE
-  let monitorType = 'services'
-  switch (type) {
-    case 'Deployment':
-    case 'StatefulSet':
-      monitorType = 'services'
-      break
-    case 'Job':
-    case 'Pod':
-      monitorType = 'instances'
-      break
-    default:
-      break
-  }
   return request({
-    url: `${paasApiUrl}${CLUSTERS}/${cluster}/metric/${monitorType}/${name}/metrics?${queryString.stringify(query)}`,
+    url: `${paasApiUrl}${CLUSTERS}/${cluster}/metric/instances/${name}/metrics?${queryString.stringify(query)}`,
     options: {
       headers: {
         project,

@@ -412,20 +412,22 @@ const formatMonitorName = data => {
 /**
  * 统一 pod 和 service 监控数据格式
  * @param {object} res 数据源
- * @param {string} name 服务/pod 名称
  * @return {object} result data
  */
-const formatPodMonitor = (res, name) => {
-  const result = {}
-  const metrics = res.metrics || []
-  metrics.forEach(metric => {
-    metric.value && (metric.value = Math.ceil(metric.value * 100) / 100)
-    metric.floatValue && (metric.floatValue = Math.ceil(metric.floatValue * 100) / 100)
-  })
-  res.container_name = name
-  res.metrics = metrics
-  result.data = result.data || []
-  result.data.push(res)
+const formatPodMonitor = res => {
+  const result = {
+    data: [],
+  }
+  for (const [ key, value ] of Object.entries(res)) {
+    const metrics = value.metrics || []
+    metrics.forEach(metric => {
+      metric.value && (metric.value = Math.ceil(metric.value * 100) / 100)
+      metric.floatValue && (metric.floatValue = Math.ceil(metric.floatValue * 100) / 100)
+    })
+    value.container_name = key
+    value.metrics = metrics
+    result.data.push(value)
+  }
   return result
 }
 
