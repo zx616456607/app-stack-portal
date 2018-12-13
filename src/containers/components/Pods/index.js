@@ -146,34 +146,37 @@ export default class Pods extends React.PureComponent {
       title: '操作',
       width: '15%',
       key: 'action',
-      render: data => <Dropdown.Button
-        trigger={[ 'click' ]}
-        overlay={
-          <Menu onClick={ e => this.onMenuChange(e.key, data.metadata.name)}>
-            <Menu.Item key="delete"><div>&nbsp;&nbsp;强制删除&nbsp;&nbsp;</div></Menu.Item>
-            <Menu.Item key="re"><div>&nbsp;&nbsp;重新分配&nbsp;&nbsp;</div></Menu.Item>
-          </Menu>}
-        onClick={async () => {
-          await this.props.dispatch({
-            type: 'nativeDetail/updateState',
-            payload: {
-              dockVisible: false,
-              dockContainer: '',
-              dockName: '',
-            },
-          })
-          await this.props.dispatch({
-            type: 'nativeDetail/updateState',
-            payload: {
-              dockVisible: true,
-              dockContainer: getDeepValue(data, 'spec.containers.0.name'.split('.')),
-              dockName: getDeepValue(data, 'metadata.name'.split('.')),
-            },
-          })
-        }}
-      >
-        <div>终端</div>
-      </Dropdown.Button>,
+      render: data => {
+        const { phase } = getStatus(data, cron ? 'Job' : 'Pod')
+        return <Dropdown.Button
+          trigger={[ 'click' ]}
+          overlay={
+            <Menu onClick={ e => this.onMenuChange(e.key, data.metadata.name)}>
+              <Menu.Item key="delete" disabled={phase === 'Succeeded'}><div>&nbsp;&nbsp;强制删除&nbsp;&nbsp;</div></Menu.Item>
+              <Menu.Item key="re" disabled={phase === 'Succeeded'}><div>&nbsp;&nbsp;重新分配&nbsp;&nbsp;</div></Menu.Item>
+            </Menu>}
+          onClick={async () => {
+            await this.props.dispatch({
+              type: 'nativeDetail/updateState',
+              payload: {
+                dockVisible: false,
+                dockContainer: '',
+                dockName: '',
+              },
+            })
+            await this.props.dispatch({
+              type: 'nativeDetail/updateState',
+              payload: {
+                dockVisible: true,
+                dockContainer: getDeepValue(data, 'spec.containers.0.name'.split('.')),
+                dockName: getDeepValue(data, 'metadata.name'.split('.')),
+              },
+            })
+          }}
+        >
+          <div>终端</div>
+        </Dropdown.Button>
+      },
     })
     cron && res.push({
       title: '操作',

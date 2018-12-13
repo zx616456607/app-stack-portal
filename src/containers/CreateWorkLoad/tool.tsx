@@ -132,7 +132,7 @@ class SampleInner extends React.Component<SampleProps, SampleState> {
   render() {
     const selectArray = Object.entries(this.props.sampleInfo)
     .filter(([key]) => this.state.value.includes(key))
-    .map(([_, value]) => value)
+    .map(([_, value]) => value )
     .reduce((current, next) => current.concat(next), [])
     const uniqSelectArray = uniqById(selectArray)
     return(
@@ -542,16 +542,23 @@ function selectIcon(type: string = '') {
 }
 
 // 根据id去掉重复项
+// 创建id优先排在前面
+const createId = [ 12, 10, 11, 9 ]
 function uniqById (nodes: Node[]) {
   const idArray = [] as number[]
   const nodeArray = [] as Node[]
+  const createArray: Node[] = []
   nodes.forEach((node) => {
     if (!idArray.includes(node.id)) {
       idArray.push(node.id)
-      nodeArray.push(node)
+      if (createId.includes(node.id)) {
+        createArray.push(node)
+      } else {
+        nodeArray.push(node)
+      }
     }
   })
-  return nodeArray
+  return createArray.concat(nodeArray)
 }
 
 export function dumpArray(yamlJson: any[]): yamlString {
