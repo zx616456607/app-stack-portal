@@ -12,17 +12,15 @@
 import React from 'react'
 import styles from './style/index.less'
 import { connect } from 'react-redux'
-import { notification, Button, Timeline, Row, Col, Collapse } from 'antd'
+import {
+  notification, Button, Timeline, Row, Col, Collapse,
+  message as antMsg,
+} from 'antd'
 import TimeHover from '@tenx-ui/time-hover'
+import Ellipsis from '@tenx-ui/ellipsis'
+import cloneDeep from 'lodash/cloneDeep'
 
 const Panel = Collapse.Panel
-const customPanelStyle = {
-  background: '#f7f7f7',
-  borderRadius: 4,
-  marginBottom: 24,
-  border: 0,
-  overflow: 'hidden',
-}
 
 @connect(state => {
   const { appStack, loading, app } = state
@@ -39,10 +37,16 @@ export default class Events extends React.PureComponent {
 
   componentDidMount() {
     this.loadEvents()
+    this.loadTimmer = setInterval(this.loadEvents, 30000);
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.loadTimmer)
   }
 
   loadEvents = async () => {
     const { dispatch, cluster } = this.props
+    const clear = antMsg.loading('加载事件中')
     try {
       await dispatch({
         type: 'appStack/fetchAppStackEvents',
@@ -50,9 +54,10 @@ export default class Events extends React.PureComponent {
       })
     } catch (error) {
       notification.warn({
-        message: '获取事件失败',
+        antMsg: '获取事件失败',
       })
     }
+    clear()
   }
 
   render() {
@@ -61,27 +66,49 @@ export default class Events extends React.PureComponent {
       <div className={styles.operation}>
         <Button icon="sync" onClick={this.loadEvents}>刷新</Button>
       </div>
-      <Collapse bordered={false} className={styles.events}>
-        {
-          Object.entries(appStackEvents).map(([ key, events ]) => (
-            <Panel header={key} key={key} style={customPanelStyle}>
-              <Timeline>
-                {
-                  events.map(({ reason, message, lastTimestamp }) => (
-                    <Timeline.Item key={reason}>
-                      <Row>
-                        <Col span="4" className={styles.reason}>{reason}</Col>
-                        <Col span="16">{message}</Col>
-                        <Col span="4"><TimeHover time={lastTimestamp} /></Col>
-                      </Row>
-                    </Timeline.Item>
-                  ))
-                }
-              </Timeline>
-            </Panel>
-          ))
-        }
-      </Collapse>
+      {
+        Object.keys(appStackEvents).length > 0
+          ? <Collapse
+            bordered={false}
+            className={styles.events}
+            defaultActiveKey={Object.keys(appStackEvents)}
+          >
+            {
+              Object.entries(appStackEvents).map(([ key, events ]) => (
+                <Panel header={key} key={key}>
+                  {/* <pre>{JSON.stringify(events)}</pre>
+                  <pre>{JSON.stringify(events.reverse())}</pre> */}
+                  <Timeline>
+                    {
+                      cloneDeep(events).reverse().map(({
+                        metadata: { uid }, reason, message, firstTimestamp,
+                      }) => (
+                        <Timeline.Item key={uid}>
+                          <Row className={styles.line}>
+                            <Col span="4" className={styles.reason}>
+                              <Ellipsis>
+                                {reason}
+                              </Ellipsis>
+                            </Col>
+                            <Col span="17">
+                              <Ellipsis>
+                                {message}
+                              </Ellipsis>
+                            </Col>
+                            <Col span="3" className={styles.time}>
+                              <TimeHover time={firstTimestamp} />
+                            </Col>
+                          </Row>
+                        </Timeline.Item>
+                      ))
+                    }
+                  </Timeline>
+                </Panel>
+              ))
+            }
+          </Collapse>
+          : <i>暂无事件</i>
+      }
     </div>
   }
 }

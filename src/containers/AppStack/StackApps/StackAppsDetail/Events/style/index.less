@@ -18,8 +18,39 @@
   }
   .events {
     :global {
-      .ant-timeline-item-last .ant-timeline-item-content {
-        min-height: auto;
+      .ant-collapse-header {
+        font-size: 14px;
+      }
+      .ant-timeline-item-content {
+        background-color: @background-color;
+        padding: 0 @padding-small;
+      }
+      .ant-timeline-item-last {
+        .ant-timeline-item-content {
+          min-height: auto;
+        }
+      }
+      .ant-timeline-item-head {
+        top: 10px;
+      }
+      .ant-timeline-item-tail {
+        top: 0.8em;
+      }
+      .cssTooltip {
+        display: inline-block;
+        max-width: 100%;
+      }
+    }
+    .line {
+      height: 40px;
+      display: flex;
+      align-items: center;
+      .reason {
+        font-size: 14px;
+      }
+      .time {
+        text-align: right;
+        padding-right: @padding-small;
       }
     }
   }
