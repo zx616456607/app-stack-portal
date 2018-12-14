@@ -93,13 +93,15 @@ class NativeDetail extends React.PureComponent {
         tabKey: 'yaml',
       })
     }
-    res.push({
-      path: `/${type}/:id/monitor`,
-      component: require('./Monitor').default,
-      tabName: '监控',
-      tabKey: 'monitor',
-      tabDisabled: type === 'CronJob',
-    })
+    if (type !== 'CronJob') { // [KK-1585]
+      res.push({
+        path: `/${type}/:id/monitor`,
+        component: require('./Monitor').default,
+        tabName: '监控',
+        tabKey: 'monitor',
+        tabDisabled: type === 'CronJob',
+      })
+    }
     if (type === 'Pod') {
       res.push({
         path: `/${type}/:id/log`,
