@@ -464,7 +464,7 @@ inputs: []`,
     }
   }
 
-  onKeyDown = keyName => {
+  onKeyDown = (keyName, e) => {
     switch (keyName) {
       case 'delete':
       case 'backspace':
@@ -482,6 +482,11 @@ inputs: []`,
       case 'ctrl+shift+z':
       case 'command+shift+z':
         this.redo()
+        break
+      case 'ctrl+s':
+      case 'command+s':
+        e.preventDefault()
+        this.setState({ saveStackModal: true })
         break
       default:
         break
@@ -782,7 +787,7 @@ inputs: []`,
         onEnd={this.initDesigner}
       >
         <Hotkeys
-          keyName="delete,backspace,ctrl+z,command+z,ctrl+shift+z,command+shift+z"
+          keyName="delete,backspace,ctrl+z,command+z,ctrl+shift+z,command+shift+z,ctrl+s,command+s"
           onKeyDown={this.onKeyDown}
           key="hotkeys-wrapper"
           tabIndex="0"
