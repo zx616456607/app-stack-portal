@@ -124,6 +124,7 @@ class ImportComposeFile extends React.Component<FileProps, FileState> {
             })(
             <Select
               showSearch
+              optionFilterProp="children"
               onChange={this.handleChange}
               style={{ width: 280 }}
               onPopupScroll={debounce(this.onPopupScroll, 600)}

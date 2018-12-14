@@ -4,6 +4,7 @@ import TenxEditor from '@tenx-ui/editor'
 import '@tenx-ui/editor/assets/index.css'
 import styles from './style/index.less'
 import 'brace/mode/yaml'
+import 'brace/snippets/yaml'
 import 'brace/theme/monokai'
 import yamlParser from 'js-yaml'
 

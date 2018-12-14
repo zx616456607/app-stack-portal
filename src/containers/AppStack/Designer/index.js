@@ -20,6 +20,7 @@ import graphlib from 'graphlib'
 import TenxEditor from '@tenx-ui/editor'
 import '@tenx-ui/editor/assets/index.css'
 import 'brace/mode/yaml'
+import 'brace/snippets/yaml'
 import 'brace/theme/chrome'
 import { confirm } from '@tenx-ui/modal'
 import {
