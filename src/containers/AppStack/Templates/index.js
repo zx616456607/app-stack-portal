@@ -34,6 +34,9 @@ class Templates extends React.Component {
     }
     this.getTemplates(query)
   }
+  componentDidCatch(error, info) {
+    console.warn('Templates componentDidCatch', error, info)
+  }
   getTemplates = async query => {
     const { dispatch } = this.props
     try {

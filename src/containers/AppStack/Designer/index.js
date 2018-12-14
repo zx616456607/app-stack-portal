@@ -4,7 +4,7 @@
  */
 
 /**
- * AppStack
+ * AppStackDesigner
  *
  * @author zhangpc
  * @date 2018-11-14
@@ -139,7 +139,7 @@ const mapStateToProps = state => {
 }
 @Form.create()
 @connect(mapStateToProps)
-export default class AppStack extends React.Component {
+export default class AppStackDesigner extends React.Component {
   state = {
     templateYamlStr: `nodes: []
 inputs: []`,
@@ -178,6 +178,10 @@ inputs: []`,
     })
     window.removeEventListener('beforeunload', this.handleWindowClose)
     this._saveGraphObj2LS()
+  }
+
+  componentDidCatch(error, info) {
+    console.warn('AppStackDesigner componentDidCatch', error, info)
   }
 
   handleWindowClose = () => {
