@@ -28,7 +28,16 @@ const options = {
       strokeWidth: 1,
     },
   },
-  // _app_stack_template: {},
+  _app_stack_template: {
+    apiVersion: 'v1',
+    kind: 'Application',
+    metadata: {
+      name: {
+        get_input: 'app_name',
+      },
+      labels: {},
+    },
+  },
   _app_stack_input: {
     app_name: {
       label: '扩展资源',

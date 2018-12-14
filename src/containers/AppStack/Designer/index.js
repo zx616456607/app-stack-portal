@@ -38,6 +38,7 @@ import styles from './style/index.less'
 import './style/joint-custom.less'
 import './shapes'
 import Hotkeys from 'react-hot-keys'
+import { getDeepValue } from '../../../utils/helper'
 
 const isProd = process.env.NODE_ENV === 'production'
 
@@ -318,12 +319,14 @@ inputs: []`,
       const currentOldEmbeds = this.embedsMap[id] || []
 
       // [embed-label-handle-part-2] change child input label to app_name label when isEmbedding
-      const parentInputLabel = element.attributes._app_stack_input.app_name.label
+      const parentInputLabel = getDeepValue(element, [ 'attributes', '_app_stack_input', 'app_name', 'label' ])
       newEmbeds.forEach(embedId => {
         const currentElement = this.graph.getCell(embedId)
         const childInput = currentElement.attributes._app_stack_input || {}
         Object.keys(childInput).forEach(key => {
-          childInput[key].label = parentInputLabel
+          if (parentInputLabel) {
+            childInput[key].label = parentInputLabel
+          }
         })
       })
       // [embed-label-handle-part-3] remove app_name label when embed out
@@ -575,20 +578,23 @@ inputs: []`,
     try {
       let { yamlObj = {} } = this.state
       if (templateYamlStr) {
-        yamlObj = yamlParser.safeLoad(templateYamlStr)
+        yamlObj = yamlParser.safeLoad(templateYamlStr) || {}
       } else {
         yamlObj.inputs = yamlParser.safeLoad(inputYamlStr)
       }
       this.setState({ yamlObj })
       const { idShortIdMap } = this.state
-      Object.keys(yamlObj.nodes || yamlObj.inputs).forEach(key => {
-        const cell = this.graph.getCell(idShortIdMap[key])
-        if (yamlObj.nodes) {
-          cell.attributes._app_stack_template = yamlObj.nodes[key]
+      const nodes = yamlObj.nodes || {}
+      const inputs = yamlObj.inputs || {}
+      this.graph.getCells().forEach(cell => {
+        const key = idShortIdMap[cell.id]
+        if (!nodes[key]) {
+          cell.remove()
+          this.graph2Yaml()
+          return
         }
-        if (yamlObj.inputs) {
-          cell.attributes._app_stack_input = yamlObj.inputs[key]
-        }
+        cell.attributes._app_stack_template = nodes[key]
+        cell.attributes._app_stack_input = inputs[key]
       })
     } catch (error) {
       console.warn('parse yaml failed', error)

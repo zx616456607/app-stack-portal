@@ -35,11 +35,13 @@ const SUPPORT_WORK_LOAD = [ 'Deployment', 'Service', 'StatefulSet', 'Job', 'Cron
     const appObj = {}
     deployments.forEach(({ spec, metadata: { name, creationTimestamp, labels, uid } }) => {
       const appName = labels['system/appName']
-      appObj[appName] = {
-        kind: 'Application',
-        name: appName,
-        creationTimestamp,
-        uid: appName,
+      if (appName) {
+        appObj[appName] = {
+          kind: 'Application',
+          name: appName,
+          creationTimestamp,
+          uid: appName,
+        }
       }
       stackElements.push({
         kind: 'Deployment',
