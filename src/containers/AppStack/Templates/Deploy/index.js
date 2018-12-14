@@ -34,12 +34,7 @@ const formItemLayout = {
     sm: { span: 16, pull: 5 },
   },
 }
-const panelStyle = {
-  background: '#f7f7f7',
-  marginBottom: 24,
-  border: 0,
-  overflow: 'hidden',
-};
+const DEPLOY_2_K8S_IGNORE_SHAPES = [ 'devs.Application' ]
 
 @connect(state => {
   const { app: { cluster = '' } = {}, appStack, loading } = state
@@ -160,7 +155,6 @@ class StackTemplateDeploy extends React.Component {
           inputObj.key = key
           inputObj._shortId = _shortId
           inputObj.kind = this._findInputKind(nodes[_shortId], inputObj)
-          // inputObj.kind = nodes[_shortId] && nodes[_shortId].kind || 'Application'
           templateInputs[inputObj.label] = templateInputs[inputObj.label] || []
           templateInputs[inputObj.label].push(inputObj)
         })
@@ -204,6 +198,7 @@ class StackTemplateDeploy extends React.Component {
           }
           if (value.get_input) {
             template[key] = values[`${id}-${value.get_input}`]
+            // if undefined, find parent input value
             if (template[key] === undefined) {
               template[key] = values[`${parentId}-${value.get_input}`]
             }
@@ -214,7 +209,10 @@ class StackTemplateDeploy extends React.Component {
           }
         })
       }
-      templateContent._graph.cells.forEach(({ _app_stack_template, id, parent }) => {
+      let cells = templateContent._graph.cells
+      // filter deploy to k8s ignore shapes: Application
+      cells = cells.filter(({ type }) => DEPLOY_2_K8S_IGNORE_SHAPES.indexOf(type) < 0)
+      cells.forEach(({ _app_stack_template, id, parent }) => {
         const _shortId = this._idShort(id)
         if (_app_stack_template) {
           if (!Array.isArray(_app_stack_template)) {
@@ -320,7 +318,7 @@ class StackTemplateDeploy extends React.Component {
                   >
                     {
                       Object.entries(templateInputs).map(([ label, inputs ]) => {
-                        return <Panel header={label} key={label} style={panelStyle}>
+                        return <Panel header={label} key={label}>
                           <Table
                             columns={this.columns}
                             dataSource={inputs}

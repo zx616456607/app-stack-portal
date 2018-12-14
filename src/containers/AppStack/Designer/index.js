@@ -572,12 +572,12 @@ inputs: []`,
   }
 
   yaml2Graph = (templateYamlStr, inputYamlStr) => {
-    if (!templateYamlStr && !inputYamlStr) {
+    if (templateYamlStr === undefined && inputYamlStr === undefined) {
       return
     }
     try {
       let { yamlObj = {} } = this.state
-      if (templateYamlStr) {
+      if (templateYamlStr !== undefined) {
         yamlObj = yamlParser.safeLoad(templateYamlStr) || {}
       } else {
         yamlObj.inputs = yamlParser.safeLoad(inputYamlStr)
