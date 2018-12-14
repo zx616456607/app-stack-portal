@@ -100,11 +100,11 @@ function getColumns(self): Array<any> {
             <span onClick={() => self.delete(record.name)}>
               <i className="fa fa-trash-o" />删除</span>
           </Menu.Item>
-          <Menu.Item key="1" >
+          <Menu.Item key="1" disabled={record.status.phase === 'Running'} > // [KK-1644]
             <span onClick={() => self.start(record.name)}>
               <i className="fa fa-trash-o" />启动</span>
           </Menu.Item>
-          <Menu.Item key="1" >
+          <Menu.Item key="1" disabled={record.status.phase === 'Stopped'} > // [KK-1644]
             <span onClick={() => self.stop(record.name)}>
               <i className="fa fa-trash-o" />停止</span>
           </Menu.Item>
