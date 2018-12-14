@@ -14,11 +14,11 @@ import { getDeepValue } from '../../../../../utils/helper'
 
 const config = {
   rankdir: 'LR',
-  nodesep: 200,
-  edgesep: 200,
-  // ranksep: 100,
-  marginx: 100,
-  marginy: 100,
+  nodesep: 160,
+  edgesep: 160,
+  ranksep: 160,
+  // marginx: 100,
+  // marginy: 100,
 } // 默认relation-chart 配置
 
 interface RTProps {
@@ -127,13 +127,12 @@ export default class ResourceTopology extends React.Component<RTProps, RTState> 
       }
     })
     const [ edgesArray, nodeArray] = formateEdgesAndNodes(appStack, this.onNodeClick)
-    this.setState({ nodeArray, edgesArray})
+    this.setState({ nodeArray, edgesArray })
   }
   onNodeClick = (lname: string, e): void => {
     e.stopPropagation();
     const { nodeArray } = this.state;
     const newNodes = [...nodeArray]
-    console.log('lname', lname)
     newNodes.forEach(n => {
       if (n.active !== undefined) {
         delete n.active;
