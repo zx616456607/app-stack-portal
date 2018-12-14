@@ -351,6 +351,7 @@ class DetailHeader extends React.PureComponent {
             type === 'Pod' &&
             <Button
               onClick={() => this.loginTerminal()}
+              disabled={getStatus(data, type).phase === 'Succeeded'} // [KK-1494]
               className={styles.loginTerminal}>登录终端</Button>
           }
           <Button onClick={() => toYamlEditor(dispatch, name, type)} type="primary"> 编辑 Yaml</Button>
