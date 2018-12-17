@@ -147,7 +147,7 @@ class StackElements extends React.Component {
   render() {
     const { stackElements, loading } = this.props
     const { searchValue } = this.state
-    const filterStackElements = stackElements.filter(({ name }) => name.indexOf(searchValue) > -1)
+    const filterStackElements = stackElements.filter(({ name }) => (name || '').indexOf(searchValue) > -1)
     return <div id="stackElements">
       <div className={styles.operation}>
         <div className={styles.operationLeft}>
