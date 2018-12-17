@@ -93,6 +93,7 @@ function getColumns(self): Array<any> {
       return (
         <div className="actionBox commonData" onClick={(e) => e.stopPropagation()}>
         <Dropdown.Button
+          disabled={record.status.phase === 'Succeeded'}
           overlay={
             <Menu onClick={e => self.onMenuChange(e.key, _.key, self, record)}>
               <Menu.Item key="yaml"><div>查看/编辑Yaml</div></Menu.Item>

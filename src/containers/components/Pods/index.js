@@ -149,6 +149,7 @@ export default class Pods extends React.PureComponent {
       render: data => {
         const { phase } = getStatus(data, cron ? 'Job' : 'Pod')
         return <Dropdown.Button
+          disabled={phase === 'Succeeded'}
           trigger={[ 'click' ]}
           overlay={
             <Menu onClick={ e => this.onMenuChange(e.key, data.metadata.name)}>
