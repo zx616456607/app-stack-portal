@@ -1,17 +1,3 @@
-/*
- * Licensed Materials - Property of tenxcloud.com
- * (C) Copyright 2018 TenxCloud. All Rights Reserved.
- * ----
- * Monitor.js page
- *
- * @author zhangtao
- * @date Friday December 14th 2018
- */
-/**
- * Licensed Materials - Property of tenxcloud.com
- * (C) Copyright 2018 TenxCloud. All Rights Reserved.
-*/
-
 /**
  *
  * Job container
