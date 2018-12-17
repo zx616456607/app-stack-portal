@@ -153,7 +153,7 @@ class DetailHeader extends React.PureComponent {
     return (
       <div className={classnames({
         [styles.container]: true,
-        [styles.cronJob]: type === 'CronJob',
+        [styles.cronJob]: type === 'CronJob' || type === 'Service',
       })}>
         {getLeftIcon(type)}
         <div className={styles.left}>
@@ -354,7 +354,9 @@ class DetailHeader extends React.PureComponent {
               disabled={getStatus(data, type).phase === 'Succeeded'} // [KK-1494]
               className={styles.loginTerminal}>登录终端</Button>
           }
-          <Button onClick={() => toYamlEditor(dispatch, name, type)} type="primary"> 编辑 Yaml</Button>
+          <Button
+            disabled={ type === 'Pod' && getStatus(data, type).phase === 'Succeeded'}
+            onClick={() => toYamlEditor(dispatch, name, type)} type="primary"> 编辑 Yaml</Button>
         </div>
       </div>
     )

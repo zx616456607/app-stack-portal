@@ -97,6 +97,7 @@ function getColumns(self): Array<any> {
       return (
         <div className={DropdownDisbale} onClick={(e) => e.stopPropagation()}>
         <Dropdown.Button
+          disabled={record.status.phase === 'Succeeded'}
           overlay={
             <Menu onClick={e => self.onMenuChange(e.key, _.key, self, record)} >
             <Menu.Item key="yaml" disabled={record.status.phase === 'Succeeded'}>
