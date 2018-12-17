@@ -141,6 +141,7 @@ function RouterConfig({ history, app }) {
       component: () => import('./containers/AppStack/StackApps/StackAppsDetail'),
       models: () => [
         import('./models/appStack'),
+        import('./models/nativeDetail'),
       ],
     },
     {
