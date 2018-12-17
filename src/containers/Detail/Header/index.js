@@ -153,7 +153,7 @@ class DetailHeader extends React.PureComponent {
     return (
       <div className={classnames({
         [styles.container]: true,
-        [styles.cronJob]: type === 'CronJob',
+        [styles.cronJob]: type === 'CronJob' || type === 'Service',
       })}>
         {getLeftIcon(type)}
         <div className={styles.left}>
