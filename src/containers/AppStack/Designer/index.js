@@ -192,7 +192,7 @@ inputs: []`,
 
   // edit mode not support
   _saveGraphObj2LS = () => {
-    if (this.editMode) {
+    if (this.editMode || !this.graph) {
       return
     }
     const graphData = JSON.stringify(this.graph.toJSON())
