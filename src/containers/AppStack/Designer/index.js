@@ -4,7 +4,7 @@
  */
 
 /**
- * AppStack
+ * AppStackDesigner
  *
  * @author zhangpc
  * @date 2018-11-14
@@ -20,6 +20,7 @@ import graphlib from 'graphlib'
 import TenxEditor from '@tenx-ui/editor'
 import '@tenx-ui/editor/assets/index.css'
 import 'brace/mode/yaml'
+import 'brace/snippets/yaml'
 import 'brace/theme/chrome'
 import { confirm } from '@tenx-ui/modal'
 import {
@@ -38,6 +39,7 @@ import styles from './style/index.less'
 import './style/joint-custom.less'
 import './shapes'
 import Hotkeys from 'react-hot-keys'
+import { getDeepValue } from '../../../utils/helper'
 
 const isProd = process.env.NODE_ENV === 'production'
 
@@ -138,7 +140,7 @@ const mapStateToProps = state => {
 }
 @Form.create()
 @connect(mapStateToProps)
-export default class AppStack extends React.Component {
+export default class AppStackDesigner extends React.Component {
   state = {
     templateYamlStr: `nodes: []
 inputs: []`,
@@ -179,6 +181,10 @@ inputs: []`,
     this._saveGraphObj2LS()
   }
 
+  componentDidCatch(error, info) {
+    console.warn('AppStackDesigner componentDidCatch', error, info)
+  }
+
   handleWindowClose = () => {
     this._saveGraphObj2LS()
     return true
@@ -186,7 +192,7 @@ inputs: []`,
 
   // edit mode not support
   _saveGraphObj2LS = () => {
-    if (this.editMode) {
+    if (this.editMode || !this.graph) {
       return
     }
     const graphData = JSON.stringify(this.graph.toJSON())
@@ -314,12 +320,14 @@ inputs: []`,
       const currentOldEmbeds = this.embedsMap[id] || []
 
       // [embed-label-handle-part-2] change child input label to app_name label when isEmbedding
-      const parentInputLabel = element.attributes._app_stack_input.app_name.label
+      const parentInputLabel = getDeepValue(element, [ 'attributes', '_app_stack_input', 'app_name', 'label' ])
       newEmbeds.forEach(embedId => {
         const currentElement = this.graph.getCell(embedId)
         const childInput = currentElement.attributes._app_stack_input || {}
         Object.keys(childInput).forEach(key => {
-          childInput[key].label = parentInputLabel
+          if (parentInputLabel) {
+            childInput[key].label = parentInputLabel
+          }
         })
       })
       // [embed-label-handle-part-3] remove app_name label when embed out
@@ -456,7 +464,7 @@ inputs: []`,
     }
   }
 
-  onKeyDown = keyName => {
+  onKeyDown = (keyName, e) => {
     switch (keyName) {
       case 'delete':
       case 'backspace':
@@ -474,6 +482,11 @@ inputs: []`,
       case 'ctrl+shift+z':
       case 'command+shift+z':
         this.redo()
+        break
+      case 'ctrl+s':
+      case 'command+s':
+        e.preventDefault()
+        this.setState({ saveStackModal: true })
         break
       default:
         break
@@ -565,26 +578,29 @@ inputs: []`,
   }
 
   yaml2Graph = (templateYamlStr, inputYamlStr) => {
-    if (!templateYamlStr && !inputYamlStr) {
+    if (templateYamlStr === undefined && inputYamlStr === undefined) {
       return
     }
     try {
       let { yamlObj = {} } = this.state
-      if (templateYamlStr) {
-        yamlObj = yamlParser.safeLoad(templateYamlStr)
+      if (templateYamlStr !== undefined) {
+        yamlObj = yamlParser.safeLoad(templateYamlStr) || {}
       } else {
         yamlObj.inputs = yamlParser.safeLoad(inputYamlStr)
       }
       this.setState({ yamlObj })
       const { idShortIdMap } = this.state
-      Object.keys(yamlObj.nodes || yamlObj.inputs).forEach(key => {
-        const cell = this.graph.getCell(idShortIdMap[key])
-        if (yamlObj.nodes) {
-          cell.attributes._app_stack_template = yamlObj.nodes[key]
+      const nodes = yamlObj.nodes || {}
+      const inputs = yamlObj.inputs || {}
+      this.graph.getCells().forEach(cell => {
+        const key = idShortIdMap[cell.id]
+        if (!nodes[key]) {
+          cell.remove()
+          this.graph2Yaml()
+          return
         }
-        if (yamlObj.inputs) {
-          cell.attributes._app_stack_input = yamlObj.inputs[key]
-        }
+        cell.attributes._app_stack_template = nodes[key]
+        cell.attributes._app_stack_input = inputs[key]
       })
     } catch (error) {
       console.warn('parse yaml failed', error)
@@ -771,7 +787,7 @@ inputs: []`,
         onEnd={this.initDesigner}
       >
         <Hotkeys
-          keyName="delete,backspace,ctrl+z,command+z,ctrl+shift+z,command+shift+z"
+          keyName="delete,backspace,ctrl+z,command+z,ctrl+shift+z,command+shift+z,ctrl+s,command+s"
           onKeyDown={this.onKeyDown}
           key="hotkeys-wrapper"
           tabIndex="0"

@@ -33,8 +33,7 @@ import Ellipsis from '@tenx-ui/ellipsis'
 import classnames from 'classnames'
 import compact from 'lodash/compact'
 import Terminal from '../Detail/Terminal'
-import styles from '../Detail/style/index.less';
-// import styles from './styles/index.less'
+import styles from './styles/index.less'
 const Search = Input.Search
 
 function getColumns(self): Array<any> {
@@ -90,20 +89,28 @@ function getColumns(self): Array<any> {
     title: '操作',
     key: 'operation',
     render: (_, record) => {
+      const DropdownDisbale = classnames({
+        actionBox: true,
+        commonData: true,
+        [styles.DropdownDisbale]: record.status.phase === 'Succeeded',
+      })
       return (
-        <div className="actionBox commonData" onClick={(e) => e.stopPropagation()}>
+        <div className={DropdownDisbale} onClick={(e) => e.stopPropagation()}>
         <Dropdown.Button
           disabled={record.status.phase === 'Succeeded'}
           overlay={
-            <Menu onClick={e => self.onMenuChange(e.key, _.key, self, record)}>
-              <Menu.Item key="yaml"><div>查看/编辑Yaml</div></Menu.Item>
-           <Menu.Item key="delete" disabled={record.status.phase === 'Succeeded'}>
+            <Menu onClick={e => self.onMenuChange(e.key, _.key, self, record)} >
+            <Menu.Item key="yaml" disabled={record.status.phase === 'Succeeded'}>
+              <div>查看/编辑Yaml</div>
+            </Menu.Item>
+           <Menu.Item key="delete">
             <div>&nbsp;&nbsp;强制删除&nbsp;&nbsp;</div></Menu.Item>
            <Menu.Item key="re" disabled={record.status.phase === 'Succeeded'}>
            <div>&nbsp;&nbsp;重新分配&nbsp;&nbsp;</div></Menu.Item>
             </Menu>}
           type="ghost"
           onClick={async () => {
+            if (record.status.phase === 'Succeeded' ) { return }
             self.setState({
               dockName: record.name,
               terminalContainer: record.terminalContainer,

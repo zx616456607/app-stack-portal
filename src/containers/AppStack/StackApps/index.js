@@ -35,6 +35,9 @@ class StackApps extends React.Component {
     }
     this.getAppStackList(query)
   }
+  componentDidCatch(error, info) {
+    console.warn('StackApps componentDidCatch', error, info)
+  }
   getAppStackList = query => {
     const { dispatch, cluster } = this.props
     try {

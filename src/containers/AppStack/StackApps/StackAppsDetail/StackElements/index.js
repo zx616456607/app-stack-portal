@@ -35,11 +35,13 @@ const SUPPORT_WORK_LOAD = [ 'Deployment', 'Service', 'StatefulSet', 'Job', 'Cron
     const appObj = {}
     deployments.forEach(({ spec, metadata: { name, creationTimestamp, labels, uid } }) => {
       const appName = labels['system/appName']
-      appObj[appName] = {
-        kind: 'Application',
-        name: appName,
-        creationTimestamp,
-        uid: appName,
+      if (appName) {
+        appObj[appName] = {
+          kind: 'Application',
+          name: appName,
+          creationTimestamp,
+          uid: appName,
+        }
       }
       stackElements.push({
         kind: 'Deployment',
@@ -145,7 +147,7 @@ class StackElements extends React.Component {
   render() {
     const { stackElements, loading } = this.props
     const { searchValue } = this.state
-    const filterStackElements = stackElements.filter(({ name }) => name.indexOf(searchValue) > -1)
+    const filterStackElements = stackElements.filter(({ name }) => (name || '').indexOf(searchValue) > -1)
     return <div id="stackElements">
       <div className={styles.operation}>
         <div className={styles.operationLeft}>
