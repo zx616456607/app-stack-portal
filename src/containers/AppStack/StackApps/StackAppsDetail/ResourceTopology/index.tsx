@@ -11,14 +11,15 @@ import * as React from 'react'
 import RelationChart from '@tenx-ui/relation-chart'
 import { connect } from 'dva'
 import { getDeepValue } from '../../../../../utils/helper'
+import Detail from './detail'
 
 const config = {
   rankdir: 'LR',
   nodesep: 160,
   edgesep: 160,
   ranksep: 160,
-  // marginx: 100,
-  // marginy: 100,
+  marginx: 40,
+  marginy: 40,
 } // 默认relation-chart 配置
 
 interface RTProps {
@@ -28,6 +29,8 @@ interface RTProps {
 interface RTState {
   nodeArray: any[],
   edgesArray: any[],
+  isVisible: boolean,
+  pods: any[],
 }
 
 function mapStateToProps(state) {
@@ -84,7 +87,7 @@ function formateEdgesAndNodes(appStack: any, onClick: (lname: string, e: any) =>
   const edgeEdge: any[] = []
   const NodeArray: any[] = []
   Object.entries(appStack).forEach(([appNode, dpNodeArray]) => {
-    NodeArray.push(Object.assign({}, defaultAppConfig, { id: appNode, label: appNode, onClick }))
+    NodeArray.push(Object.assign({}, defaultAppConfig, { id: appNode, label: appNode }))
     dpNodeArray.forEach(dpNode => {
       const name = getDeepValue(dpNode, ['metadata', 'name'])
       NodeArray.push(Object.assign({}, defaultDpConfig, { id: name, label: name, onClick }))
@@ -97,7 +100,7 @@ function formateEdgesAndNodes(appStack: any, onClick: (lname: string, e: any) =>
       });
       const cmArray = getDeepValue(dpNode, ['configMap']) || {}
       Object.keys(cmArray).forEach((cmName) => {
-        NodeArray.push(Object.assign({}, defaultcMConfig, { id: cmName, label: cmName, onClick }))
+        NodeArray.push(Object.assign({}, defaultcMConfig, { id: cmName, label: cmName }))
         edgeEdge.push(Object.assign({}, defaultEdgeConfig, { source: name, target: cmName }))
       })
     });
@@ -110,6 +113,8 @@ export default class ResourceTopology extends React.Component<RTProps, RTState> 
   state = {
     nodeArray: [],
     edgesArray: [],
+    isVisible: false,
+    pods: [],
   }
   componentDidMount() {
     const deployments: any[] = getDeepValue(this.props.appStackDetail, ['deployments']) || []
@@ -129,6 +134,20 @@ export default class ResourceTopology extends React.Component<RTProps, RTState> 
     const [ edgesArray, nodeArray] = formateEdgesAndNodes(appStack, this.onNodeClick)
     this.setState({ nodeArray, edgesArray })
   }
+  findPods(name: string): any {
+    const deployments: any[] = getDeepValue(this.props.appStackDetail, ['deployments']) || []
+    const choiceDp = deployments.filter((dp) => {
+      const lname = dp.metadata.name
+      return lname === name
+    })[0]
+    if (choiceDp !== undefined ) {
+      return choiceDp.pods
+    }
+    const podsArray = deployments.map(({ pods }) => pods)
+    .reduce((current, next) => current.concat(next) , [])
+    .filter((pods) => { return pods.metadata.name === name })
+    return podsArray
+  }
   onNodeClick = (lname: string, e): void => {
     e.stopPropagation();
     const { nodeArray } = this.state;
@@ -141,17 +160,24 @@ export default class ResourceTopology extends React.Component<RTProps, RTState> 
         n.active = true;
       }
     })
-    this.setState({ nodeArray: newNodes })
+    const Pods = this.findPods(lname)
+    // return
+    this.setState({ pods: Pods },
+    () => this.setState({ nodeArray: newNodes, isVisible: true  }))
   }
   onRelationChartClick = () => {
-    const { nodeArray } = this.state;
-    const newNodes = [...nodeArray];
+    const { nodeArray } = this.state
+    const newNodes = [...nodeArray]
     newNodes.forEach(n => {
       if (n.active !== undefined) {
-        delete n.active;
+        delete n.active
       }
     })
-    this.setState({ nodeArray: newNodes })
+    this.setState({ nodeArray: newNodes, isVisible: false })
+  }
+  cancelDock = () => {
+    this.setState({ isVisible: false })
+    this.onRelationChartClick()
   }
   render() {
     return(
@@ -161,7 +187,13 @@ export default class ResourceTopology extends React.Component<RTProps, RTState> 
         edges={this.state.edgesArray}
         SvgHeight={'420px'}
         onSvgClick={this.onRelationChartClick}
-      />
+      >
+        <Detail
+          isVisible={this.state.isVisible}
+          cancelDock={this.cancelDock}
+          pods={this.state.pods}
+        />
+      </RelationChart>
     )
   }
 }
