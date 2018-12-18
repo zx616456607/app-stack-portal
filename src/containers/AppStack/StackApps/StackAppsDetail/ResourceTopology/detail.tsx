@@ -8,6 +8,7 @@
  * @date Friday December 14th 2018
  */
 import * as React from 'react'
+import { Drawer } from 'antd'
 import Dock from 'react-dock'
 import { connect } from 'dva'
 import Monitor from './Monitor'
@@ -21,6 +22,7 @@ interface DetailProps {
   isVisible: boolean,
   cancelDock: () => void;
   pods: any[];
+  getContainer?: any;
 }
 
 interface DetailState {
@@ -34,14 +36,33 @@ export default  class Detail extends React.Component<DetailProps, DetailState> {
   }
   render () {
     return(
-      <Dock
-        fluid={false}
-        position={'right'}
-        defaultSize={800}
-        isVisible={this.props.isVisible}
-        onVisibleChange={this.props.cancelDock}
-      >
-      <div className={styles.MonitorWrap}>
+      // <Dock
+      //   fluid={false}
+      //   position={'right'}
+      //   defaultSize={800}
+      //   isVisible={this.props.isVisible}
+      //   onVisibleChange={this.props.cancelDock}
+      // >
+      // <div className={styles.MonitorWrap}>
+      //   <div className={styles.header} >监控信息</div>
+      //   {
+      //     this.props.isVisible &&
+      //   <Monitor
+      //     pods={this.props.pods}
+      //   />
+      //   }
+      // </div>
+      // </Dock>
+        <Drawer
+          placement="right"
+          closable={false}
+          onClose={this.props.cancelDock}
+          visible={this.props.isVisible}
+          width={'75%'}
+          mask={false}
+          getContainer={this.props.getContainer}
+        >
+                <div className={styles.MonitorWrap}>
         <div className={styles.header} >监控信息</div>
         {
           this.props.isVisible &&
@@ -50,7 +71,7 @@ export default  class Detail extends React.Component<DetailProps, DetailState> {
         />
         }
       </div>
-      </Dock>
+        </Drawer>
     )
   }
 }
