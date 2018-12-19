@@ -188,7 +188,7 @@ export default class ResourceTopology extends React.Component<RTProps, RTState> 
         graphConfigs={config}
         nodes={this.state.nodeArray}
         edges={this.state.edgesArray}
-        SvgHeight={'420px'}
+        SvgHeight={'800px'}
         onSvgClick={this.onRelationChartClick}
         ref={(node) => this.relationChart = node}
         fullScreenMode={(full) => this.fullScreen = full}
