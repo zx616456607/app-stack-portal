@@ -56,9 +56,9 @@ class ExportComposeFile extends React.Component<FileProps, FileState> {
       try {
         await this.props.dispatch({ type: 'createNative/createStack', payload: { obj } })
       } catch (e) {
-        return notification.warn({ message: '创建失败', description: e.response.message })
+        return notification.warn({ message: '保存失败', description: e.response.message })
       }
-      notification.success({ message: '创建成功', description: '' })
+      notification.success({ message: '保存成功', description: '' })
       this.props.setVisible(false)
       this.setState({ loading: false })
     })
