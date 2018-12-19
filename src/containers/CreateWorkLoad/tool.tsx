@@ -544,11 +544,13 @@ function selectIcon(type: string = '') {
 // 根据id去掉重复项
 // 创建id优先排在前面
 const createId = [ 12, 10, 11, 9 ]
+const filterId = [1, 2, 3, 4] // 去掉不需要的操作
 function uniqById (nodes: Node[]) {
   const idArray = [] as number[]
   const nodeArray = [] as Node[]
   const createArray: Node[] = []
   nodes.forEach((node) => {
+    if (filterId.includes(node.id)) { return }
     if (!idArray.includes(node.id)) {
       idArray.push(node.id)
       if (createId.includes(node.id)) {
