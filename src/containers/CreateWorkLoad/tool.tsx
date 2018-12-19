@@ -340,10 +340,14 @@ class SampleNodeInner extends React.Component<SampleNodeProps, any> {
           <div className={styles.SampleNode}>
             <div className={styles.nodeTitle}>
               <div>{`${index}. ${dataNode.opt_name}`}</div>
-              <div className={disableButton} onClick={() => this.onClickNode(dataNode)}>
+              <div className={disableButton}>
               {
                 inserNodeFlage &&
-                <div className={disable ? styles.insert : styles.disable}><InsertIcon/>插入</div>
+                <div
+                  className={disable ? styles.insert : styles.disable}
+                  onClick={() => this.onClickNode(dataNode)}
+                ><InsertIcon/>插入
+                </div>
               }{
                 explainFlage &&
                 <div className={styles.info}>（未开启服务网格）</div>
