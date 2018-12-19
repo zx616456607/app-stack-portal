@@ -122,7 +122,7 @@ class SampleInner extends React.Component<SampleProps, SampleState> {
     const config = queryString.parse(search)
     const filterResource = [ 'Deployment', 'StatefulSet', 'Job', 'CronJob' ]
     if (filterResource.includes(config.type)) {
-      this.setState({ value: config.type })
+      this.setState({ value: [config.type] })
     }
     const payload = { cluster: this.props.cluster }
     const istioEnable =
