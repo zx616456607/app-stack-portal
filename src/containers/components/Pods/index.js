@@ -23,6 +23,8 @@ import { getStatus } from '../../../utils/status_identify'
 import NativeStatus from '../../../components/NativeStatus'
 import { confirm } from '@tenx-ui/modal'
 import { getDeepValue } from '../../../utils/helper'
+import styles from '../../Pod/styles/index.less'
+import classnames from 'classnames'
 
 export default class Pods extends React.PureComponent {
   state = {
@@ -148,35 +150,43 @@ export default class Pods extends React.PureComponent {
       key: 'action',
       render: data => {
         const { phase } = getStatus(data, cron ? 'Job' : 'Pod')
-        return <Dropdown.Button
-          disabled={phase === 'Succeeded'}
-          trigger={[ 'click' ]}
-          overlay={
-            <Menu onClick={ e => this.onMenuChange(e.key, data.metadata.name)}>
-              <Menu.Item key="delete" disabled={phase === 'Succeeded'}><div>&nbsp;&nbsp;强制删除&nbsp;&nbsp;</div></Menu.Item>
-              <Menu.Item key="re" disabled={phase === 'Succeeded'}><div>&nbsp;&nbsp;重新分配&nbsp;&nbsp;</div></Menu.Item>
-            </Menu>}
-          onClick={async () => {
-            await this.props.dispatch({
-              type: 'nativeDetail/updateState',
-              payload: {
-                dockVisible: false,
-                dockContainer: '',
-                dockName: '',
-              },
-            })
-            await this.props.dispatch({
-              type: 'nativeDetail/updateState',
-              payload: {
-                dockVisible: true,
-                dockContainer: getDeepValue(data, 'spec.containers.0.name'.split('.')),
-                dockName: getDeepValue(data, 'metadata.name'.split('.')),
-              },
-            })
-          }}
-        >
-          <div>终端</div>
-        </Dropdown.Button>
+        return (
+          <div className={classnames({
+            actionBox: true,
+            commonData: true,
+            [styles.DropdownDisbale]: phase === 'Succeeded',
+          })} onClick={e => e.stopPropagation()}>
+            <Dropdown.Button
+              trigger={[ 'click' ]}
+              overlay={
+                <Menu onClick={ e => this.onMenuChange(e.key, data.metadata.name)}>
+                  <Menu.Item key="delete"><div>&nbsp;&nbsp;强制删除&nbsp;&nbsp;</div></Menu.Item>
+                  <Menu.Item key="re" disabled={phase === 'Succeeded'}><div>&nbsp;&nbsp;重新分配&nbsp;&nbsp;</div></Menu.Item>
+                </Menu>}
+              onClick={async () => {
+                if (phase === 'Succeeded') return
+                await this.props.dispatch({
+                  type: 'nativeDetail/updateState',
+                  payload: {
+                    dockVisible: false,
+                    dockContainer: '',
+                    dockName: '',
+                  },
+                })
+                await this.props.dispatch({
+                  type: 'nativeDetail/updateState',
+                  payload: {
+                    dockVisible: true,
+                    dockContainer: getDeepValue(data, 'spec.containers.0.name'.split('.')),
+                    dockName: getDeepValue(data, 'metadata.name'.split('.')),
+                  },
+                })
+              }}
+            >
+              <div>终端</div>
+            </Dropdown.Button>
+          </div>
+        )
       },
     })
     cron && res.push({
