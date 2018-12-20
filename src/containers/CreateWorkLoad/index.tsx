@@ -85,6 +85,21 @@ class CreateWorkLoad extends React.Component<CreateWorkLoadProps, CreateWorkLoad
       this.props.dispatch({ type: 'createNative/updateYamlValue', payload: { yamlValue: '' } })
     }
   }
+  composeFileCreate = async () => {
+    const { location: { search }  } = this.props
+    const config = queryString.parse(search)
+    const templateid = config.templateid || false
+    if (!templateid) { return }
+    const payload = { id: templateid  }
+    let res
+    try {
+      res = await this.props.dispatch({ type: 'createNative/loadStackDetail', payload })
+    } catch (e) {
+      return notification.warn({ message: '加载编排文件详情失败', description: '' })
+    }
+    const content = getDeepValue(res, [ 'data', 'content' ])
+    this.props.dispatch({ type: 'createNative/updateYamlValue', payload: { yamlValue: content } })
+  }
   async componentDidMount() {
     const { location: { search }  } = this.props
     const config = queryString.parse(search)
@@ -102,6 +117,7 @@ class CreateWorkLoad extends React.Component<CreateWorkLoadProps, CreateWorkLoad
         },
       })
     }
+    this.composeFileCreate()
     if (!config.name || !config.type) { return } // 如果参数不全, 直接返回
     const payload = { cluster: this.props.cluster, type: config.type, name: config.name }
     try {
