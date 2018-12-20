@@ -308,8 +308,18 @@ class SampleNodeInner extends React.Component<SampleNodeProps, any> {
     if (id === 5) {
       yamlJson.forEach((singleValue) => {
         const annotations = getDeepValue(singleValue, [ 'metadata', 'annotations' ]) || {}
-        const newAnnotations = Object.assign({}, annotations, contentObj.metadata.annotations )
-        singleValue.metadata.annotations = newAnnotations
+        const kind = getDeepValue(singleValue, ['kind'])
+        const otherKind = getDeepValue(singleValue, ['spec', 'template'])
+        let newAnnotations = {}
+        if (kind === 'Pod') {
+          newAnnotations = Object.assign({}, annotations, contentObj.metadata.annotations )
+          singleValue.metadata.annotations = newAnnotations
+        } else if (otherKind !== null) {
+          const tannotations =
+          getDeepValue(singleValue, [ 'spec', 'template', 'metadata', 'annotations' ]) || {}
+          newAnnotations = Object.assign({}, tannotations, contentObj.metadata.annotations )
+          singleValue.spec.template.metadata.annotations = newAnnotations
+        }
       })
       const newPayload = { yamlValue: dumpArray(yamlJson) }
       this.props.dispatch({ type: 'createNative/updateYamlValue', payload: newPayload })
