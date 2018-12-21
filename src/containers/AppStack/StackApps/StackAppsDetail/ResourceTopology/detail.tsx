@@ -54,8 +54,9 @@ export default  class Detail extends React.Component<DetailProps, DetailState> {
       // </div>
       // </Dock>
         <Drawer
+          title={<div >监控信息</div>}
           placement="right"
-          closable={false}
+          // closable={false}
           onClose={this.props.cancelDock}
           visible={this.props.isVisible}
           width={'75%'}
@@ -63,7 +64,6 @@ export default  class Detail extends React.Component<DetailProps, DetailState> {
           getContainer={this.props.getContainer}
         >
                 <div className={styles.MonitorWrap}>
-        <div className={styles.header} >监控信息</div>
         {
           this.props.isVisible &&
         <Monitor
