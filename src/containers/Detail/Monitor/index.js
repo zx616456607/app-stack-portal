@@ -25,6 +25,7 @@ import {
   UPDATE_INTERVAL, FRESH_FREQUENCY, REALTIME_INTERVAL,
 } from '../../../utils/constants'
 import styles from '../style/Monitor.less'
+import { notification } from "antd/lib/index";
 
 const sourceTypeArray = [
   METRICS_CPU, METRICS_MEMORY, METRICS_NETWORK_TRANSMITTED,
@@ -61,8 +62,19 @@ class Monitor extends React.PureComponent {
     })
   }
 
-  componentDidMount() {
+  async componentDidMount() {
+    const { type: monitorType } = this.props
+    if (monitorType === 'StatefulSet') {
+      await this.fetchPodList()
+      this.intervalLoadMetrics()
+    }
     this.intervalLoadMetrics()
+  }
+  fetchPodList = () => {
+    const { dispatch } = this.props
+    return dispatch({
+      type: 'nativeDetail/fetchPodsList',
+    }).catch(() => notification.warn({ message: '获取 Pods 失败' }))
   }
 
   intervalLoadMetrics = () => {
