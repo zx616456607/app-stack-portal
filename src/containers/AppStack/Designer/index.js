@@ -34,6 +34,7 @@ import {
   AppC as AppIcon,
   ServiceC as ServiceIcon,
   ConfigmapC as ConfigmapIcon,
+  FatArrowLeft as FatArrowLeftIcon,
 } from '@tenx-ui/icon'
 import styles from './style/index.less'
 import './style/joint-custom.less'
@@ -843,15 +844,19 @@ inputs: []`,
               <div className={styles.toolBtns}>
                 <Button.Group>
                   <Button
-                    icon="undo"
                     disabled={this.isUndoDisabled()}
                     onClick={this.undo}
-                  />
+                    className={styles.undo}
+                  >
+                    <FatArrowLeftIcon />
+                  </Button>
                   <Button
-                    icon="redo"
                     disabled={redoList.length === 0}
                     onClick={this.redo}
-                  />
+                    className={styles.redo}
+                  >
+                    <FatArrowLeftIcon />
+                  </Button>
                 </Button.Group>
                 <Button icon="delete" onClick={this.clearGraph}>
                 清空设计
