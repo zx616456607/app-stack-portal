@@ -42,7 +42,7 @@ export default class ImagePopCard extends React.Component<ImagePopCardProps, Ima
         <div onClick={this.onClick}>
         <Popover
           placement="right"
-          content={<CopyList addressList={this.props.addressList}/>}
+          content={<CopyList addressList={this.props.addressList} inputShow={this.state.show}/>}
           trigger="click"
           onVisibleChange={this.showPop}
           arrowPointAtCenter
@@ -61,6 +61,7 @@ export default class ImagePopCard extends React.Component<ImagePopCardProps, Ima
 
 interface CopyListProps {
   addressList: string[];
+  inputShow: boolean
 }
 
 interface CopyListState {
@@ -93,10 +94,12 @@ class CopyList extends React.Component<CopyListProps, CopyListState> {
   render() {
     return (
       <div>
+        { this.props.inputShow &&
         <input
           style={{ position: 'absolute', opacity: 0, height: 0 }}
           id={styles.input}
         />
+        }
         {
           this.props.addressList.map(address => {
             return (<div key={address} className={styles.CopyList}>
