@@ -63,6 +63,17 @@
         & > * {
           margin-right: @padding-base;
         }
+        .undo {
+          padding: 0 @padding-base;
+        }
+        .redo {
+          padding: 0 @padding-base;
+          :global {
+            .tenx-icon {
+              transform: scaleX(-1);
+            }
+          }
+        }
       }
       .toolZoom {
         position: absolute;
