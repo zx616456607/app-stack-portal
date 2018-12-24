@@ -14,7 +14,7 @@
 
 import React from 'react'
 import { connect } from 'dva'
-import { Spin } from 'antd'
+import { Spin, notification } from 'antd'
 import cloneDeep from 'lodash/cloneDeep'
 import isEmpty from 'lodash/isEmpty'
 import Metric from '@tenx-ui/monitorChart'
@@ -25,7 +25,6 @@ import {
   UPDATE_INTERVAL, FRESH_FREQUENCY, REALTIME_INTERVAL,
 } from '../../../utils/constants'
 import styles from '../style/Monitor.less'
-import { notification } from "antd/lib/index";
 
 const sourceTypeArray = [
   METRICS_CPU, METRICS_MEMORY, METRICS_NETWORK_TRANSMITTED,
