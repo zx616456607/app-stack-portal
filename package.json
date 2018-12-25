@@ -46,7 +46,7 @@
     "@tenx-ui/time-hover": "^1.1.3",
     "@tenx-ui/webSocket": "^1.1.2",
     "@tenx-ui/xterm": "^0.0.1",
-    "antd": "3.10.7",
+    "antd": "^3.11.6",
     "babel-plugin-dva-hmr": "^0.4.1",
     "babel-plugin-import": "^1.6.6",
     "babel-plugin-transform-react-remove-prop-types": "^0.4.13",
