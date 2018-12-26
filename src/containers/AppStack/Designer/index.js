@@ -17,18 +17,12 @@ import { connect } from 'dva'
 import * as joint from 'jointjs'
 import 'jointjs/dist/joint.css'
 import graphlib from 'graphlib'
-import TenxEditor from '@tenx-ui/editor'
-import '@tenx-ui/editor/assets/index.css'
-import 'brace/mode/yaml'
-import 'brace/snippets/yaml'
-import 'brace/theme/chrome'
 import { confirm } from '@tenx-ui/modal'
 import {
-  Button, notification, Slider, Icon, Row, Col, Tabs, Modal, Form, Input,
+  Button, notification, Slider, Icon, Row, Col, Modal, Form, Input,
 } from 'antd'
 import classnames from 'classnames'
 // import $ from 'jquery'
-import Dock from 'react-dock'
 import yamlParser from 'js-yaml'
 import {
   AppC as AppIcon,
@@ -41,10 +35,10 @@ import './style/joint-custom.less'
 import './shapes'
 import Hotkeys from 'react-hot-keys'
 import { getDeepValue } from '../../../utils/helper'
+import YamlDock from './YamlDock'
 
 const isProd = process.env.NODE_ENV === 'production'
 
-const TabPane = Tabs.TabPane
 const FormItem = Form.Item
 
 const SIDER_WIDTH = isProd ? 0 : 200
@@ -131,7 +125,6 @@ const RESOURCE_LIST = [
     title: '安全组',
   },
 ]
-const DOCK_DEFAULT_HEADER_SIZE = 42
 const APP_STACK_LOCAL_STORAGE_KEY = '_app_stack_graph'
 
 const mapStateToProps = state => {
@@ -150,8 +143,7 @@ inputs: []`,
     createBtnLoading: false,
     paperScale: 1,
     yamlDockVisible: false,
-    yamlDockSize: 340,
-    yamlEditorTabKey: 'template',
+    yamlDockSize: null,
     saveStackModal: false,
     saveStackBtnLoading: false,
     idShortIdMap: {},
@@ -167,8 +159,6 @@ inputs: []`,
 
   yarmlEditor = undefined
 
-  yaml2GraphTimeout = undefined
-
   componentDidMount() {
     window.addEventListener('beforeunload', this.handleWindowClose)
   }
@@ -180,10 +170,6 @@ inputs: []`,
     })
     window.removeEventListener('beforeunload', this.handleWindowClose)
     this._saveGraphObj2LS()
-  }
-
-  componentDidCatch(error, info) {
-    console.warn('AppStackDesigner componentDidCatch', error, info)
   }
 
   handleWindowClose = () => {
@@ -608,18 +594,6 @@ inputs: []`,
     }
   }
 
-  onTemplateYamlChange = templateYamlStr => {
-    this.setState({ templateYamlStr })
-    clearTimeout(this.yaml2GraphTimeout)
-    this.yaml2GraphTimeout = setTimeout(() => this.yaml2Graph(templateYamlStr), 300);
-  }
-
-  onInputYamlChange = inputYamlStr => {
-    this.setState({ inputYamlStr })
-    clearTimeout(this.yaml2GraphTimeout)
-    this.yaml2GraphTimeout = setTimeout(() => this.yaml2Graph(null, inputYamlStr), 300);
-  }
-
   handlePaperScale = type => {
     let { paperScale } = this.state
     switch (type) {
@@ -770,8 +744,9 @@ inputs: []`,
     const { form, templateDetail } = this.props
     const { getFieldDecorator } = form
     const {
-      yamlDockSize, yamlDockVisible, paperScale, yamlEditorTabKey,
+      yamlDockSize, yamlDockVisible, paperScale,
       saveStackModal, saveStackBtnLoading, redoList,
+      templateYamlStr, inputYamlStr,
     } = this.state
     const FormItemLayout = {
       labelCol: {
@@ -810,20 +785,6 @@ inputs: []`,
                       // Add the target element's id to the data transfer object
                       ev.dataTransfer.setData('text/plain', id)
                       ev.dropEffect = 'move'
-                      // console.warn('onDrop ev', ev)
-                      // console.warn('ev.screenX', ev.screenX)
-                      // console.warn('ev.screenY', ev.screenY)
-                      // console.warn('ev.pageX', ev.pageX)
-                      // console.warn('ev.pageY', ev.pageY)
-                      // console.warn('ev.clientX', ev.clientX)
-                      // console.warn('ev.clientY', ev.clientY)
-                      // console.warn('ev.movementX', ev.movementX)
-                      // console.warn('ev.movementY', ev.movementY)
-                      // console.warn('ev.target', ev.target)
-                      // console.warn('ev.dropTarget', ev.dropTarget)
-                      // console.warn('ev.target offset', $(ev.target).offset())
-                      // console.warn('ev.target.offsetHeight', ev.target.offsetHeight)
-                      // console.warn('ev.target.offsetY', ev.target.offsetY)
                     }}
                     className={classnames({ [styles.enabled]: enabled })}
                   >
@@ -939,69 +900,17 @@ inputs: []`,
               </div>
             </div>
           </div>
-          <Dock
-            fluid={false}
-            size={yamlDockSize}
-            isVisible={yamlDockVisible}
-            position="bottom"
-            dimMode="none"
-            onSizeChange={dockSize => {
-              if (dockSize < DOCK_DEFAULT_HEADER_SIZE) return
-              this.setState({ yamlDockSize: dockSize }, () => {
-                this.yarmlEditor.resize()
-              })
+          <YamlDock
+            visible={yamlDockVisible}
+            onVisibleChange={visible => this.setState({ yamlDockVisible: visible })}
+            onTabChange={this.onYamlTabChange}
+            onSizeChange={size => this.setState({ yamlDockSize: size })}
+            onYamlChange={({ templateYamlStr: template, inputYamlStr: input }) => {
+              this.setState({ templateYamlStr: template, inputYamlStr: input })
+              this.yaml2Graph(template, input)
             }}
-          >
-            <div className={styles.yamlEditor}>
-              <div className={styles.yamlEditorHeader}>
-                <Tabs
-                  activeKey={yamlEditorTabKey}
-                  onChange={this.onYamlTabChange}
-                  tabBarExtraContent={<div className={styles.yamlEditorHeaderBtns}>
-                    <Button type="dashed" icon="search" />
-                    <Button
-                      type="dashed"
-                      icon="minus"
-                      onClick={() => this.setState({ yamlDockVisible: false })}
-                    />
-                    {/* <Button type="dashed" icon="arrows-alt" /> */}
-                  </div>}
-                >
-                  <TabPane tab="模版" key="template"></TabPane>
-                  <TabPane tab="输入" key="input"></TabPane>
-                  {/* <TabPane tab="输出" key="output"></TabPane> */}
-                </Tabs>
-              </div>
-              {
-                yamlEditorTabKey === 'template' &&
-                <TenxEditor
-                  name="app_stack_template"
-                  theme="chrome"
-                  fontSize={12}
-                  value={this.state.templateYamlStr}
-                  onChange={this.onTemplateYamlChange}
-                  onLoad={editor => {
-                    editor.$blockScrolling = Infinity
-                    this.yarmlEditor = editor
-                  }}
-                />
-              }
-              {
-                yamlEditorTabKey === 'input' &&
-                <TenxEditor
-                  name="app_stack_input"
-                  theme="chrome"
-                  fontSize={12}
-                  value={this.state.inputYamlStr}
-                  onChange={this.onInputYamlChange}
-                  onLoad={editor => {
-                    editor.$blockScrolling = Infinity
-                    this.yarmlEditor = editor
-                  }}
-                />
-              }
-            </div>
-          </Dock>
+            value={{ templateYamlStr, inputYamlStr }}
+          />
           <Modal
             title="保存堆栈模板"
             okText="确认保存"
