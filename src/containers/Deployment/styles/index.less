@@ -8,7 +8,16 @@
  * @date Friday November 9th 2018
  */
  @import '../../../assets/style/core/index.less';
-.icon {
+ .iconWarpper {
+   display: flex;
+ }
+ .osIcon {
+  margin-left: 5px;
+  svg path {
+    fill: white;
+  }
+}
+.icon, .osIcon {
   display: flex;
   margin-top: 4px;
   height: 16px;
