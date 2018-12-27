@@ -172,7 +172,7 @@ export function getStatefulSetStatus(_service) {
     phase,
     updatedReplicas,
     observedGeneration,
-    readyReplicas,
+    readyReplicas = 0,
   } = status
   const { updateStrategy = {} } = service.spec || {}
   if (status.replicas > specReplicas && updateStrategy.type === 'RollingUpdate') {
@@ -202,7 +202,8 @@ export function getStatefulSetStatus(_service) {
   /* if (uncurrentReplicas > 0 && (!currentReplicas || currentReplicas < replicas)) {
     status.phase = 'Pending'
   } */
-  if (specReplicas > 0 && currentReplicas < 1) {
+  if ((specReplicas > 0 && currentReplicas < 1) ||
+    (currentReplicas > 0 && readyReplicas === 0)) {
     status.uncurrentReplicas = specReplicas
     status.phase = 'Pending'
     return status

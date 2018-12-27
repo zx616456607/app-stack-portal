@@ -8,6 +8,5 @@ WORKDIR /usr/src/app
 
 # Install dependencies modules
 RUN npm set registry http://192.168.1.3:4873
-RUN npm i yarn -g
 COPY package.json /usr/src/app/
 RUN yarn && rm -f package.json

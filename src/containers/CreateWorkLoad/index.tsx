@@ -85,6 +85,21 @@ class CreateWorkLoad extends React.Component<CreateWorkLoadProps, CreateWorkLoad
       this.props.dispatch({ type: 'createNative/updateYamlValue', payload: { yamlValue: '' } })
     }
   }
+  composeFileCreate = async () => {
+    const { location: { search }  } = this.props
+    const config = queryString.parse(search)
+    const templateid = config.templateid || false
+    if (!templateid) { return }
+    const payload = { id: templateid  }
+    let res
+    try {
+      res = await this.props.dispatch({ type: 'createNative/loadStackDetail', payload })
+    } catch (e) {
+      return notification.warn({ message: '加载编排文件详情失败', description: '' })
+    }
+    const content = getDeepValue(res, [ 'data', 'content' ])
+    this.props.dispatch({ type: 'createNative/updateYamlValue', payload: { yamlValue: content } })
+  }
   async componentDidMount() {
     const { location: { search }  } = this.props
     const config = queryString.parse(search)
@@ -102,6 +117,7 @@ class CreateWorkLoad extends React.Component<CreateWorkLoadProps, CreateWorkLoad
         },
       })
     }
+    this.composeFileCreate()
     if (!config.name || !config.type) { return } // 如果参数不全, 直接返回
     const payload = { cluster: this.props.cluster, type: config.type, name: config.name }
     try {
@@ -138,14 +154,14 @@ class CreateWorkLoad extends React.Component<CreateWorkLoadProps, CreateWorkLoad
           history.back()
         }, 600)
       } catch (e) {
-        const { code, reason } = e.response
+        const { code, reason, message } = e.response
         if (code === 409 && reason === 'AlreadyExists') {
           return notification.warn({ message: '该资源已经存在', description: reason })
         }
         if (code === 500) {
           return notification.warn({ message: 'yaml格式错误', description: reason })
         }
-        notification.warn({ message: '创建失败', description: reason })
+        notification.warn({ message: '创建失败', description: message })
       }
       return
     }
@@ -163,11 +179,11 @@ class CreateWorkLoad extends React.Component<CreateWorkLoadProps, CreateWorkLoad
           history.back()
         }, 600)
       } catch (e) {
-        const { code, reason } = e.response
+        const { code, message } = e.response
         if (code === 500) {
           return notification.warn({ message: 'yaml格式错误', description: '' })
         }
-        notification.success({ message: '更新失败', description: reason })
+        notification.success({ message: '更新失败', description: message })
       }
     }
   }

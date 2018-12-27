@@ -114,8 +114,8 @@ class ImportComposeFile extends React.Component<FileProps, FileState> {
               <Radio.Group
                 onChange={(e) => this.reloadOptionArray(e.target.value)}
               >
-                <Radio value="private">私有</Radio>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<Radio value="public">公有</Radio>
+                <Radio value="private">我的编排</Radio>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<Radio value="public">公共编排</Radio>
               </Radio.Group>)}
           </FormItem>
           <FormItem label="选择编排" {...formItemLayout} colon={false}>

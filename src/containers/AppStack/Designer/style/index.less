@@ -63,6 +63,17 @@
         & > * {
           margin-right: @padding-base;
         }
+        .undo {
+          padding: 0 @padding-base;
+        }
+        .redo {
+          padding: 0 @padding-base;
+          :global {
+            .tenx-icon {
+              transform: scaleX(-1);
+            }
+          }
+        }
       }
       .toolZoom {
         position: absolute;
@@ -97,32 +108,6 @@
         right: @padding-small;
         border: 1px solid @border-color-split;
         border-radius: @border-radius-base;
-      }
-    }
-  }
-}
-@yamlEditorHeaderHeight: 42px;
-.yamlEditor {
-  height: 100%;
-  .yamlEditorHeader {
-    height: @yamlEditorHeaderHeight;
-    .yamlEditorHeaderBtns {
-      & > *:not(:last-child) {
-        margin-right: @padding-base;
-      }
-      :global {
-        .ant-btn {
-          border: none;
-        }
-      }
-    }
-  }
-  :global {
-    .codeEditor {
-      height: calc(~"100% - @{yamlEditorHeaderHeight}");
-      .codeEditorHeader {
-        display: none;
-        border-radius: 0;
       }
     }
   }

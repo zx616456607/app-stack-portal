@@ -122,7 +122,7 @@ class SampleInner extends React.Component<SampleProps, SampleState> {
     const config = queryString.parse(search)
     const filterResource = [ 'Deployment', 'StatefulSet', 'Job', 'CronJob' ]
     if (filterResource.includes(config.type)) {
-      this.setState({ value: config.type })
+      this.setState({ value: [config.type] })
     }
     const payload = { cluster: this.props.cluster }
     const istioEnable =
@@ -308,8 +308,18 @@ class SampleNodeInner extends React.Component<SampleNodeProps, any> {
     if (id === 5) {
       yamlJson.forEach((singleValue) => {
         const annotations = getDeepValue(singleValue, [ 'metadata', 'annotations' ]) || {}
-        const newAnnotations = Object.assign({}, annotations, contentObj.metadata.annotations )
-        singleValue.metadata.annotations = newAnnotations
+        const kind = getDeepValue(singleValue, ['kind'])
+        const otherKind = getDeepValue(singleValue, ['spec', 'template'])
+        let newAnnotations = {}
+        if (kind === 'Pod') {
+          newAnnotations = Object.assign({}, annotations, contentObj.metadata.annotations )
+          singleValue.metadata.annotations = newAnnotations
+        } else if (otherKind !== null) {
+          const tannotations =
+          getDeepValue(singleValue, [ 'spec', 'template', 'metadata', 'annotations' ]) || {}
+          newAnnotations = Object.assign({}, tannotations, contentObj.metadata.annotations )
+          singleValue.spec.template.metadata.annotations = newAnnotations
+        }
       })
       const newPayload = { yamlValue: dumpArray(yamlJson) }
       this.props.dispatch({ type: 'createNative/updateYamlValue', payload: newPayload })
@@ -340,10 +350,14 @@ class SampleNodeInner extends React.Component<SampleNodeProps, any> {
           <div className={styles.SampleNode}>
             <div className={styles.nodeTitle}>
               <div>{`${index}. ${dataNode.opt_name}`}</div>
-              <div className={disableButton} onClick={() => this.onClickNode(dataNode)}>
+              <div className={disableButton}>
               {
                 inserNodeFlage &&
-                <div className={disable ? styles.insert : styles.disable}><InsertIcon/>插入</div>
+                <div
+                  className={disable ? styles.insert : styles.disable}
+                  onClick={() => this.onClickNode(dataNode)}
+                ><InsertIcon/>插入
+                </div>
               }{
                 explainFlage &&
                 <div className={styles.info}>（未开启服务网格）</div>
@@ -544,11 +558,13 @@ function selectIcon(type: string = '') {
 // 根据id去掉重复项
 // 创建id优先排在前面
 const createId = [ 12, 10, 11, 9 ]
+const filterId = [1, 2, 3, 4] // 去掉不需要的操作
 function uniqById (nodes: Node[]) {
   const idArray = [] as number[]
   const nodeArray = [] as Node[]
   const createArray: Node[] = []
   nodes.forEach((node) => {
+    if (filterId.includes(node.id)) { return }
     if (!idArray.includes(node.id)) {
       idArray.push(node.id)
       if (createId.includes(node.id)) {

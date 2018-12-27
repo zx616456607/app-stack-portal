@@ -12,6 +12,7 @@ import RelationChart from '@tenx-ui/relation-chart'
 import { connect } from 'dva'
 import { getDeepValue } from '../../../../../utils/helper'
 import Detail from './detail'
+import { findDOMNode } from 'react-dom';
 
 const config = {
   rankdir: 'LR',
@@ -110,6 +111,8 @@ function formateEdgesAndNodes(appStack: any, onClick: (lname: string, e: any) =>
 
 @connect(mapStateToProps)
 export default class ResourceTopology extends React.Component<RTProps, RTState> {
+  relationChart: React.ReactDOM
+  fullScreen: boolean
   state = {
     nodeArray: [],
     edgesArray: [],
@@ -185,14 +188,26 @@ export default class ResourceTopology extends React.Component<RTProps, RTState> 
         graphConfigs={config}
         nodes={this.state.nodeArray}
         edges={this.state.edgesArray}
-        SvgHeight={'420px'}
+        SvgHeight={'800px'}
         onSvgClick={this.onRelationChartClick}
+        ref={(node) => this.relationChart = node}
+        fullScreenMode={(full) => this.fullScreen = full}
       >
+      { !this.fullScreen &&
         <Detail
           isVisible={this.state.isVisible}
           cancelDock={this.cancelDock}
           pods={this.state.pods}
         />
+      }{
+        this.fullScreen &&
+        <Detail
+          isVisible={this.state.isVisible}
+          cancelDock={this.cancelDock}
+          pods={this.state.pods}
+          getContainer={findDOMNode(this.relationChart)}
+        />
+      }
       </RelationChart>
     )
   }
