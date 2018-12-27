@@ -28,7 +28,30 @@ export default class YamlTab extends React.PureComponent {
 
   render() {
     const { data, type } = this.props
-    const value = { apiVersion: 'apps/v1', kind: type, ...data }
+    let apiVersion = ''
+    switch (type) {
+      case 'CronJob':
+        apiVersion = 'batch/v1beta1'
+        break
+      case 'Deployment':
+        apiVersion = 'apps/v1'
+        break
+      case 'Job':
+        apiVersion = 'batch/v1'
+        break
+      case 'Pod':
+        apiVersion = 'Core/v1'
+        break
+      case 'StatefulSet':
+        apiVersion = 'apps/v1'
+        break
+      case 'Service':
+        apiVersion = 'v1'
+        break
+      default:
+        break
+    }
+    const value = { apiVersion, kind: type, ...data }
     return (
       <div style={{ height: 500 }} >
         <TenxEditor
