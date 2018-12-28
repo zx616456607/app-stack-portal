@@ -28,6 +28,10 @@ const options = {
       strokeWidth: 1,
     },
   },
+  _link_rules: {
+    required: false,
+    types: [ 'devs.Service', 'devs.ConfigMap' ],
+  },
   _app_stack_template: {
     apiVersion: 'extensions/v1beta1',
     kind: 'Deployment',

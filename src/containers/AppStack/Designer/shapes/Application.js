@@ -28,6 +28,10 @@ const options = {
       strokeWidth: 1,
     },
   },
+  _link_rules: {
+    required: false,
+    types: [],
+  },
   _app_stack_template: {
     apiVersion: 'v1',
     kind: 'Application',

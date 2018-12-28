@@ -22,6 +22,8 @@ import yamlParser from 'js-yaml'
 import styles from './style/index.less'
 import { addAppStackLabelsForResource } from './utils'
 import cloneDeep from 'lodash/cloneDeep'
+import { getDeepValue } from '../../../../utils/helper'
+import * as _builtInFunction from '../../Designer/shapes/_builtInFunction'
 
 const FormItem = Form.Item
 const { TextArea } = Input
@@ -196,11 +198,12 @@ class StackTemplateDeploy extends React.Component {
           if (!value) {
             return
           }
-          if (value.get_input) {
-            template[key] = values[`${id}-${value.get_input}`]
+          const inputValue = value.get_input || value.get_inmap
+          if (inputValue) {
+            template[key] = values[`${id}-${inputValue}`]
             // if undefined, find parent input value
-            if (template[key] === undefined) {
-              template[key] = values[`${parentId}-${value.get_input}`]
+            if (template[key] === undefined && parentId) {
+              template[key] = values[`${parentId}-${inputValue}`]
             }
             return
           }
@@ -208,6 +211,42 @@ class StackTemplateDeploy extends React.Component {
             _relaceInput2Value(value, id, parentId)
           }
         })
+      }
+      const _relaceGetAttribute2Value = template => {
+        const _replace = _template => {
+          Object.entries(_template).forEach(([ key, value ]) => {
+            if (!value) {
+              return
+            }
+            const attributePath = value.get_attribute
+            if (attributePath) {
+              _template[key] = getDeepValue(template, attributePath)
+              return
+            }
+            if (typeof value === 'object') {
+              _replace(value)
+            }
+          })
+        }
+        _replace(template)
+      }
+      const _relaceGetBuildInFuntion2Value = template => {
+        const _replace = _template => {
+          Object.entries(_template).forEach(([ key, value ]) => {
+            if (!value) {
+              return
+            }
+            const _builtInFuncName = value.get_by_build_in_function
+            if (_builtInFuncName) {
+              _template[key] = _builtInFunction[_builtInFuncName](template)
+              return
+            }
+            if (typeof value === 'object') {
+              _replace(value)
+            }
+          })
+        }
+        _replace(template)
       }
       let cells = templateContent._graph.cells
       // filter deploy to k8s ignore shapes: Application
@@ -219,13 +258,19 @@ class StackTemplateDeploy extends React.Component {
             _app_stack_template = [ _app_stack_template ]
           }
           _app_stack_template.forEach(template => {
-            _relaceInput2Value(template, _shortId, this._idShort(parent))
             addAppStackLabelsForResource(name, template)
+            // replace get_input, get_inmap to value
+            _relaceInput2Value(template, _shortId, parent && this._idShort(parent))
+            // replace get_attribute to value
+            _relaceGetAttribute2Value(template)
+            // replace get_by_build_in_function to value
+            _relaceGetBuildInFuntion2Value(template)
             // remove undefined value
             k8sManifest.push(JSON.parse(JSON.stringify(template)))
           })
         }
       })
+      // console.log('k8sManifest', JSON.stringify(k8sManifest, null, 2))
 
       try {
         await deployAppstack({

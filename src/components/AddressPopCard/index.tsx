@@ -34,15 +34,18 @@ export default class AddressPopCard extends React.Component<AddressPopCardProps,
       show: !show,
     })
   }
+  onClick = (e) => {
+    e.stopPropagation()
+  }
   render() {
     return (
-      <div className="AddressPopCard">
+      <div className="AddressPopCard" onClick={this.onClick}>
       {
         this.props.addressList.length === 0 ?
         <span>-</span> :
         <Popover
           placement="right"
-          content={<CopyList addressList={this.props.addressList}/>}
+          content={<CopyList addressList={this.props.addressList} inputShow={this.state.show}/>}
           trigger="click"
           onVisibleChange={this.showPop}
           arrowPointAtCenter
@@ -59,6 +62,7 @@ export default class AddressPopCard extends React.Component<AddressPopCardProps,
 
 interface CopyListProps {
   addressList: AddressNode[];
+  inputShow: boolean
 }
 
 interface CopyListState {
@@ -69,8 +73,9 @@ class CopyList extends React.Component<CopyListProps, CopyListState> {
   state = {
     copyStatus: false,
   }
+  inputID = Math.random()
   copyCode = (e) => {
-    const code = document.getElementById(styles.input)
+    const code = document.getElementById('__AddressPopCardInput')
     code.select();
     document.execCommand('Copy', false);
     this.setState({
@@ -78,7 +83,7 @@ class CopyList extends React.Component<CopyListProps, CopyListState> {
     });
   }
   startCopyCode = (address) => {
-    const code = document.getElementById(styles.input)
+    const code = document.getElementById('__AddressPopCardInput')
     code.value = address;
   }
   returnDefaultTooltip = () => {
@@ -91,10 +96,11 @@ class CopyList extends React.Component<CopyListProps, CopyListState> {
   render() {
     return (
       <div>
+        { this.props.inputShow &&
         <input
           style={{ position: 'absolute', opacity: 0, height: 0 }}
-          id={styles.input}
-        />
+          id="__AddressPopCardInput"
+        />}
         {
           this.props.addressList.map(({ name: address, protocol }) => {
             return (<div key={address} className={styles.CopyList}>
