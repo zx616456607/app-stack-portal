@@ -112,12 +112,14 @@ export default class YamlDock extends React.PureComponent {
                 type="dashed"
                 icon="question-circle"
                 onClick={this.handle}
+                shape="circle"
               />
-              <Button type="dashed" icon="search" />
+              <Button type="dashed" icon="search" shape="circle" />
               <Button
                 type="dashed"
                 icon="minus"
                 onClick={() => onVisibleChange(false)}
+                shape="circle"
               />
               {/* <Button type="dashed" icon="arrows-alt" /> */}
             </div>}

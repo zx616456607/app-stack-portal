@@ -50,8 +50,8 @@ const SUPPORT_WORK_LOAD = [ 'Deployment', 'Service', 'StatefulSet', 'Job', 'Cron
         uid,
         resource: <React.Fragment>
           <Row className={styles.resourceLine}>
-            <Col span="8">CPU:</Col>
-            <Col span="16">{
+            <Col span={8}>CPU:</Col>
+            <Col span={16}>{
               cpuFormat(
                 getDeepValue(spec, 'template.spec.containers.0.resources.requests.memory'.split('.')),
                 getDeepValue(spec, 'template.spec.containers.0.resources'.split('.'))
@@ -59,8 +59,8 @@ const SUPPORT_WORK_LOAD = [ 'Deployment', 'Service', 'StatefulSet', 'Job', 'Cron
             }</Col>
           </Row>
           <Row className={styles.resourceLine}>
-            <Col span="8">内存:</Col>
-            <Col span="16">{
+            <Col span={8}>内存:</Col>
+            <Col span={16}>{
               memoryFormat(getDeepValue(spec, 'template.spec.containers.0.resources'.split('.'))) || '-'
             }</Col>
           </Row>

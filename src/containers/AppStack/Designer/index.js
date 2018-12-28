@@ -29,6 +29,7 @@ import {
   ServiceC as ServiceIcon,
   ConfigmapC as ConfigmapIcon,
   FatArrowLeft as FatArrowLeftIcon,
+  ClusterMeshPort as ClusterMeshPortIcon,
 } from '@tenx-ui/icon'
 import styles from './style/index.less'
 import './style/joint-custom.less'
@@ -62,6 +63,12 @@ const RESOURCE_LIST = [
     id: 'ConfigMap',
     icon: <ConfigmapIcon />,
     title: 'ConfigMap',
+    enabled: true,
+  },
+  {
+    id: 'LBgroup',
+    icon: <ClusterMeshPortIcon />,
+    title: '集群网络出口',
     enabled: true,
   },
   {
@@ -108,11 +115,6 @@ const RESOURCE_LIST = [
     id: 'service-8',
     icon: <Icon type="appstore" />,
     title: '应用负载均衡·集群外',
-  },
-  {
-    id: 'service-9',
-    icon: <Icon type="appstore" />,
-    title: '集群网络出口',
   },
   {
     id: 'service-10',
@@ -224,7 +226,20 @@ inputs: []`,
       // when number of mousemove events exceeds the clickThreshold there is
       // no pointerclick event triggered after mouseup. It defaults to 0.
       clickThreshold: 5,
-      defaultConnectionPoint: { name: 'boundary' },
+      defaultConnectionPoint: {
+        name: 'boundary',
+      },
+      defaultAnchor: {
+        name: 'center',
+      },
+      // defaultLink: new joint.shapes.standard.Link({
+      defaultLink: new joint.dia.Link({
+        connector: { name: 'rounded' },
+        smooth: true,
+      }),
+      defaultRouter: {
+        name: 'manhattan',
+      },
       highlighting: {
         default: {
           name: 'stroke',
@@ -242,7 +257,14 @@ inputs: []`,
       interactive: { arrowheadMove: false },
       allowLink(linkView, paper) {
         const graph = paper.model
-        return graphlib.alg.findCycles(graph.toGraphLib()).length === 0;
+        const { source: { id: sourceId }, target: { id: targetId } } = linkView.model.attributes
+        const isFindCycles = graphlib.alg.findCycles(graph.toGraphLib()).length > 0;
+        if (isFindCycles) {
+          return false
+        }
+        const source = graph.getCell(sourceId)
+        const target = graph.getCell(targetId)
+        return source.attributes._link_rules.types.indexOf(target.attributes.type) > -1
       },
       validateEmbedding: (childView, parentView) => {
         const isEmbedding = parentView.model instanceof joint.shapes.devs.Application
@@ -820,10 +842,10 @@ inputs: []`,
                   </Button>
                 </Button.Group>
                 <Button icon="delete" onClick={this.clearGraph}>
-                清空设计
+                  清空设计
                 </Button>
                 <Button icon="layout" onClick={this.layout} disabled>
-                自动布局
+                  自动布局
                 </Button>
                 <Button
                   icon="gateway"
@@ -838,7 +860,7 @@ inputs: []`,
                   }}
                   disabled
                 >
-                适应屏幕
+                  适应屏幕
                 </Button>
                 <Button icon="save" onClick={() => this.setState({ saveStackModal: true })}>
                   {
@@ -849,7 +871,7 @@ inputs: []`,
                   icon="deployment-unit"
                   onClick={() => this.setState({ yamlDockVisible: !yamlDockVisible })}
                 >
-                完善编排
+                  完善编排
                 </Button>
               </div>
               <div className={styles.toolZoom}>
