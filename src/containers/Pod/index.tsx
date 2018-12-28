@@ -48,32 +48,29 @@ function getColumns(self): Array<any> {
       const { os, arch } = record
       let osEle
       if (os === 'windows') {
-        osEle = <span  className={styles.osIcon} style={{ lineHeight: '16px', backgroundColor: '#2db7f5' }} >
+        osEle = <span  className={styles.osIcon}>
           <Tooltip title="Windows">
             <TenxIcon
               type="windows"
-              style={{ color: '#2db7f5', height: '16px', width: '16px' }}
               className="meshIcon"
             />
           </Tooltip>
         </span>
       } else if (os === 'linux') {
         if (arch === 'amd64') {
-          osEle = <span  className={styles.osIcon} style={{ lineHeight: '16px', backgroundColor: '#2db7f5' }} >
+          osEle = <span  className={styles.osIcon}>
             <Tooltip title="Linux">
               <TenxIcon
                 type="Linux"
-                style={{ color: '#2db7f5', height: '16px', width: '16px' }}
                 className="meshIcon"
               />
             </Tooltip>
           </span>
         } else if (arch === 'arm64') {
-          osEle = <span  className={styles.osIcon} style={{ lineHeight: '16px', backgroundColor: '#2db7f5' }} >
+          osEle = <span  className={styles.osIcon}>
             <Tooltip title="Arm">
               <TenxIcon
                 type="Arm"
-                style={{ color: '#2db7f5', height: '16px', width: '16px' }}
                 className="meshIcon"
               />
             </Tooltip>
