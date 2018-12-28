@@ -19,7 +19,7 @@ import 'brace/snippets/yaml'
 import 'brace/theme/chrome'
 import Dock from 'react-dock'
 import {
-  Button, Tabs,
+  Button, Tabs, Tooltip,
 } from 'antd'
 import styles from './style/YamlDock.less'
 
@@ -102,19 +102,26 @@ export default class YamlDock extends React.PureComponent {
         })
       }}
     >
-      <div className={styles.yamlEditor}>
+      <div id="yaml-dock" className={styles.yamlEditor}>
         <div className={styles.yamlEditorHeader}>
           <Tabs
             activeKey={tabKey}
             onChange={this.onTabChange}
             tabBarExtraContent={<div className={styles.yamlEditorHeaderBtns}>
-              <Button
-                type="dashed"
-                icon="question-circle"
-                onClick={this.handle}
-                shape="circle"
-              />
-              <Button type="dashed" icon="search" shape="circle" />
+              <Tooltip
+                title="画布设计仅为辅助作用，您可编辑堆栈内编排字段（如修改默认值等），灵活调整画布视图，并完善编排以确保与画布表示一致"
+                placement="topRight"
+                getTooltipContainer={() => document.getElementById('yaml-dock')}
+                arrowPointAtCenter
+              >
+                <Button
+                  type="dashed"
+                  icon="question-circle"
+                  // onClick={this.handle}
+                  shape="circle"
+                />
+              </Tooltip>
+              {/* <Button type="dashed" icon="search" shape="circle" /> */}
               <Button
                 type="dashed"
                 icon="minus"

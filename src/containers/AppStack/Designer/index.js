@@ -20,6 +20,7 @@ import graphlib from 'graphlib'
 import { confirm } from '@tenx-ui/modal'
 import {
   Button, notification, Slider, Icon, Row, Col, Modal, Form, Input,
+  Tooltip,
 } from 'antd'
 import classnames from 'classnames'
 // import $ from 'jquery'
@@ -151,6 +152,7 @@ inputs: []`,
     idShortIdMap: {},
     undoList: [],
     redoList: [],
+    yamlBtnTipVisible: false,
   }
 
   editMode = this.props.match.path === '/app-stack/designer/:name/edit'
@@ -162,6 +164,10 @@ inputs: []`,
   yarmlEditor = undefined
 
   componentDidMount() {
+    const { dispatch } = this.props
+    dispatch({
+      type: 'appStack/clearAppStackTemplateDetail',
+    })
     window.addEventListener('beforeunload', this.handleWindowClose)
   }
 
@@ -197,6 +203,9 @@ inputs: []`,
   }
 
   initDesigner = () => {
+    this.setState({
+      yamlBtnTipVisible: true,
+    })
     this.paperDom = document.getElementById('app-stack-paper')
     this.navigatorDom = document.getElementById('app-stack-paper-navigator')
     this.graph = new joint.dia.Graph()
@@ -797,7 +806,7 @@ inputs: []`,
     const {
       yamlDockSize, yamlDockVisible, paperScale,
       saveStackModal, saveStackBtnLoading, redoList,
-      templateYamlStr, inputYamlStr,
+      templateYamlStr, inputYamlStr, yamlBtnTipVisible,
     } = this.state
     const FormItemLayout = {
       labelCol: {
@@ -896,12 +905,21 @@ inputs: []`,
                     this.editMode ? '保存更新' : '保存并提交'
                   }
                 </Button>
-                <Button
-                  icon="deployment-unit"
-                  onClick={() => this.setState({ yamlDockVisible: !yamlDockVisible })}
+                <Tooltip
+                  title="请完善堆栈，确保与画布设计表示一致"
+                  placement="right"
+                  visible={yamlBtnTipVisible}
                 >
-                  完善编排
-                </Button>
+                  <Button
+                    icon="deployment-unit"
+                    onClick={() => this.setState({
+                      yamlDockVisible: !yamlDockVisible,
+                      yamlBtnTipVisible: false,
+                    })}
+                  >
+                    完善堆栈
+                  </Button>
+                </Tooltip>
               </div>
               <div className={styles.toolZoom}>
                 <Button

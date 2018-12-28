@@ -6,7 +6,7 @@
 /**
  * StackTemplateDeploy
  *
- * @author zhouhaitao
+ * @author zhouhaitao,zhangpc
  * @date 2018-11-23
  */
 
@@ -23,6 +23,7 @@ import yamlParser from 'js-yaml'
 import styles from './style/index.less'
 import { addAppStackLabelsForResource } from './utils'
 import cloneDeep from 'lodash/cloneDeep'
+import _set from 'lodash/set'
 import { getDeepValue } from '../../../../utils/helper'
 import * as _builtInFunction from '../../Designer/shapes/_builtInFunction'
 
@@ -241,8 +242,8 @@ class StackTemplateDeploy extends React.Component {
 
   appStackStart = () => {
     const { form, deployAppstack, cluster, history } = this.props
-    const { validateFields } = form
-    validateFields(async (err, values) => {
+    const { validateFieldsAndScroll } = form
+    validateFieldsAndScroll(async (err, values) => {
       if (err) {
         return
       }
@@ -306,16 +307,16 @@ class StackTemplateDeploy extends React.Component {
         }
         _replace(template)
       }
-      let cells = templateContent._graph.cells
-      // filter deploy to k8s ignore shapes: Application
-      cells = cells.filter(cell => cell._deploy_2_yaml === true)
-      cells.forEach(({ _app_stack_template, id, parent }) => {
+      // replate template values
+      templateContent._graph.cells.forEach(cell => {
+        const { _app_stack_template, id, parent } = cell
         const _shortId = this._idShort(id)
         if (_app_stack_template) {
+          let templates = cloneDeep(_app_stack_template)
           if (!Array.isArray(_app_stack_template)) {
-            _app_stack_template = [ _app_stack_template ]
+            templates = [ templates ]
           }
-          _app_stack_template.forEach(template => {
+          templates.forEach(template => {
             addAppStackLabelsForResource(name, template)
             // replace get_input, get_inmap to value
             _relaceInput2Value(template, _shortId, parent && this._idShort(parent))
@@ -323,12 +324,56 @@ class StackTemplateDeploy extends React.Component {
             _relaceGetAttribute2Value(template)
             // replace get_by_build_in_function to value
             _relaceGetBuildInFuntion2Value(template)
+          })
+          cell._app_stack_template = Array.isArray(_app_stack_template)
+            ? templates
+            : templates[0]
+        }
+      })
+      // patch template by link
+      const links = templateContent._graph.cells.filter(({ type }) => type === 'link')
+      templateContent._graph.cells.forEach(cell => {
+        const { _app_stack_template, id } = cell
+        if (_app_stack_template && _app_stack_template.method === 'patch') {
+          const needPatchCellsId = []
+          links.forEach(({ source: { id: sourceId }, target: { id: targetId } }) => {
+            if (id === sourceId) {
+              needPatchCellsId.push(targetId)
+            } else if (id === targetId) {
+              needPatchCellsId.push(sourceId)
+            }
+          })
+          _app_stack_template.metadata.body.forEach(({ patchPath, overwrite, data }) => {
+            templateContent._graph.cells.forEach(_cell => {
+              if (needPatchCellsId.indexOf(_cell.id) > -1) {
+                const patchPathPop = patchPath.slice(0, patchPath.length - 1)
+                if (!getDeepValue(_cell._app_stack_template, patchPathPop)) {
+                  return
+                }
+                const setData = overwrite
+                  ? data
+                  : Object.assign({}, getDeepValue(_cell._app_stack_template, patchPath), data)
+                _set(_cell._app_stack_template, patchPath, setData)
+              }
+            })
+          })
+        }
+      })
+      // add tempates to k8sManifest
+      templateContent._graph.cells.forEach(cell => {
+        const { _app_stack_template, _deploy_2_yaml } = cell
+        // filter deploy to k8s ignore shapes: Application, LBgroup
+        if (_deploy_2_yaml) {
+          let templates = cloneDeep(_app_stack_template)
+          if (!Array.isArray(_app_stack_template)) {
+            templates = [ templates ]
+          }
+          templates.forEach(template => {
             // remove undefined value
             k8sManifest.push(JSON.parse(JSON.stringify(template)))
           })
         }
       })
-      // console.log('k8sManifest', JSON.stringify(k8sManifest, null, 2))
 
       try {
         await deployAppstack({
