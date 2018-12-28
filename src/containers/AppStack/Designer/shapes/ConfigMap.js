@@ -20,7 +20,7 @@ const options = {
   outPorts: [ 'out' ],
   attrs: {
     '.label': {
-      text: 'ConfigMap',
+      text: '普通配置',
     },
     '.body': {
       rx: 6,

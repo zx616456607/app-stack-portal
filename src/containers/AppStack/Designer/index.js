@@ -63,7 +63,7 @@ const RESOURCE_LIST = [
   {
     id: 'ConfigMap',
     icon: <ConfigmapIcon />,
-    title: 'ConfigMap',
+    title: '服务配置·普通配置',
     enabled: true,
   },
   {
