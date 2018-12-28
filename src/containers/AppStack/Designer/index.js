@@ -680,6 +680,35 @@ inputs: []`,
         })
         return
       }
+      // check link
+      let linkCheckPassed = true
+      const links = _graph.cells.filter(({ type }) => type === 'link')
+      _graph.cells.every(cell => {
+        const { _link_rules, id } = cell
+        if (!_link_rules || !_link_rules.required) {
+          return true
+        }
+        let isLink = false
+        links.every(({ source: { id: sourceId }, target: { id: targetId } }) => {
+          if (sourceId === id || targetId === id) {
+            isLink = true
+            return false
+          }
+          return true
+        })
+        if (!isLink) {
+          linkCheckPassed = false
+          notification.warn({
+            message: _link_rules.message,
+          })
+          return false
+        }
+        return true
+      })
+      if (!linkCheckPassed) {
+        this.setState({ saveStackModal: false })
+        return
+      }
       this.setState({ saveStackBtnLoading: true })
       const { name } = body
       const { yamlObj } = this.state

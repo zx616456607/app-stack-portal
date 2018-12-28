@@ -14,6 +14,7 @@ import React from 'react'
 import QueueAnim from 'rc-queue-anim'
 import {
   Card, Form, Input, Collapse, Table, Button, notification, InputNumber,
+  Select,
 } from 'antd'
 import { Link } from 'react-router-dom'
 import { connect } from 'dva'
@@ -26,6 +27,7 @@ import { getDeepValue } from '../../../../utils/helper'
 import * as _builtInFunction from '../../Designer/shapes/_builtInFunction'
 
 const FormItem = Form.Item
+const Option = Select.Option
 const { TextArea } = Input
 const Panel = Collapse.Panel
 const formItemLayout = {
@@ -36,12 +38,14 @@ const formItemLayout = {
     sm: { span: 16, pull: 5 },
   },
 }
-const DEPLOY_2_K8S_IGNORE_SHAPES = [ 'devs.Application' ]
 
 @connect(state => {
   const { app: { cluster = '' } = {}, appStack, loading } = state
-  const { templateDetail } = appStack
-  return { cluster, templateDetail, loading }
+  const { templateDetail, appStackConfigs } = appStack
+  return {
+    cluster, templateDetail, loading,
+    appStackConfigs: appStackConfigs || {},
+  }
 }, dispatch => ({
   appStackTemplateDetail: name => dispatch({
     type: 'appStack/fetchAppStackTemplateDetail',
@@ -51,6 +55,10 @@ const DEPLOY_2_K8S_IGNORE_SHAPES = [ 'devs.Application' ]
     type: 'appStack/fetchDeployAppstack',
     payload,
   }),
+  getAppstackConfigs: payload => dispatch({
+    type: 'appStack/fetchAppstackConfigs',
+    payload,
+  }),
 }))
 class StackTemplateDeploy extends React.Component {
   state = {
@@ -58,6 +66,33 @@ class StackTemplateDeploy extends React.Component {
     templateInputs: {},
     collapseActiveKey: [],
     btnLoading: false,
+  }
+
+  getSelectOptions = ({ backend, configType }) => {
+    // @Todo: should support defined options in template
+    if (!backend) {
+      return []
+    }
+    const { appStackConfigs } = this.props
+    return appStackConfigs[configType] || []
+  }
+
+  renderInput = input => {
+    const { type, description } = input
+    switch (type) {
+      case 'select':
+        return <Select placeholder={description}>
+          {
+            this.getSelectOptions(input).map(({ name, id }) =>
+              <Option key={id}>{name}</Option>
+            )
+          }
+        </Select>
+      case 'number':
+        return <InputNumber placeholder={description} style={{ width: '100%' }} />
+      default:
+        return <Input placeholder={description} />
+    }
   }
 
   columns = [
@@ -75,11 +110,11 @@ class StackTemplateDeploy extends React.Component {
       render: (value, input) => {
         const { form } = this.props
         const { getFieldDecorator } = form
-        const { key, _shortId, description, type } = input
+        const { key, _shortId, description } = input
         return <FormItem>
           {
             getFieldDecorator(`${_shortId}-${key}`, {
-              initialValue: value,
+              initialValue: value || undefined,
               rules: [
                 {
                   required: true,
@@ -87,9 +122,7 @@ class StackTemplateDeploy extends React.Component {
                 },
               ],
             })(
-              type === 'number'
-                ? <InputNumber placeholder={description} style={{ width: '100%' }} />
-                : <Input placeholder={description} />
+              this.renderInput(input)
             )
           }
         </FormItem>
@@ -134,8 +167,17 @@ class StackTemplateDeploy extends React.Component {
     }
   }
 
+  getBackendLoadQuery = ({ needCluster }) => {
+    const query = {}
+    const { cluster } = this.props
+    if (needCluster) {
+      query.clusterID = cluster
+    }
+    return query
+  }
+
   async componentDidMount() {
-    const { appStackTemplateDetail, match } = this.props
+    const { appStackTemplateDetail, match, getAppstackConfigs } = this.props
     try {
       await appStackTemplateDetail(match.params.name)
       const { templateDetail } = this.props
@@ -149,10 +191,18 @@ class StackTemplateDeploy extends React.Component {
         return
       }
       const templateInputs = {}
+      const loadByBackend = []
       Object.entries(inputs).forEach(([ _shortId, input ], index) => {
         Object.entries(input).forEach(([ key, inputObj ]) => {
           if (index === 0) {
             this.setState({ collapseActiveKey: [ inputObj.label ] })
+          }
+          if (inputObj.backend) {
+            const { configType } = inputObj
+            loadByBackend.push(getAppstackConfigs({
+              configType,
+              query: this.getBackendLoadQuery(inputObj),
+            }))
           }
           inputObj.key = key
           inputObj._shortId = _shortId
@@ -164,13 +214,21 @@ class StackTemplateDeploy extends React.Component {
       // sort inputs: move input without default value to the front
       Object.keys(templateInputs).forEach(key => {
         templateInputs[key].sort((inputA, inputB) => {
-          const order = (inputA.default !== '' && inputB.default === '')
-            ? 1
-            : 0
-          return order
+          if (inputA.default === '' && inputB.default !== '') {
+            return -1
+          }
+          if (inputA.default !== '' && inputB.default === '') {
+            return 1
+          }
+          return 0
         })
       })
       this.setState({ templateContent, templateInputs })
+      await Promise.all(loadByBackend).catch(() => {
+        notification.warn({
+          message: '获取后端可续参数失败',
+        })
+      })
     } catch (error) {
       console.warn(error)
       notification.warn({
@@ -250,7 +308,7 @@ class StackTemplateDeploy extends React.Component {
       }
       let cells = templateContent._graph.cells
       // filter deploy to k8s ignore shapes: Application
-      cells = cells.filter(({ type }) => DEPLOY_2_K8S_IGNORE_SHAPES.indexOf(type) < 0)
+      cells = cells.filter(cell => cell._deploy_2_yaml === true)
       cells.forEach(({ _app_stack_template, id, parent }) => {
         const _shortId = this._idShort(id)
         if (_app_stack_template) {
@@ -276,8 +334,8 @@ class StackTemplateDeploy extends React.Component {
         await deployAppstack({
           name,
           cluster,
-          description: values.description,
           body: {
+            description: values.description,
             content: JSON.stringify(templateContent),
             k8sManifest: k8sManifest.map(template => yamlParser.safeDump(template)).join('---\n'),
           },

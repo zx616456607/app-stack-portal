@@ -28,8 +28,10 @@ const options = {
       strokeWidth: 1,
     },
   },
+  _deploy_2_yaml: false,
   _link_rules: {
     required: true,
+    message: '集群网络出口必须要与一个服务连线',
     types: [ 'devs.DeploymentService', 'devs.Service' ],
   },
   _app_stack_template: {

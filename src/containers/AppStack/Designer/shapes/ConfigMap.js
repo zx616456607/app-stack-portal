@@ -28,6 +28,7 @@ const options = {
       strokeWidth: 1,
     },
   },
+  _deploy_2_yaml: true,
   _link_rules: {
     required: false,
     types: [ 'devs.DeploymentService', 'devs.Deployment' ],

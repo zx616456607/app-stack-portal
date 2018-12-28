@@ -29,6 +29,12 @@ export const updateAppstack = ({ name, body }) => request({
     body,
   },
 })
+export const getAppstackConfigs = ({ configType, query }) => request({
+  url: `${paasApiUrl}/appstacks/configs/${configType}?${queryString.stringify(query)}`,
+  options: {
+    method: 'GET',
+  },
+})
 export const deployAppstack = ({ cluster, name, body }) => request({
   url: `${paasApiUrl}${CLUSTERS}/${cluster}/appstacks/${name}`,
   options: {

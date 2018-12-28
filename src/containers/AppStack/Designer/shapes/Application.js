@@ -28,6 +28,7 @@ const options = {
       strokeWidth: 1,
     },
   },
+  _deploy_2_yaml: false,
   _link_rules: {
     required: false,
     types: [],
