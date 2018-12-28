@@ -34,6 +34,7 @@ import classnames from 'classnames'
 import compact from 'lodash/compact'
 import Terminal from '../Detail/Terminal'
 import styles from './styles/index.less'
+import TenxIcon from '@tenx-ui/icon/es/_old'
 const Search = Input.Search
 
 function getColumns(self): Array<any> {
@@ -43,12 +44,53 @@ function getColumns(self): Array<any> {
     title: '名称',
     dataIndex: 'name',
     key: 'name',
-    render: (name) => {
-      return <Link to={`/Pod/${name}`}>
-      <Ellipsis title={name}>
-      {name}
-    </Ellipsis>
-    </Link>
+    render: (name, record) => {
+      const { os, arch } = record
+      let osEle
+      if (os === 'windows') {
+        osEle = <span  className={styles.osIcon} style={{ lineHeight: '16px', backgroundColor: '#2db7f5' }} >
+          <Tooltip title="Windows">
+            <TenxIcon
+              type="windows"
+              style={{ color: '#2db7f5', height: '16px', width: '16px' }}
+              className="meshIcon"
+            />
+          </Tooltip>
+        </span>
+      } else if (os === 'linux') {
+        if (arch === 'amd64') {
+          osEle = <span  className={styles.osIcon} style={{ lineHeight: '16px', backgroundColor: '#2db7f5' }} >
+            <Tooltip title="Linux">
+              <TenxIcon
+                type="Linux"
+                style={{ color: '#2db7f5', height: '16px', width: '16px' }}
+                className="meshIcon"
+              />
+            </Tooltip>
+          </span>
+        } else if (arch === 'arm64') {
+          osEle = <span  className={styles.osIcon} style={{ lineHeight: '16px', backgroundColor: '#2db7f5' }} >
+            <Tooltip title="Arm">
+              <TenxIcon
+                type="Arm"
+                style={{ color: '#2db7f5', height: '16px', width: '16px' }}
+                className="meshIcon"
+              />
+            </Tooltip>
+          </span>
+        }
+      } else {
+        osEle = null
+      }
+      return <div className={styles.nameWrap}><Link to={`/Pod/${name}`}>
+        <Ellipsis title={name}>
+        {name}
+      </Ellipsis>
+      </Link>
+      <div className={styles.iconWarpper}>
+        {osEle}
+      </div>
+    </div>
     },
   }, {
     title: '状态',
@@ -239,6 +281,8 @@ class Pod extends React.Component<PodProps, PodState> {
           createTime: PodNode.metadata.creationTimestamp,
           status: getPodStatus(PodNode),
           image: imageArray,
+          os:  getDeepValue(PodNode, ['metadata', 'annotations', 'imagetag_os']) || '',
+          arch:  getDeepValue(PodNode, ['metadata', 'annotations', 'imagetag_arch']) || '',
           terminalContainer: getDeepValue(PodNode, 'spec.containers.0.name'.split('.')), // 登录终端用
         }
       }).sort(( a, b ) => { return new Date(b.createTime).valueOf() - new Date(a.createTime).valueOf() })
