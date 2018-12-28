@@ -11,12 +11,6 @@
  .iconWarpper {
    display: flex;
  }
- .osIcon {
-  margin-left: 5px;
-  svg path {
-    fill: white;
-  }
-}
 .icon, .osIcon {
   display: flex;
   margin-top: 4px;
@@ -33,6 +27,19 @@
     height: 10px;
     font-size: 10px;
     line-height: 10px;
+  }
+}
+.osIcon {
+  line-height: 16px;
+  background-color: @primary-color !important;
+  border-color: @primary-color !important;
+  margin-left: 5px;
+  i {
+    height: 12px !important;
+    width: 12px !important;
+  }
+  svg path {
+    fill: white;
   }
 }
 .NativeIcon {
