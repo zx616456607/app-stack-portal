@@ -17,6 +17,7 @@ import { connect } from 'dva'
 import { Card, Button, notification } from 'antd'
 import { Link } from 'react-router-dom'
 import { Stack as StackIcon } from '@tenx-ui/icon'
+import { Circle as CircleIcon } from '@tenx-ui/icon'
 import Loader from '@tenx-ui/loader'
 import Ellipsis from '@tenx-ui/ellipsis'
 import styles from './style/index.less'
@@ -51,6 +52,38 @@ class StackApps extends React.Component {
     } catch (e) {
       notification.warn({ message: '获取堆栈列表失败', description: '' })
     }
+  }
+  status = item => {
+    let status = {
+      text: '未知',
+      color: '#ccc',
+    }
+    const { serviceCount, pending, running, stopped } = item
+    if (serviceCount > running && running > 0) {
+      status = {
+        text: '资源未全部运行',
+        color: '#ffbf00',
+      }
+    }
+    if (serviceCount === pending) {
+      status = {
+        text: '堆栈启动中',
+        color: '#2db7f5',
+      }
+    }
+    if (serviceCount === running) {
+      status = {
+        text: '正常运行',
+        color: '#5cb85c',
+      }
+    }
+    if (serviceCount === stopped) {
+      status = {
+        text: '堆栈停止',
+        color: '#f85a5a',
+      }
+    }
+    return status
   }
   render() {
     const { loading, appStack } = this.props
@@ -89,6 +122,10 @@ class StackApps extends React.Component {
                               {v.name}
                             </Ellipsis>
                           </h2>
+                        </div>
+                        <div className={styles.status} style={{ color: this.status(v).color }}>
+                          <CircleIcon style={{ marginRight: 4 }}/>
+                          {this.status(v).text}
                         </div>
                         <div className={styles.description}>
                           <Ellipsis lines={2}>
