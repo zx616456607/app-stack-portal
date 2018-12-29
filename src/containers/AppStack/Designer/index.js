@@ -571,6 +571,10 @@ inputs: []`,
       resource.attributes._app_stack_input.app_name.label = `应用-${_shortId}`
     }
 
+    // add lable id
+    resource.attributes.attrs['label-id'] = { text: _shortId }
+    this.paper.findViewByModel(resource).update()
+
     this.graph2Yaml()
   }
 

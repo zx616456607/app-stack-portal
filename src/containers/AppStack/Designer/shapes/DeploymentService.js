@@ -11,27 +11,16 @@
  */
 
 import * as joint from 'jointjs'
+import { getOptions } from './_base'
+import icon from './svg/DeploymentService.svg'
 
-const options = {
-  size: {
-    width: 88,
-    height: 88,
-  },
+let options = {
   inPorts: [ 'in' ],
-  attrs: {
-    '.label': {
-      text: '服务',
-    },
-    '.body': {
-      rx: 6,
-      ry: 6,
-      strokeWidth: 1,
-    },
-  },
+  outPorts: null,
   _deploy_2_yaml: true,
   _link_rules: {
     required: false,
-    types: [ 'devs.LBgroup' ],
+    types: [ 'devs.LBgroup', 'devs.ConfigMap' ],
   },
   _app_stack_template: [
     {
@@ -255,6 +244,7 @@ const options = {
     },
   },
 }
+options = getOptions({ text: '服务', icon }, options)
 const DeploymentService = joint.shapes.devs.Model.define('devs.DeploymentService', options)
 
 DeploymentService.options = options

@@ -57,6 +57,13 @@ module.exports = webpackConfig => {
         }
       })
     }
+    // change svg from url-loader to file-loader
+    if (rule.exclude && rule.loader && String(rule.loader).indexOf('/url-loader/') > -1) {
+      rule.exclude.push(/\.svg$/)
+    }
+    if (rule.loader && String(rule.loader).indexOf('/file-loader/') > -1) {
+      rule.test = [ rule.test, /\.svg$/ ]
+    }
   })
 
   webpackConfig.plugins = webpackConfig.plugins.concat([

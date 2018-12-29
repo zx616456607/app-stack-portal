@@ -11,21 +11,102 @@
  */
 
 import * as joint from 'jointjs'
+import icon from './svg/Application.svg'
 
 const options = {
   size: {
     width: 300,
     height: 300,
   },
-  outPorts: [ 'out' ],
+  markup: [
+    {
+      tagName: 'rect',
+      selector: 'rect', // not necessary but faster
+      attributes: {
+        class: 'body',
+        rx: 6,
+        ry: 6,
+        strokeWidth: 1,
+        width: 300,
+        height: 300,
+      },
+    },
+    {
+      tagName: 'g',
+      attributes: {
+        transform: 'translate(18, -10)',
+      },
+      children: [
+        {
+          tagName: 'rect',
+          attributes: {
+            width: 120,
+            height: 20,
+            rx: 12,
+            ry: 8,
+            strokeWidth: 1,
+            stroke: '#2db7f5',
+            'stroke-dasharray': 4,
+          },
+        },
+        {
+          tagName: 'image',
+          attributes: {
+            class: 'image',
+            href: icon,
+            width: 12,
+            height: 12,
+            transform: 'translate(12,3)',
+          },
+        },
+        {
+          tagName: 'text',
+          selector: 'label-app',
+          attributes: {
+            class: 'label-app',
+            transform: 'translate(28,4)',
+            children: [
+              {
+                tagName: 'tspan',
+                attributes: {
+                  dy: 0,
+                  class: 'v-line',
+                },
+              },
+            ],
+          },
+        },
+        {
+          tagName: 'text',
+          selector: 'label-id',
+          attributes: {
+            class: 'label-id',
+            'font-size': 18,
+            'xml:space': 'preserve',
+            y: '0.8em',
+            'text-anchor': 'middle',
+            fill: '#000',
+            transform: 'translate(82,4)',
+            children: [
+              {
+                tagName: 'tspan',
+                attributes: {
+                  dy: 0,
+                  class: 'v-line',
+                },
+              },
+            ],
+          },
+        },
+      ],
+    },
+  ],
   attrs: {
-    '.label': {
+    'label-app': {
       text: '应用',
     },
-    '.body': {
-      rx: 6,
-      ry: 6,
-      strokeWidth: 1,
+    'label-id': {
+      text: '-',
     },
   },
   _deploy_2_yaml: false,

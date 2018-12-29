@@ -11,23 +11,10 @@
  */
 
 import * as joint from 'jointjs'
+import { getOptions } from './_base'
+import icon from './svg/LBgroup.svg'
 
-const options = {
-  size: {
-    width: 88,
-    height: 88,
-  },
-  outPorts: [ 'out' ],
-  attrs: {
-    '.label': {
-      text: '集群网络出口',
-    },
-    '.body': {
-      rx: 6,
-      ry: 6,
-      strokeWidth: 1,
-    },
-  },
+let options = {
   _deploy_2_yaml: false,
   _link_rules: {
     required: true,
@@ -64,6 +51,8 @@ const options = {
     },
   },
 }
+options = getOptions({ text: '集群网络出口', icon }, options)
+
 const LBgroup = joint.shapes.devs.Model.define('devs.LBgroup', options)
 
 LBgroup.options = options
