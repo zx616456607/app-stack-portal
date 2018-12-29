@@ -8,7 +8,10 @@
  * @date Friday November 9th 2018
  */
  @import '../../../assets/style/core/index.less';
-.icon {
+ .iconWarpper {
+   display: flex;
+ }
+.icon, .osIcon {
   display: flex;
   margin-top: 4px;
   height: 16px;
@@ -24,6 +27,19 @@
     height: 10px;
     font-size: 10px;
     line-height: 10px;
+  }
+}
+.osIcon {
+  line-height: 16px;
+  background-color: @primary-color !important;
+  border-color: @primary-color !important;
+  margin-left: 5px;
+  i {
+    height: 12px !important;
+    width: 12px !important;
+  }
+  svg path {
+    fill: white;
   }
 }
 .NativeIcon {

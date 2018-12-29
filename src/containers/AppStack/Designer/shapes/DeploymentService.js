@@ -28,6 +28,11 @@ const options = {
       strokeWidth: 1,
     },
   },
+  _deploy_2_yaml: true,
+  _link_rules: {
+    required: false,
+    types: [ 'devs.LBgroup' ],
+  },
   _app_stack_template: [
     {
       apiVersion: 'extensions/v1beta1',
@@ -137,15 +142,16 @@ const options = {
       kind: 'Service',
       metadata: {
         annotations: {
-          'system/lbgroup': 'none',
-          'system/schemaPortname': 'port-name-1/tcp',
+          'system/schemaPortname': {
+            get_by_build_in_function: 'getSchemaPortname',
+          },
         },
         labels: {
           'system/appName': {
             get_input: 'app_name',
           },
           'system/svcName': {
-            get_input: 'deployment_name',
+            get_attribute: [ 'metadata', 'name' ],
           },
         },
         name: {

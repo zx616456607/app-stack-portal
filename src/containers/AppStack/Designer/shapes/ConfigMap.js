@@ -20,13 +20,18 @@ const options = {
   outPorts: [ 'out' ],
   attrs: {
     '.label': {
-      text: 'ConfigMap',
+      text: '普通配置',
     },
     '.body': {
       rx: 6,
       ry: 6,
       strokeWidth: 1,
     },
+  },
+  _deploy_2_yaml: true,
+  _link_rules: {
+    required: false,
+    types: [ 'devs.DeploymentService', 'devs.Deployment' ],
   },
   _app_stack_template: {
     apiVersion: 'v1',

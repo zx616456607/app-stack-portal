@@ -33,6 +33,7 @@ import Ellipsis from '@tenx-ui/ellipsis'
 import styles from './styles/index.less';
 import classnames from 'classnames'
 import compact from 'lodash/compact'
+import TenxIcon from '@tenx-ui/icon/es/_old'
 // import styles from './styles/index.less'
 const Search = Input.Search
 
@@ -44,6 +45,40 @@ function getColumns(self): Array<any> {
     dataIndex: 'name',
     key: 'name',
     render: (name, record) => {
+      const { os, arch } = record
+      let osEle
+      if (os === 'windows') {
+        osEle = <span  className={styles.osIcon} >
+          <Tooltip title="Windows">
+            <TenxIcon
+              type="windows"
+              className="meshIcon"
+            />
+          </Tooltip>
+        </span>
+      } else if (os === 'linux') {
+        if (arch === 'amd64') {
+          osEle = <span  className={styles.osIcon} >
+            <Tooltip title="Linux">
+              <TenxIcon
+                type="Linux"
+                className="meshIcon"
+              />
+            </Tooltip>
+          </span>
+        } else if (arch === 'arm64') {
+          osEle = <span  className={styles.osIcon} >
+            <Tooltip title="Arm">
+              <TenxIcon
+                type="Arm"
+                className="meshIcon"
+              />
+            </Tooltip>
+          </span>
+        }
+      } else {
+        osEle = null
+      }
       return <div className={styles.nameWrap}>
       <Link to={`/Deployment/${name}`}>
       <Ellipsis title={name}>
@@ -52,18 +87,20 @@ function getColumns(self): Array<any> {
     </Link>
     {
       record.joinTenxPass === true ?
-      <div>
+      <div className={styles.iconWarpper}>
         <Tooltip title={'已加入应用管理'}>
         <div className={styles.icon}>
         <div>管</div>
         </div>
         </Tooltip>
-      </div> : <div>
+        {osEle}
+      </div> : <div className={styles.iconWarpper}>
         <Tooltip title={'原生创建, 未加入应用管理'}>
         <div className={styles.NativeIcon}>
         <div>原</div>
         </div>
         </Tooltip>
+        {osEle}
       </div>
     }
     </div>
@@ -202,6 +239,10 @@ class Deployment extends React.Component<DeploymentProps, DeploymentState> {
           name: DeploymentNode.metadata.name,
           createTime: DeploymentNode.metadata.creationTimestamp,
           status: getDeploymentStatus(DeploymentNode),
+          os:  getDeepValue(DeploymentNode, ['spec', 'template',
+            'metadata', 'annotations', 'imagetag_os']) || '',
+          arch:  getDeepValue(DeploymentNode, ['spec', 'template',
+            'metadata', 'annotations', 'imagetag_arch']) || '',
           image: imageArray,
           joinTenxPass,
         }

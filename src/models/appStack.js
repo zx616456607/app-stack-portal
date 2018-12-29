@@ -13,6 +13,7 @@
 import {
   createAppstack,
   updateAppstack,
+  getAppstackConfigs,
   deployAppstack,
   appStacksListRequest,
   templateListRequest,
@@ -38,6 +39,10 @@ export default {
     appStackTemplateList(state, { payload }) {
       return { ...state, ...payload }
     },
+    appStackConfigs(state, { payload }) {
+      const appStackConfigs = Object.assign({}, state.appStackConfigs, payload)
+      return { ...state, appStackConfigs }
+    },
   },
   effects: {
     * fetchCreateAppstack({ payload: { name, body } }, { call }) {
@@ -49,6 +54,18 @@ export default {
     * fetchUpdateAppstack({ payload: { name, body } }, { call }) {
       const res = yield call(updateAppstack, {
         name, body,
+      })
+      return res
+    },
+    * fetchAppstackConfigs({ payload: { configType, query } }, { call, put }) {
+      const res = yield call(getAppstackConfigs, {
+        configType, query,
+      })
+      yield put({
+        type: 'appStackConfigs',
+        payload: {
+          [configType]: res.data.data,
+        },
       })
       return res
     },

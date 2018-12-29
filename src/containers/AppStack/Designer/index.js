@@ -17,33 +17,30 @@ import { connect } from 'dva'
 import * as joint from 'jointjs'
 import 'jointjs/dist/joint.css'
 import graphlib from 'graphlib'
-import TenxEditor from '@tenx-ui/editor'
-import '@tenx-ui/editor/assets/index.css'
-import 'brace/mode/yaml'
-import 'brace/snippets/yaml'
-import 'brace/theme/chrome'
 import { confirm } from '@tenx-ui/modal'
 import {
-  Button, notification, Slider, Icon, Row, Col, Tabs, Modal, Form, Input,
+  Button, notification, Slider, Icon, Row, Col, Modal, Form, Input,
+  Tooltip,
 } from 'antd'
 import classnames from 'classnames'
 // import $ from 'jquery'
-import Dock from 'react-dock'
 import yamlParser from 'js-yaml'
 import {
   AppC as AppIcon,
   ServiceC as ServiceIcon,
   ConfigmapC as ConfigmapIcon,
+  FatArrowLeft as FatArrowLeftIcon,
+  ClusterMeshPort as ClusterMeshPortIcon,
 } from '@tenx-ui/icon'
 import styles from './style/index.less'
 import './style/joint-custom.less'
 import './shapes'
 import Hotkeys from 'react-hot-keys'
 import { getDeepValue } from '../../../utils/helper'
+import YamlDock from './YamlDock'
 
 const isProd = process.env.NODE_ENV === 'production'
 
-const TabPane = Tabs.TabPane
 const FormItem = Form.Item
 
 const SIDER_WIDTH = isProd ? 0 : 200
@@ -66,7 +63,13 @@ const RESOURCE_LIST = [
   {
     id: 'ConfigMap',
     icon: <ConfigmapIcon />,
-    title: 'ConfigMap',
+    title: '服务配置·普通配置',
+    enabled: true,
+  },
+  {
+    id: 'LBgroup',
+    icon: <ClusterMeshPortIcon />,
+    title: '集群网络出口',
     enabled: true,
   },
   {
@@ -115,11 +118,6 @@ const RESOURCE_LIST = [
     title: '应用负载均衡·集群外',
   },
   {
-    id: 'service-9',
-    icon: <Icon type="appstore" />,
-    title: '集群网络出口',
-  },
-  {
     id: 'service-10',
     icon: <Icon type="appstore" />,
     title: '自定义资源',
@@ -130,7 +128,6 @@ const RESOURCE_LIST = [
     title: '安全组',
   },
 ]
-const DOCK_DEFAULT_HEADER_SIZE = 42
 const APP_STACK_LOCAL_STORAGE_KEY = '_app_stack_graph'
 
 const mapStateToProps = state => {
@@ -149,13 +146,13 @@ inputs: []`,
     createBtnLoading: false,
     paperScale: 1,
     yamlDockVisible: false,
-    yamlDockSize: 340,
-    yamlEditorTabKey: 'template',
+    yamlDockSize: null,
     saveStackModal: false,
     saveStackBtnLoading: false,
     idShortIdMap: {},
     undoList: [],
     redoList: [],
+    yamlBtnTipVisible: false,
   }
 
   editMode = this.props.match.path === '/app-stack/designer/:name/edit'
@@ -166,9 +163,11 @@ inputs: []`,
 
   yarmlEditor = undefined
 
-  yaml2GraphTimeout = undefined
-
   componentDidMount() {
+    const { dispatch } = this.props
+    dispatch({
+      type: 'appStack/clearAppStackTemplateDetail',
+    })
     window.addEventListener('beforeunload', this.handleWindowClose)
   }
 
@@ -179,10 +178,6 @@ inputs: []`,
     })
     window.removeEventListener('beforeunload', this.handleWindowClose)
     this._saveGraphObj2LS()
-  }
-
-  componentDidCatch(error, info) {
-    console.warn('AppStackDesigner componentDidCatch', error, info)
   }
 
   handleWindowClose = () => {
@@ -208,6 +203,9 @@ inputs: []`,
   }
 
   initDesigner = () => {
+    this.setState({
+      yamlBtnTipVisible: true,
+    })
     this.paperDom = document.getElementById('app-stack-paper')
     this.navigatorDom = document.getElementById('app-stack-paper-navigator')
     this.graph = new joint.dia.Graph()
@@ -237,7 +235,20 @@ inputs: []`,
       // when number of mousemove events exceeds the clickThreshold there is
       // no pointerclick event triggered after mouseup. It defaults to 0.
       clickThreshold: 5,
-      defaultConnectionPoint: { name: 'boundary' },
+      defaultConnectionPoint: {
+        name: 'boundary',
+      },
+      defaultAnchor: {
+        name: 'center',
+      },
+      // defaultLink: new joint.shapes.standard.Link({
+      defaultLink: new joint.dia.Link({
+        connector: { name: 'rounded' },
+        smooth: true,
+      }),
+      defaultRouter: {
+        name: 'manhattan',
+      },
       highlighting: {
         default: {
           name: 'stroke',
@@ -255,7 +266,14 @@ inputs: []`,
       interactive: { arrowheadMove: false },
       allowLink(linkView, paper) {
         const graph = paper.model
-        return graphlib.alg.findCycles(graph.toGraphLib()).length === 0;
+        const { source: { id: sourceId }, target: { id: targetId } } = linkView.model.attributes
+        const isFindCycles = graphlib.alg.findCycles(graph.toGraphLib()).length > 0;
+        if (isFindCycles) {
+          return false
+        }
+        const source = graph.getCell(sourceId)
+        const target = graph.getCell(targetId)
+        return source.attributes._link_rules.types.indexOf(target.attributes.type) > -1
       },
       validateEmbedding: (childView, parentView) => {
         const isEmbedding = parentView.model instanceof joint.shapes.devs.Application
@@ -607,18 +625,6 @@ inputs: []`,
     }
   }
 
-  onTemplateYamlChange = templateYamlStr => {
-    this.setState({ templateYamlStr })
-    clearTimeout(this.yaml2GraphTimeout)
-    this.yaml2GraphTimeout = setTimeout(() => this.yaml2Graph(templateYamlStr), 300);
-  }
-
-  onInputYamlChange = inputYamlStr => {
-    this.setState({ inputYamlStr })
-    clearTimeout(this.yaml2GraphTimeout)
-    this.yaml2GraphTimeout = setTimeout(() => this.yaml2Graph(null, inputYamlStr), 300);
-  }
-
   handlePaperScale = type => {
     let { paperScale } = this.state
     switch (type) {
@@ -681,6 +687,35 @@ inputs: []`,
           message: '保存堆栈模版失败',
           description: '无效的空白模版',
         })
+        return
+      }
+      // check link
+      let linkCheckPassed = true
+      const links = _graph.cells.filter(({ type }) => type === 'link')
+      _graph.cells.every(cell => {
+        const { _link_rules, id } = cell
+        if (!_link_rules || !_link_rules.required) {
+          return true
+        }
+        let isLink = false
+        links.every(({ source: { id: sourceId }, target: { id: targetId } }) => {
+          if (sourceId === id || targetId === id) {
+            isLink = true
+            return false
+          }
+          return true
+        })
+        if (!isLink) {
+          linkCheckPassed = false
+          notification.warn({
+            message: _link_rules.message,
+          })
+          return false
+        }
+        return true
+      })
+      if (!linkCheckPassed) {
+        this.setState({ saveStackModal: false })
         return
       }
       this.setState({ saveStackBtnLoading: true })
@@ -769,8 +804,9 @@ inputs: []`,
     const { form, templateDetail } = this.props
     const { getFieldDecorator } = form
     const {
-      yamlDockSize, yamlDockVisible, paperScale, yamlEditorTabKey,
+      yamlDockSize, yamlDockVisible, paperScale,
       saveStackModal, saveStackBtnLoading, redoList,
+      templateYamlStr, inputYamlStr, yamlBtnTipVisible,
     } = this.state
     const FormItemLayout = {
       labelCol: {
@@ -809,20 +845,6 @@ inputs: []`,
                       // Add the target element's id to the data transfer object
                       ev.dataTransfer.setData('text/plain', id)
                       ev.dropEffect = 'move'
-                      // console.warn('onDrop ev', ev)
-                      // console.warn('ev.screenX', ev.screenX)
-                      // console.warn('ev.screenY', ev.screenY)
-                      // console.warn('ev.pageX', ev.pageX)
-                      // console.warn('ev.pageY', ev.pageY)
-                      // console.warn('ev.clientX', ev.clientX)
-                      // console.warn('ev.clientY', ev.clientY)
-                      // console.warn('ev.movementX', ev.movementX)
-                      // console.warn('ev.movementY', ev.movementY)
-                      // console.warn('ev.target', ev.target)
-                      // console.warn('ev.dropTarget', ev.dropTarget)
-                      // console.warn('ev.target offset', $(ev.target).offset())
-                      // console.warn('ev.target.offsetHeight', ev.target.offsetHeight)
-                      // console.warn('ev.target.offsetY', ev.target.offsetY)
                     }}
                     className={classnames({ [styles.enabled]: enabled })}
                   >
@@ -843,21 +865,25 @@ inputs: []`,
               <div className={styles.toolBtns}>
                 <Button.Group>
                   <Button
-                    icon="undo"
                     disabled={this.isUndoDisabled()}
                     onClick={this.undo}
-                  />
+                    className={styles.undo}
+                  >
+                    <FatArrowLeftIcon />
+                  </Button>
                   <Button
-                    icon="redo"
                     disabled={redoList.length === 0}
                     onClick={this.redo}
-                  />
+                    className={styles.redo}
+                  >
+                    <FatArrowLeftIcon />
+                  </Button>
                 </Button.Group>
                 <Button icon="delete" onClick={this.clearGraph}>
-                清空设计
+                  清空设计
                 </Button>
                 <Button icon="layout" onClick={this.layout} disabled>
-                自动布局
+                  自动布局
                 </Button>
                 <Button
                   icon="gateway"
@@ -872,19 +898,28 @@ inputs: []`,
                   }}
                   disabled
                 >
-                适应屏幕
+                  适应屏幕
                 </Button>
                 <Button icon="save" onClick={() => this.setState({ saveStackModal: true })}>
                   {
                     this.editMode ? '保存更新' : '保存并提交'
                   }
                 </Button>
-                <Button
-                  icon="deployment-unit"
-                  onClick={() => this.setState({ yamlDockVisible: !yamlDockVisible })}
+                <Tooltip
+                  title="请完善堆栈，确保与画布设计表示一致"
+                  placement="right"
+                  visible={yamlBtnTipVisible}
                 >
-                完善编排
-                </Button>
+                  <Button
+                    icon="deployment-unit"
+                    onClick={() => this.setState({
+                      yamlDockVisible: !yamlDockVisible,
+                      yamlBtnTipVisible: false,
+                    })}
+                  >
+                    完善堆栈
+                  </Button>
+                </Tooltip>
               </div>
               <div className={styles.toolZoom}>
                 <Button
@@ -934,69 +969,17 @@ inputs: []`,
               </div>
             </div>
           </div>
-          <Dock
-            fluid={false}
-            size={yamlDockSize}
-            isVisible={yamlDockVisible}
-            position="bottom"
-            dimMode="none"
-            onSizeChange={dockSize => {
-              if (dockSize < DOCK_DEFAULT_HEADER_SIZE) return
-              this.setState({ yamlDockSize: dockSize }, () => {
-                this.yarmlEditor.resize()
-              })
+          <YamlDock
+            visible={yamlDockVisible}
+            onVisibleChange={visible => this.setState({ yamlDockVisible: visible })}
+            onTabChange={this.onYamlTabChange}
+            onSizeChange={size => this.setState({ yamlDockSize: size })}
+            onYamlChange={({ templateYamlStr: template, inputYamlStr: input }) => {
+              this.setState({ templateYamlStr: template, inputYamlStr: input })
+              this.yaml2Graph(template, input)
             }}
-          >
-            <div className={styles.yamlEditor}>
-              <div className={styles.yamlEditorHeader}>
-                <Tabs
-                  activeKey={yamlEditorTabKey}
-                  onChange={this.onYamlTabChange}
-                  tabBarExtraContent={<div className={styles.yamlEditorHeaderBtns}>
-                    <Button type="dashed" icon="search" />
-                    <Button
-                      type="dashed"
-                      icon="minus"
-                      onClick={() => this.setState({ yamlDockVisible: false })}
-                    />
-                    {/* <Button type="dashed" icon="arrows-alt" /> */}
-                  </div>}
-                >
-                  <TabPane tab="模版" key="template"></TabPane>
-                  <TabPane tab="输入" key="input"></TabPane>
-                  {/* <TabPane tab="输出" key="output"></TabPane> */}
-                </Tabs>
-              </div>
-              {
-                yamlEditorTabKey === 'template' &&
-                <TenxEditor
-                  name="app_stack_template"
-                  theme="chrome"
-                  fontSize={12}
-                  value={this.state.templateYamlStr}
-                  onChange={this.onTemplateYamlChange}
-                  onLoad={editor => {
-                    editor.$blockScrolling = Infinity
-                    this.yarmlEditor = editor
-                  }}
-                />
-              }
-              {
-                yamlEditorTabKey === 'input' &&
-                <TenxEditor
-                  name="app_stack_input"
-                  theme="chrome"
-                  fontSize={12}
-                  value={this.state.inputYamlStr}
-                  onChange={this.onInputYamlChange}
-                  onLoad={editor => {
-                    editor.$blockScrolling = Infinity
-                    this.yarmlEditor = editor
-                  }}
-                />
-              }
-            </div>
-          </Dock>
+            value={{ templateYamlStr, inputYamlStr }}
+          />
           <Modal
             title="保存堆栈模板"
             okText="确认保存"
