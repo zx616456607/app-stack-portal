@@ -24,7 +24,7 @@ import styles from './style/index.less'
 import { addAppStackLabelsForResource } from './utils'
 import cloneDeep from 'lodash/cloneDeep'
 import _set from 'lodash/set'
-import { getDeepValue } from '../../../../utils/helper'
+import { getDeepValue, k8sNameCheck } from '../../../../utils/helper'
 import * as _builtInFunction from '../../Designer/shapes/_builtInFunction'
 
 const FormItem = Form.Item
@@ -242,7 +242,7 @@ class StackTemplateDeploy extends React.Component {
 
   appStackStart = () => {
     const { form, deployAppstack, cluster, history } = this.props
-    const { validateFieldsAndScroll } = form
+    const { validateFieldsAndScroll, setFields } = form
     validateFieldsAndScroll(async (err, values) => {
       if (err) {
         return
@@ -390,7 +390,23 @@ class StackTemplateDeploy extends React.Component {
         })
         history.push(`/app-stack/appStackDetail/${name}/events`)
       } catch (error) {
-        console.warn('error', error)
+        const { response } = error || {}
+        const { code, details } = response || {}
+        if (code === 409 && details.kind === 'stackName') {
+          setFields({
+            stackName: {
+              value: name,
+              errors: [ new Error(`堆栈 ${name} 已存在，请更换为其他名称`) ],
+            },
+          })
+          this.stackNameRef.focus()
+          // validateFieldsAndScroll([ 'stackName' ])
+          notification.warn({
+            message: '启动应用堆栈失败',
+            description: `堆栈 ${name} 已存在`,
+          })
+          return
+        }
         notification.warn({
           message: '启动应用堆栈失败',
         })
@@ -439,8 +455,17 @@ class StackTemplateDeploy extends React.Component {
                             required: true,
                             message: '请填写堆栈名称',
                           },
+                          {
+                            validator: (rule, value, cb) => {
+                              const msg = k8sNameCheck(value, '堆栈名称')
+                              if (msg === 'success') {
+                                return cb()
+                              }
+                              cb(msg)
+                            },
+                          },
                         ],
-                      })(<Input placeholder="请输入堆栈名称"/>)
+                      })(<Input ref={ref => { this.stackNameRef = ref }} placeholder="请输入堆栈名称"/>)
                     }
                   </FormItem>
                   <FormItem

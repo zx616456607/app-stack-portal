@@ -142,7 +142,6 @@ const options = {
       kind: 'Service',
       metadata: {
         annotations: {
-          // 'system/lbgroup': 'none',
           'system/schemaPortname': {
             get_by_build_in_function: 'getSchemaPortname',
           },
