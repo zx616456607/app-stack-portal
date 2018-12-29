@@ -26,7 +26,7 @@ import { getDeepValue } from '../../utils/helper';
 import classnames from 'classnames'
 
 const Option = Select.Option;
-
+const resourceKind = [ 'Deployment', 'StatefulSet', 'Job', 'CronJob' ] // 这四种资源适用去掉sider, 插入字段
 export interface ToolProps extends SubscriptionAPI, RouteComponentProps {
   cluster: string
   aceEditor: AceEditor
@@ -307,19 +307,86 @@ class SampleNodeInner extends React.Component<SampleNodeProps, any> {
     }
     if (id === 5) {
       yamlJson.forEach((singleValue) => {
-        const annotations = getDeepValue(singleValue, [ 'metadata', 'annotations' ]) || {}
+        // const annotations = getDeepValue(singleValue, [ 'metadata', 'annotations' ]) || {}
         const kind = getDeepValue(singleValue, ['kind'])
-        const otherKind = getDeepValue(singleValue, ['spec', 'template'])
+        // const otherKind = getDeepValue(singleValue, ['spec', 'template'])
+        // const CronJobKind = getDeepValue(singleValue, [ 'spec', 'jobTemplate' ])
         let newAnnotations = {}
-        if (kind === 'Pod') {
+        if (resourceKind.includes(kind)) {
+          try {
+            const spec = getDeepValue(singleValue, ['spec'])
+            if (spec) {
+              const annotations = getDeepValue(singleValue, [ 'metadata', 'annotations' ]) || {}
+              newAnnotations = Object.assign({}, annotations, contentObj.metadata.annotations )
+              if (singleValue.metadata) {
+                singleValue.metadata.annotations = newAnnotations
+              } else {
+                singleValue.metadata = { annotations: newAnnotations }
+              }
+              const twoSpec = getDeepValue(singleValue, ['spec', 'template', 'spec'])
+              if (twoSpec) {
+                const twoAnnotations = getDeepValue(singleValue, ['spec', 'template', 'metadata', 'annotations']) || {}
+                newAnnotations = Object.assign({}, twoAnnotations, contentObj.metadata.annotations )
+                if (singleValue.spec.template.metadata) {
+                  singleValue.spec.template.metadata.annotations = newAnnotations
+                } else {
+                  singleValue.spec.template.metadata = { annotations: newAnnotations }
+                }
+              }
+              const threeSpec = getDeepValue(singleValue, ['spec', 'jobTemplate', 'spec'])
+              if (threeSpec) {
+                const threeAnnotations =
+                getDeepValue(singleValue, ['spec', 'jobTemplate', 'metadata', 'annotations']) || {}
+                newAnnotations = Object.assign({}, threeAnnotations, contentObj.metadata.annotations )
+                if (singleValue.spec.jobTemplate.metadata) {
+                  singleValue.spec.jobTemplate.metadata.annotations = newAnnotations
+                } else {
+                  singleValue.spec.jobTemplate.metadata = { annotations: newAnnotations }
+                }
+              }
+              const fourSpec = getDeepValue(singleValue, [ 'spec', 'jobTemplate', 'spec', 'template', 'spec' ])
+              if (fourSpec) {
+                const fourAnnotations =
+                getDeepValue(singleValue, ['spec', 'jobTemplate', 'spec', 'template', 'metadata', 'annotations']) || {}
+                newAnnotations = Object.assign({}, fourAnnotations, contentObj.metadata.annotations )
+                if (singleValue.spec.jobTemplate.spec.template.metadata) {
+                  singleValue.spec.jobTemplate.spec.template.metadata.annotations = newAnnotations
+                } else {
+                  singleValue.spec.jobTemplate.spec.template.metadata = { annotations: newAnnotations }
+                }
+              }
+            }
+          } catch (e) {
+            notification.warn({ message: '插入失败', description: '请检查yaml结构' })
+            console.warn(e)
+          }
+        }
+        /*if (kind === 'Pod') {
           newAnnotations = Object.assign({}, annotations, contentObj.metadata.annotations )
-          singleValue.metadata.annotations = newAnnotations
+          if (singleValue.metadata) {
+            singleValue.metadata.annotations = newAnnotations
+          } else {
+            singleValue.metadata = { annotations: newAnnotations }
+          }
         } else if (otherKind !== null) {
           const tannotations =
           getDeepValue(singleValue, [ 'spec', 'template', 'metadata', 'annotations' ]) || {}
           newAnnotations = Object.assign({}, tannotations, contentObj.metadata.annotations )
-          singleValue.spec.template.metadata.annotations = newAnnotations
-        }
+          if (singleValue.spec.template.metadata) {
+            singleValue.spec.template.metadata.annotations = newAnnotations
+          } else {
+            singleValue.spec.template.metadata = { annotations: newAnnotations }
+          }
+        } else if (CronJobKind !== null) {
+          const tannotations =
+          getDeepValue(singleValue, [ 'spec', 'jobTemplate', 'metadata', 'annotations' ]) || {}
+          newAnnotations = Object.assign({}, tannotations, contentObj.metadata.annotations )
+          if (singleValue.spec.jobTemplate.metadata) {
+            singleValue.spec.jobTemplate.metadata.annotations = newAnnotations
+          } else {
+            singleValue.spec.jobTemplate.metadata = { annotations: newAnnotations }
+          }
+        }*/
       })
       const newPayload = { yamlValue: dumpArray(yamlJson) }
       this.props.dispatch({ type: 'createNative/updateYamlValue', payload: newPayload })
