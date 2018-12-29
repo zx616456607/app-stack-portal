@@ -47,6 +47,7 @@ export default class ImagePopCard extends React.Component<ImagePopCardProps, Ima
           onVisibleChange={this.showPop}
           arrowPointAtCenter
           getTooltipContainer={(node) => node as HTMLElement}
+          visible={this.state.show}
         // getTooltipContainer=
         // {(triggerNode) => triggerNode}
         >
