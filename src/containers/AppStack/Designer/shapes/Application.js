@@ -34,6 +34,7 @@ const options = {
     {
       tagName: 'g',
       attributes: {
+        class: 'label-wrapper',
         transform: 'translate(18, -10)',
       },
       children: [
