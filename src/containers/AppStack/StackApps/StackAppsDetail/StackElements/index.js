@@ -149,7 +149,7 @@ class StackElements extends React.Component {
     const { searchValue } = this.state
     const filterStackElements = stackElements.filter(({ name }) => (name || '').indexOf(searchValue) > -1)
     return <div id="stackElements">
-      <div className={styles.operation}>
+      <div className={styles.operation} style={filterStackElements.length === 0 ? { position: 'relative' } : null}>
         <div className={styles.operationLeft}>
           <Button icon="sync" onClick={this.refresh}>刷新</Button>
           <Search onSearch={this.search} placeholder="输入资源名称搜索" style={{ width: 200 }}/>
