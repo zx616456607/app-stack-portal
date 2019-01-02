@@ -20,6 +20,7 @@ import graphlib from 'graphlib'
 import { confirm } from '@tenx-ui/modal'
 import {
   Button, notification, Slider, Icon, Row, Col, Modal, Form, Input,
+  Tooltip,
 } from 'antd'
 import classnames from 'classnames'
 // import $ from 'jquery'
@@ -62,7 +63,7 @@ const RESOURCE_LIST = [
   {
     id: 'ConfigMap',
     icon: <ConfigmapIcon />,
-    title: 'ConfigMap',
+    title: '服务配置·普通配置',
     enabled: true,
   },
   {
@@ -151,6 +152,7 @@ inputs: []`,
     idShortIdMap: {},
     undoList: [],
     redoList: [],
+    yamlBtnTipVisible: false,
   }
 
   editMode = this.props.match.path === '/app-stack/designer/:name/edit'
@@ -162,6 +164,10 @@ inputs: []`,
   yarmlEditor = undefined
 
   componentDidMount() {
+    const { dispatch } = this.props
+    dispatch({
+      type: 'appStack/clearAppStackTemplateDetail',
+    })
     window.addEventListener('beforeunload', this.handleWindowClose)
   }
 
@@ -197,6 +203,9 @@ inputs: []`,
   }
 
   initDesigner = () => {
+    this.setState({
+      yamlBtnTipVisible: true,
+    })
     this.paperDom = document.getElementById('app-stack-paper')
     this.navigatorDom = document.getElementById('app-stack-paper-navigator')
     this.graph = new joint.dia.Graph()
@@ -562,6 +571,10 @@ inputs: []`,
       resource.attributes._app_stack_input.app_name.label = `应用-${_shortId}`
     }
 
+    // add lable id
+    resource.attributes.attrs['label-id'] = { text: _shortId }
+    this.paper.findViewByModel(resource).update()
+
     this.graph2Yaml()
   }
 
@@ -680,6 +693,35 @@ inputs: []`,
         })
         return
       }
+      // check link
+      let linkCheckPassed = true
+      const links = _graph.cells.filter(({ type }) => type === 'link')
+      _graph.cells.every(cell => {
+        const { _link_rules, id } = cell
+        if (!_link_rules || !_link_rules.required) {
+          return true
+        }
+        let isLink = false
+        links.every(({ source: { id: sourceId }, target: { id: targetId } }) => {
+          if (sourceId === id || targetId === id) {
+            isLink = true
+            return false
+          }
+          return true
+        })
+        if (!isLink) {
+          linkCheckPassed = false
+          notification.warn({
+            message: _link_rules.message,
+          })
+          return false
+        }
+        return true
+      })
+      if (!linkCheckPassed) {
+        this.setState({ saveStackModal: false })
+        return
+      }
       this.setState({ saveStackBtnLoading: true })
       const { name } = body
       const { yamlObj } = this.state
@@ -768,7 +810,7 @@ inputs: []`,
     const {
       yamlDockSize, yamlDockVisible, paperScale,
       saveStackModal, saveStackBtnLoading, redoList,
-      templateYamlStr, inputYamlStr,
+      templateYamlStr, inputYamlStr, yamlBtnTipVisible,
     } = this.state
     const FormItemLayout = {
       labelCol: {
@@ -867,12 +909,21 @@ inputs: []`,
                     this.editMode ? '保存更新' : '保存并提交'
                   }
                 </Button>
-                <Button
-                  icon="deployment-unit"
-                  onClick={() => this.setState({ yamlDockVisible: !yamlDockVisible })}
+                <Tooltip
+                  title="请完善堆栈，确保与画布设计表示一致"
+                  placement="right"
+                  visible={yamlBtnTipVisible}
                 >
-                  完善编排
-                </Button>
+                  <Button
+                    icon="deployment-unit"
+                    onClick={() => this.setState({
+                      yamlDockVisible: !yamlDockVisible,
+                      yamlBtnTipVisible: false,
+                    })}
+                  >
+                    完善堆栈
+                  </Button>
+                </Tooltip>
               </div>
               <div className={styles.toolZoom}>
                 <Button

@@ -27,6 +27,13 @@
       .label {
         fill: @font-color-2;
         font-size: @font-size-base;
+        &:not(.application) {
+          transform: matrix(1, 0, 0, 1, 44, 50);
+        }
+      }
+      .label-id, .label-app {
+        fill: @font-color-3;
+        font-size: @font-size-base;
       }
       .port-body {
         stroke: @primary-color;
@@ -43,6 +50,9 @@
         .body {
           stroke-dasharray: 6;
           fill: rgba(45, 183, 245, .1);
+        }
+        .label {
+          //
         }
       }
     }
@@ -102,7 +112,7 @@
         stroke: @primary-color;
         stroke-width: 4px;
       }
-      .label {
+      .label, .label-id {
         display: none;
       }
       .port-body {

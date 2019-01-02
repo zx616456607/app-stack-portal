@@ -11,25 +11,14 @@
  */
 
 import * as joint from 'jointjs'
+import { getOptions } from './_base'
+import icon from './svg/LBgroup.svg'
 
-const options = {
-  size: {
-    width: 88,
-    height: 88,
-  },
-  outPorts: [ 'out' ],
-  attrs: {
-    '.label': {
-      text: '集群网络出口',
-    },
-    '.body': {
-      rx: 6,
-      ry: 6,
-      strokeWidth: 1,
-    },
-  },
+let options = {
+  _deploy_2_yaml: false,
   _link_rules: {
     required: true,
+    message: '集群网络出口至少与一个服务连线',
     types: [ 'devs.DeploymentService', 'devs.Service' ],
   },
   _app_stack_template: {
@@ -39,15 +28,12 @@ const options = {
     metadata: {
       body: [
         {
-          patchPath: [ 'metadata', 'annotations' ],
+          patchPath: [ 1, 'metadata', 'annotations' ],
           overwrite: false,
           data: {
             'system/lbgroup': {
               get_inmap: 'lbgroup',
             },
-            /* 'system/schemaPortname': {
-              get_input: 'schemaPort',
-            }, */
           },
         },
       ],
@@ -63,13 +49,10 @@ const options = {
       default: '',
       needCluster: true,
     },
-    /* schemaPort: {
-      label: '扩展资源',
-      description: '需要暴露的端口和端口协议，如80/TCP或80/TCP,81/TCP',
-      default: '80/TCP',
-    }, */
   },
 }
+options = getOptions({ text: '集群网络出口', icon }, options)
+
 const LBgroup = joint.shapes.devs.Model.define('devs.LBgroup', options)
 
 LBgroup.options = options

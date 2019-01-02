@@ -11,23 +11,11 @@
  */
 
 import * as joint from 'jointjs'
+import { getOptions } from './_base'
+import icon from './svg/ConfigMap.svg'
 
-const options = {
-  size: {
-    width: 88,
-    height: 88,
-  },
-  outPorts: [ 'out' ],
-  attrs: {
-    '.label': {
-      text: 'ConfigMap',
-    },
-    '.body': {
-      rx: 6,
-      ry: 6,
-      strokeWidth: 1,
-    },
-  },
+let options = {
+  _deploy_2_yaml: true,
   _link_rules: {
     required: false,
     types: [ 'devs.DeploymentService', 'devs.Deployment' ],
@@ -53,6 +41,8 @@ const options = {
     },
   },
 }
+options = getOptions({ text: '普通配置', icon }, options)
+
 const ConfigMap = joint.shapes.devs.Model.define('devs.ConfigMap', options)
 
 ConfigMap.options = options

@@ -49,6 +49,7 @@ export default class AddressPopCard extends React.Component<AddressPopCardProps,
           trigger="click"
           onVisibleChange={this.showPop}
           arrowPointAtCenter
+          visible={this.state.show}
         // getTooltipContainer=
         // {(triggerNode) => triggerNode}
         >
