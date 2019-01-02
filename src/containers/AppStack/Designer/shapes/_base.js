@@ -12,7 +12,7 @@
 
 import merge from 'lodash/merge'
 
-export const getOptions = ({ text, icon }, options) => {
+export const getOptions = ({ text, type }, options) => {
   const DEFAULT_OPTIONS = {
     size: {
       width: 88,
@@ -37,7 +37,7 @@ export const getOptions = ({ text, icon }, options) => {
         attributes: {
           class: 'image',
           // ~ Support for quick assignment
-          href: icon,
+          href: `${process.env.PUBLIC_DIR}designer/svg/${type}.svg`,
           width: 36,
           height: 36,
           transform: 'translate(26, 8)',

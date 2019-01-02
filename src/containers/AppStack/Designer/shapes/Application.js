@@ -11,7 +11,6 @@
  */
 
 import * as joint from 'jointjs'
-import icon from './svg/Application.svg'
 
 const options = {
   size: {
@@ -54,7 +53,7 @@ const options = {
           tagName: 'image',
           attributes: {
             class: 'image',
-            href: icon,
+            href: `${process.env.PUBLIC_DIR}designer/svg/Application.svg`,
             width: 12,
             height: 12,
             transform: 'translate(12,3)',

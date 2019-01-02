@@ -12,7 +12,6 @@
 
 import * as joint from 'jointjs'
 import { getOptions } from './_base'
-import icon from './svg/DeploymentService.svg'
 
 let options = {
   inPorts: [ 'in' ],
@@ -244,7 +243,7 @@ let options = {
     },
   },
 }
-options = getOptions({ text: '服务', icon }, options)
+options = getOptions({ text: '服务', type: 'DeploymentService' }, options)
 const DeploymentService = joint.shapes.devs.Model.define('devs.DeploymentService', options)
 
 DeploymentService.options = options

@@ -85,17 +85,17 @@ export default class Events extends React.PureComponent {
                       }) => (
                         <Timeline.Item key={uid}>
                           <Row className={styles.line}>
-                            <Col span="4" className={styles.reason}>
+                            <Col span={4} className={styles.reason}>
                               <Ellipsis>
                                 {reason}
                               </Ellipsis>
                             </Col>
-                            <Col span="17">
+                            <Col span={17}>
                               <Ellipsis>
                                 {message}
                               </Ellipsis>
                             </Col>
-                            <Col span="3" className={styles.time}>
+                            <Col span={3} className={styles.time}>
                               <TimeHover time={firstTimestamp} />
                             </Col>
                           </Row>
