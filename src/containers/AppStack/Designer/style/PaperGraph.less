@@ -1,0 +1,109 @@
+/**
+ * Licensed Materials - Property of tenxcloud.com
+ * (C) Copyright 2018 TenxCloud. All Rights Reserved.
+ */
+
+/**
+ * style of PaperGraph
+ *
+ * @author zhangpc
+ * @date 2019-01-02
+ */
+@import '../../../../assets/style/core/index.less';
+@resourceListWidth: 200px;
+
+.designer {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  background-color: #fff;
+  border-radius: @border-radius-mini;
+  .resourceList {
+    width: @resourceListWidth;
+    & > div {
+      padding: 10px @padding-small;
+      border: 1px solid transparent;
+      cursor: not-allowed;
+      color: @font-color-3;
+      user-select: none;
+    }
+    .resourceLeft {
+      & > *:first-child {
+        font-size: @font-size-medium;
+        padding-right: @padding-base;
+      }
+    }
+    .resourceRight {
+      visibility: hidden;
+    }
+    .enabled {
+      cursor: move;
+      color: @font-color-1;
+      &:hover {
+        border: 1px dashed @primary-color;
+        border-radius: @border-radius-mini;
+        color: @primary-color;
+        .resourceRight {
+          visibility: visible;
+        }
+      }
+    }
+  }
+  .graph {
+    flex-grow: 2;
+    .toolBtns {
+      position: absolute;
+      z-index: 2;
+      top: @padding-small;
+      margin-left: @padding-small;
+      & > * {
+        margin-right: @padding-base;
+      }
+      .undo {
+        padding: 0 @padding-base;
+      }
+      .redo {
+        padding: 0 @padding-base;
+        :global {
+          .tenx-icon {
+            transform: scaleX(-1);
+          }
+        }
+      }
+    }
+    .toolZoom {
+      position: absolute;
+      z-index: 2;
+      right: @padding-small;
+      top: @padding-small;
+      :global {
+        .ant-slider {
+          height: 120px;
+          .ant-slider-rail {
+            background: #ccc;
+          }
+        }
+        .ant-slider-vertical {
+          padding: 0;
+        }
+        .ant-slider-with-marks {
+          margin-top: @padding-small;
+          margin-bottom: @padding-small;
+        }
+      }
+    }
+    .paper {
+      border-left: 1px solid @border-color-base;
+      border-top-right-radius: @border-radius-mini;
+      border-bottom-right-radius: @border-radius-mini;
+    }
+    .navigatorPaper {
+      position: absolute;
+      z-index: 2;
+      bottom: @padding-small;
+      right: @padding-small;
+      border: 1px solid @border-color-split;
+      border-radius: @border-radius-base;
+    }
+  }
+}
