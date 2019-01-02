@@ -11,11 +11,8 @@
  */
 import React from 'react'
 import { connect } from 'dva'
-import * as joint from 'jointjs'
-import 'jointjs/dist/joint.css'
-import '../../../Designer/shapes'
-import '../../../Designer/style/joint-custom.less'
 import styles from './style/index.less'
+import PaperGraph from '../../../Designer/PaperGraph'
 
 @connect(state => {
   const { appStack } = state
@@ -32,47 +29,15 @@ export default class StackTopology extends React.Component {
     paperScale: 1,
   }
 
-  componentDidMount() {
-    this.paperDom = document.getElementById('app-stack-paper')
-    this.graph = new joint.dia.Graph()
-    this.paper = new joint.dia.Paper({
-      el: this.paperDom,
-      model: this.graph,
-      width: '100%',
-      height: 800,
-      gridSize: 16,
-      drawGrid: {
-        name: 'fixedDot',
-      },
-      snapLinks: true,
-      linkPinning: false,
-      embeddingMode: true,
-      clickThreshold: 5,
-      defaultConnectionPoint: { name: 'boundary' },
-      highlighting: {
-        default: {
-          name: 'stroke',
-          options: {
-            padding: 6,
-          },
-        },
-        embedding: {
-          name: 'addClass',
-          options: {
-            className: 'highlighted-parent',
-          },
-        },
-      },
-      interactive: false,
-    })
-    this.graph.fromJSON(this.props.appStacksDetail.templateObj._graph)
-  }
-
   render() {
+    const { appStacksDetail } = this.props
     return <div className={styles.stackTopology}>
-      <div id="app-stack-paper">
-      loading...
-      </div>
+      <PaperGraph
+        readOnly={true}
+        onLoad={(paper, graph) => {
+          graph.fromJSON(appStacksDetail.templateObj._graph)
+        }}
+      />
     </div>
   }
 }

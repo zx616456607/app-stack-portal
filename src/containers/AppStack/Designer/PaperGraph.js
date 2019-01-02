@@ -45,7 +45,7 @@ export default class PaperGraph extends React.PureComponent {
   }
 
   static defaultProps = {
-    readOnly: false,
+    readOnly: true,
     editMode: false,
     onLoad: noop,
     onGraphChange: noop,
@@ -68,15 +68,13 @@ export default class PaperGraph extends React.PureComponent {
   componentDidMount() {
     const { onGraphChange, readOnly } = this.props
     this.initDesigner()
+    this.graph.initGraph = this.initGraph
+    this.graph.idShort = this.idShort
+    this.props.onLoad(this.paper, this.graph)
     if (readOnly) {
       return
     }
     this.initNavigator()
-    this.graph.initGraph = this.initGraph
-    this.graph.idShort = this.idShort
-    this.props.onLoad(this.paper, this.graph)
-    window._paper = this.paper
-    window._graph = this.graph
     // ~ add undo/redo support
     const _addUndoList = () => {
       const _graph = this.graph.toJSON()
@@ -187,7 +185,7 @@ export default class PaperGraph extends React.PureComponent {
           },
         },
       },
-      interactive: { arrowheadMove: false },
+      interactive: this.props.readOnly ? false : { arrowheadMove: false },
       allowLink(linkView, paper) {
         const graph = paper.model
         const { source: { id: sourceId }, target: { id: targetId } } = linkView.model.attributes
@@ -458,7 +456,7 @@ export default class PaperGraph extends React.PureComponent {
 
   render() {
     const { paperScale, redoList, yamlBtnTipVisible } = this.state
-    const { onGraphSave, editMode } = this.props
+    const { onGraphSave, editMode, readOnly } = this.props
     return (
       <Hotkeys
         keyName="delete,backspace,ctrl+z,command+z,ctrl+shift+z,command+shift+z,ctrl+s,command+s"
@@ -467,86 +465,92 @@ export default class PaperGraph extends React.PureComponent {
         tabIndex="0"
       >
         <div key="designer" className={styles.designer}>
-          <div className={styles.resourceList} key="resource">
-            {
-              RESOURCE_LIST.map(({ id, title, icon, enabled }) =>
-                <div
-                  draggable={enabled}
-                  key={id}
-                  onDragStart={ev => {
-                    // Add the target element's id to the data transfer object
-                    ev.dataTransfer.setData('text/plain', id)
-                    ev.dropEffect = 'move'
-                  }}
-                  className={classnames({ [styles.enabled]: enabled })}
-                >
-                  <Row>
-                    <Col className={styles.resourceLeft} span={22}>
-                      {icon}
-                      <span>{title}</span>
-                    </Col>
-                    <Col span={2} className={styles.resourceRight}>
-                      <Icon type="drag" />
-                    </Col>
-                  </Row>
-                </div>
-              )
-            }
-          </div>
-          <div className={styles.graph}>
-            <div className={styles.toolBtns}>
-              <Button.Group>
-                <Button
-                  disabled={this.isUndoDisabled()}
-                  onClick={this.undo}
-                  className={styles.undo}
-                >
-                  <FatArrowLeftIcon />
-                </Button>
-                <Button
-                  disabled={redoList.length === 0}
-                  onClick={this.redo}
-                  className={styles.redo}
-                >
-                  <FatArrowLeftIcon />
-                </Button>
-              </Button.Group>
-              <Button icon="delete" onClick={this.clearGraph}>
-                清空设计
-              </Button>
-              <Button icon="layout" onClick={this.layout} disabled>
-                自动布局
-              </Button>
-              <Button
-                icon="gateway"
-                onClick={() => {
-                  this.paper.scaleContentToFit({
-                    maxScale: 2,
-                    minScale: PAPER_SCALE_MIN,
-                  })
-                  const { sx } = this.paper.scale()
-                  this.setState({ paperScale: sx })
-                  // @Todo: 位置需要居中
-                }}
-                disabled
-              >
-                适应屏幕
-              </Button>
-              <Button icon="save" onClick={() => onGraphSave(this.graph.toJSON())}>
-                {
-                  editMode ? '保存更新' : '保存并提交'
-                }
-              </Button>
-              <Tooltip
-                title="请完善堆栈，确保与画布设计表示一致"
-                placement="right"
-                visible={yamlBtnTipVisible}
-              >
-                <Button icon="deployment-unit" onClick={this.toogleYamlDockVisible}>
-                  完善堆栈
-                </Button>
-              </Tooltip>
+          {
+            !readOnly &&
+            <div className={styles.resourceList} key="resource">
+              {
+                RESOURCE_LIST.map(({ id, title, icon, enabled }) =>
+                  <div
+                    draggable={enabled}
+                    key={id}
+                    onDragStart={ev => {
+                      // Add the target element's id to the data transfer object
+                      ev.dataTransfer.setData('text/plain', id)
+                      ev.dropEffect = 'move'
+                    }}
+                    className={classnames({ [styles.enabled]: enabled })}
+                  >
+                    <Row>
+                      <Col className={styles.resourceLeft} span={22}>
+                        {icon}
+                        <span>{title}</span>
+                      </Col>
+                      <Col span={2} className={styles.resourceRight}>
+                        <Icon type="drag" />
+                      </Col>
+                    </Row>
+                  </div>
+                )
+              }
             </div>
+          }
+          <div className={styles.graph}>
+            {
+              !readOnly &&
+              <div className={styles.toolBtns}>
+                <Button.Group>
+                  <Button
+                    disabled={this.isUndoDisabled()}
+                    onClick={this.undo}
+                    className={styles.undo}
+                  >
+                    <FatArrowLeftIcon />
+                  </Button>
+                  <Button
+                    disabled={redoList.length === 0}
+                    onClick={this.redo}
+                    className={styles.redo}
+                  >
+                    <FatArrowLeftIcon />
+                  </Button>
+                </Button.Group>
+                <Button icon="delete" onClick={this.clearGraph}>
+                  清空设计
+                </Button>
+                <Button icon="layout" onClick={this.layout} disabled>
+                  自动布局
+                </Button>
+                <Button
+                  icon="gateway"
+                  onClick={() => {
+                    this.paper.scaleContentToFit({
+                      maxScale: 2,
+                      minScale: PAPER_SCALE_MIN,
+                    })
+                    const { sx } = this.paper.scale()
+                    this.setState({ paperScale: sx })
+                    // @Todo: 位置需要居中
+                  }}
+                  disabled
+                >
+                  适应屏幕
+                </Button>
+                <Button icon="save" onClick={() => onGraphSave(this.graph.toJSON())}>
+                  {
+                    editMode ? '保存更新' : '保存并提交'
+                  }
+                </Button>
+                <Tooltip
+                  title="请完善堆栈，确保与画布设计表示一致"
+                  placement="right"
+                  visible={yamlBtnTipVisible}
+                >
+                  <Button icon="deployment-unit" onClick={this.toogleYamlDockVisible}>
+                    完善堆栈
+                  </Button>
+                </Tooltip>
+              </div>
+            }
             <div className={styles.toolZoom}>
               <Button
                 shape="circle"
@@ -586,13 +590,16 @@ export default class PaperGraph extends React.PureComponent {
             >
               <div className="loading">loading ...</div>
             </div>
-            <div
-              id="app-stack-paper-navigator"
-              className={styles.navigatorPaper}
-              key="navigator-paper"
-            >
-              <div className="loading">loading ...</div>
-            </div>
+            {
+              !readOnly &&
+              <div
+                id="app-stack-paper-navigator"
+                className={styles.navigatorPaper}
+                key="navigator-paper"
+              >
+                <div className="loading">loading ...</div>
+              </div>
+            }
           </div>
         </div>
       </Hotkeys>

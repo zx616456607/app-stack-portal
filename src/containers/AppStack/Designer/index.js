@@ -321,8 +321,7 @@ inputs: []`,
               this.graph = graph
               this.initGraph()
             }}
-          >
-          </PaperGraph>
+          />
         </QueueAnim>
         <YamlDock
           visible={yamlDockVisible}
