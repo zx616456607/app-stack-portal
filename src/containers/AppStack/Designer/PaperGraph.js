@@ -45,7 +45,7 @@ export default class PaperGraph extends React.PureComponent {
   }
 
   static defaultProps = {
-    readOnly: true,
+    readOnly: false,
     editMode: false,
     onLoad: noop,
     onGraphChange: noop,
