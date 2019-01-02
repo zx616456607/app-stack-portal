@@ -14,7 +14,7 @@ import {
   AppC as AppIcon,
   ServiceC as ServiceIcon,
   ConfigmapC as ConfigmapIcon,
-  ClusterMeshPort as ClusterMeshPortIcon,
+  ClusterMeshPortC as ClusterMeshPortIcon,
 } from '@tenx-ui/icon'
 import { Icon } from 'antd'
 
