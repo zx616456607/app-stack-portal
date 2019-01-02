@@ -53,7 +53,8 @@ class Log extends React.PureComponent {
       <div>
         <span className={styles.name}>[{log.name}]&nbsp;</span>
         <span className={styles.date}>[{
-          moment(parseInt(log.time_nano / 1000))
+          // [KK-2102] the length of log.time_nano may be equal to 19
+          moment(parseInt(log.time_nano / Math.pow(10, (log.time_nano + '').length - 13)))
             .format(DEFAULT_TIME_FORMAT)
         }]&nbsp;</span>
         <span className={styles.content}>{log.log}</span>
