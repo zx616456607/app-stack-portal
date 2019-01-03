@@ -172,7 +172,7 @@ inputs: []`,
       const nodes = yamlObj.nodes || {}
       const inputs = yamlObj.inputs || {}
       this.graph.getCells().forEach(cell => {
-        const key = this.graph.idshort(cell.id)
+        const key = this.graph.idShort(cell.id)
         if (!nodes[key]) {
           cell.remove()
           this.graph2Yaml()
