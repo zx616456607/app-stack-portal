@@ -31,7 +31,7 @@
   },
   "devDependencies": {
     "@antv/data-set": "^0.10.0",
-    "@tenx-ui/editor": "2.0.3",
+    "@tenx-ui/editor": "2.0.4",
     "@tenx-ui/ellipsis": "^0.0.4",
     "@tenx-ui/icon": "^2.1.32",
     "@tenx-ui/loader": "^0.0.3",
