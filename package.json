@@ -33,20 +33,20 @@
     "@antv/data-set": "^0.10.0",
     "@tenx-ui/editor": "2.0.3",
     "@tenx-ui/ellipsis": "^0.0.4",
-    "@tenx-ui/icon": "^2.1.30",
+    "@tenx-ui/icon": "^2.1.32",
     "@tenx-ui/loader": "^0.0.3",
     "@tenx-ui/logs": "^1.1.6",
     "@tenx-ui/modal": "^1.0.9",
     "@tenx-ui/monitorChart": "^1.0.1",
     "@tenx-ui/page": "^1.0.2",
+    "@tenx-ui/relation-chart": "^0.2.11",
     "@tenx-ui/resource-custom-config": "^0.0.5",
     "@tenx-ui/return-button": "^0.0.4",
     "@tenx-ui/select-with-checkbox": "^0.0.6",
     "@tenx-ui/time-hover": "^1.1.3",
     "@tenx-ui/webSocket": "^1.1.2",
     "@tenx-ui/xterm": "^0.0.1",
-    "@tenx-ui/relation-chart": "^0.2.11",
-    "antd": "3.10.7",
+    "antd": "^3.11.6",
     "babel-plugin-dva-hmr": "^0.4.1",
     "babel-plugin-import": "^1.6.6",
     "babel-plugin-transform-react-remove-prop-types": "^0.4.13",
@@ -84,7 +84,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "npm run lint-fix"
+      "pre-commit": "npm run lint"
     }
   }
 }

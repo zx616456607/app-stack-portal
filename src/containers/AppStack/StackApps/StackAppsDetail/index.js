@@ -37,13 +37,13 @@ const childRoutes = [
   {
     path: '/app-stack/appStackDetail/:name/stack-topology',
     component: require('./StackTopology').default,
-    tabName: '堆栈拓扑',
+    tabName: '模板拓扑',
     tabKey: 'stack-topology',
   },
   {
     path: '/app-stack/appStackDetail/:name/resource-topology',
     component: require('./ResourceTopology').default,
-    tabName: '资源拓扑',
+    tabName: '全链路监控',
     tabKey: 'resource-topology',
   },
   {
@@ -156,13 +156,21 @@ class StackAppsDetail extends React.Component {
           }
           return
         }
+
+        if (stoppedList.length === deployments.length) {
+          status = {
+            txt: '堆栈停止',
+            color: '#f85a5a',
+          }
+          return
+        }
       })
     }
     return status
   }
   start = () => {
     const name = this.props.match.params.name
-    const { cluster, appStackStart } = this.props
+    const { cluster, appStackStart, getStackDetail } = this.props
     modal.confirm({
       modalTitle: '启动堆栈',
       title: '该操作将启动堆栈内所有服务，待所有服务正常运行后，堆栈运行状态为正常',
@@ -175,6 +183,7 @@ class StackAppsDetail extends React.Component {
             this.setState({
               stopModal: false,
             })
+            getStackDetail({ cluster, name })
             notification.success({ message: '启动成功' })
           } else {
             notification.warn({ message: '启动失败' })
@@ -189,7 +198,7 @@ class StackAppsDetail extends React.Component {
   }
   stop = () => {
     const name = this.props.match.params.name
-    const { cluster, appStackStop } = this.props
+    const { cluster, appStackStop, getStackDetail } = this.props
     modal.confirm({
       modalTitle: '停止堆栈',
       title: '该操作将停止堆栈内所有服务，待所有服务停止运行后，堆栈运行状态为未启动',
@@ -202,6 +211,7 @@ class StackAppsDetail extends React.Component {
             this.setState({
               stopModal: false,
             })
+            getStackDetail({ cluster, name })
             notification.success({ message: '停止成功' })
           } else {
             notification.warn({ message: '停止失败' })

@@ -28,6 +28,11 @@ const options = {
       strokeWidth: 1,
     },
   },
+  _deploy_2_yaml: false,
+  _link_rules: {
+    required: false,
+    types: [],
+  },
   _app_stack_template: {
     apiVersion: 'v1',
     kind: 'Application',

@@ -14,7 +14,7 @@
 
 import React from 'react'
 import { connect } from 'dva'
-import { Spin } from 'antd'
+import { Spin, notification } from 'antd'
 import cloneDeep from 'lodash/cloneDeep'
 import isEmpty from 'lodash/isEmpty'
 import Metric from '@tenx-ui/monitorChart'
@@ -61,8 +61,19 @@ class Monitor extends React.PureComponent {
     })
   }
 
-  componentDidMount() {
+  async componentDidMount() {
+    const { type: monitorType } = this.props
+    if (monitorType === 'StatefulSet') {
+      await this.fetchPodList()
+      this.intervalLoadMetrics()
+    }
     this.intervalLoadMetrics()
+  }
+  fetchPodList = () => {
+    const { dispatch } = this.props
+    return dispatch({
+      type: 'nativeDetail/fetchPodsList',
+    }).catch(() => notification.warn({ message: '获取 Pods 失败' }))
   }
 
   intervalLoadMetrics = () => {

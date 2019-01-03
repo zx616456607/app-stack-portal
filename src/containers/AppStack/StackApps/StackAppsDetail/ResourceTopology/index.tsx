@@ -152,7 +152,7 @@ export default class ResourceTopology extends React.Component<RTProps, RTState> 
     return podsArray
   }
   onNodeClick = (_, e, nodeInfo: any): void => {
-    let lname = nodeInfo.label
+    const lname = nodeInfo.label
     e.stopPropagation();
     const { nodeArray } = this.state;
     const newNodes = [...nodeArray]

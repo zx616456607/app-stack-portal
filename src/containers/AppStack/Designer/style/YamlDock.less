@@ -1,0 +1,37 @@
+/**
+ * Licensed Materials - Property of tenxcloud.com
+ * (C) Copyright 2018 TenxCloud. All Rights Reserved.
+ */
+
+/**
+ * style of YamlDock
+ *
+ * @author zhangpc
+ * @date 2018-12-27
+ */
+@import '../../../../assets/style/core/index.less';
+
+@yamlEditorHeaderHeight: 42px;
+.yamlEditor {
+  height: 100%;
+  .yamlEditorHeader {
+    height: @yamlEditorHeaderHeight;
+    .yamlEditorHeaderBtns {
+      margin-right: @padding-base;
+      :global {
+        .ant-btn {
+          border: none;
+        }
+      }
+    }
+  }
+  :global {
+    .codeEditor {
+      height: calc(~"100% - @{yamlEditorHeaderHeight}");
+      .codeEditorHeader {
+        display: none;
+        border-radius: 0;
+      }
+    }
+  }
+}
