@@ -121,7 +121,12 @@ export default class YamlDock extends React.PureComponent {
                   shape="circle"
                 />
               </Tooltip>
-              {/* <Button type="dashed" icon="search" shape="circle" /> */}
+              <Button
+                type="dashed"
+                icon="search"
+                shape="circle"
+                onClick={() => { this.yarmlEditor.execCommand('find') }}
+              />
               <Button
                 type="dashed"
                 icon="minus"

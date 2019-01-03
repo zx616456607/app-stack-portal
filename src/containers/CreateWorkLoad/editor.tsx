@@ -90,6 +90,7 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
           onSiderClick={() => {
             this.setState({ collapsed: !this.state.collapsed }, () => this.Ace.resize())
           }}
+          onSearchClick={() => { this.Ace.execCommand('find') }}
         />
         <Layout
           style={{ height: this.state.fullScreen ? 'calc( 100vh - 30px )' : 'calc( 100vh - 102px )' }}
@@ -181,6 +182,7 @@ interface EditorHeaderProps {
   fullScreen: boolean,
   toggleFullScreen: () => void,
   onSiderClick: () => void,
+  onSearchClick: () => void,
 }
 
 const EditorHeader = ({
@@ -190,6 +192,7 @@ const EditorHeader = ({
   fullScreen,
   onSiderClick,
   toggleFullScreen,
+  onSearchClick,
 }: EditorHeaderProps,
 ) => {
   return (
@@ -220,6 +223,12 @@ const EditorHeader = ({
         theme="outlined"
       />
       工具
+      </div>
+      </Tooltip>
+      <Tooltip title={'搜索'}>
+      <div className={styles.editIcon}  onClick={onSearchClick}>
+      <Icon type="search" />
+      搜索
       </div>
       </Tooltip>
       <Tooltip title={fullScreen ? '退出全屏' : '全屏'}>
