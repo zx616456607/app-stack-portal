@@ -37,13 +37,13 @@ const childRoutes = [
   {
     path: '/app-stack/appStackDetail/:name/stack-topology',
     component: require('./StackTopology').default,
-    tabName: '堆栈拓补',
+    tabName: '堆栈拓扑',
     tabKey: 'stack-topology',
   },
   {
     path: '/app-stack/appStackDetail/:name/resource-topology',
     component: require('./ResourceTopology').default,
-    tabName: '资源拓补',
+    tabName: '资源拓扑',
     tabKey: 'resource-topology',
   },
   {

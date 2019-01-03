@@ -42,7 +42,7 @@ function mapStateToProps(state) {
 const defaultAppConfig = {
   id: '',
   label: '',
-  width: 0, height: 0,
+  width: 50, height: 50,
   onClick: () => {},
   isAnimated: true,
   shape: 'dottedcylinder',
@@ -51,7 +51,7 @@ const defaultAppConfig = {
 const defaultDpConfig = {
   id: '',
   label: '',
-  width: 0, height: 0,
+  width: 50, height: 50,
   onClick: () => {},
   isAnimated: true,
   shape: 'cloud',
@@ -60,7 +60,7 @@ const defaultDpConfig = {
 const defaultPodConfig = {
   id: '',
   label: '',
-  width: 0, height: 0,
+  width: 50, height: 50,
   onClick: () => {},
   isAnimated: true,
   shape: 'circle',
@@ -69,7 +69,7 @@ const defaultPodConfig = {
 const defaultcMConfig = {
   id: '',
   label: '',
-  width: 0, height: 0,
+  width: 50, height: 50,
   onClick: () => {},
   isAnimated: true,
   shape: 'triangle',
@@ -79,7 +79,7 @@ const defaultEdgeConfig = {
   source: '',
   target: '',
   withArrow: true,
-  arrowOffset: 25,
+  arrowOffset: 10,
   label: '',
   isAnimated: true,
 }
@@ -88,21 +88,21 @@ function formateEdgesAndNodes(appStack: any, onClick: (lname: string, e: any) =>
   const edgeEdge: any[] = []
   const NodeArray: any[] = []
   Object.entries(appStack).forEach(([appNode, dpNodeArray]) => {
-    NodeArray.push(Object.assign({}, defaultAppConfig, { id: appNode, label: appNode }))
+    NodeArray.push(Object.assign({}, defaultAppConfig, { id: `app-${appNode}`, label: appNode }))
     dpNodeArray.forEach(dpNode => {
       const name = getDeepValue(dpNode, ['metadata', 'name'])
-      NodeArray.push(Object.assign({}, defaultDpConfig, { id: name, label: name, onClick }))
-      edgeEdge.push(Object.assign({}, defaultEdgeConfig, { source: appNode, target: name }))
+      NodeArray.push(Object.assign({}, defaultDpConfig, { id: `deployment-${name}`, label: name, onClick }))
+      edgeEdge.push(Object.assign({}, defaultEdgeConfig, { source: `app-${appNode}`, target: `deployment-${name}` }))
       const podsArray = getDeepValue(dpNode, ['pods']) || []
       podsArray.forEach(pods => {
         const podsName = getDeepValue(pods, [ 'metadata', 'name' ])
         NodeArray.push(Object.assign({}, defaultPodConfig, { id: podsName, label: podsName, onClick }))
-        edgeEdge.push(Object.assign({}, defaultEdgeConfig, { source: name, target: podsName }))
+        edgeEdge.push(Object.assign({}, defaultEdgeConfig, { source: `deployment-${name}`, target: podsName }))
       });
       const cmArray = getDeepValue(dpNode, ['configMap']) || {}
       Object.keys(cmArray).forEach((cmName) => {
         NodeArray.push(Object.assign({}, defaultcMConfig, { id: cmName, label: cmName }))
-        edgeEdge.push(Object.assign({}, defaultEdgeConfig, { source: name, target: cmName }))
+        edgeEdge.push(Object.assign({}, defaultEdgeConfig, { source: `deployment-${name}`, target: cmName }))
       })
     });
   })
@@ -151,7 +151,8 @@ export default class ResourceTopology extends React.Component<RTProps, RTState> 
     .filter((pods) => { return pods.metadata.name === name })
     return podsArray
   }
-  onNodeClick = (lname: string, e): void => {
+  onNodeClick = (_, e, nodeInfo: any): void => {
+    let lname = nodeInfo.label
     e.stopPropagation();
     const { nodeArray } = this.state;
     const newNodes = [...nodeArray]
