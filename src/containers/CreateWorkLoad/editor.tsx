@@ -27,6 +27,7 @@ import PanelGroup from 'react-panelgroup'
 import AnalyzeNameSpace from './analyzeNameSpace'
 import { Import as ImportIcon } from '@tenx-ui/icon'
 import '@tenx-ui/icon/assets/index.css'
+import { getDeepValue } from '../../utils/helper';
 const {  Sider, Content } = Layout
 interface EditorProps extends SubscriptionAPI {
   onBeforeChange: (value: yamlString) => void;
@@ -42,6 +43,7 @@ interface EditorState {
   Exportvisible: boolean;
   Importvisible: boolean;
   collapsed: boolean;
+  warnWrapHeight: number
 }
 export default class Editor extends React.Component<EditorProps, EditorState> {
   state = {
@@ -49,6 +51,7 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
     Exportvisible: false,
     Importvisible: false,
     collapsed: false,
+    warnWrapHeight: 80,
   }
   editorNode: HTMLDivElement
   innerNode: HTMLDivElement
@@ -104,15 +107,24 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
           borderColor="#252525"
           panelWidths={[
             { resize: 'stretch' },
-            { size: 80, minSize: 0, resize: 'dynamic' },
+            {
+              size: this.state.warnWrapHeight,
+              minSize: 0,
+              resize: 'dynamic',
+            },
           ]}
-          onUpdate={() => this.Ace.resize()}
+          onUpdate={(res) => {
+            const warnWrapHeight = getDeepValue(res, [1, 'size'])
+            this.setState({ warnWrapHeight })
+            this.Ace.resize()
+          }}
         >
         <TenxEditor
           titleDisplay={false}
           onChange={this.props.onBeforeChange}
           value={this.props.value}
           onLoad={(ace) => this.Ace = (ace as AceEditor)}
+          fullscreenHeight="100%"
         />
         <div className={styles.warnZoon}>
         <div className={styles.errorInfo}>错误调试窗口</div>
