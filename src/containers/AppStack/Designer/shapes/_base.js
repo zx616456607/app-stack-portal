@@ -87,6 +87,9 @@ export const getOptions = ({ text, type }, options) => {
         in: {
           position: {
             name: 'right',
+            args: {
+              y: 22,
+            },
           },
           attrs: {
             '.port-label': {
@@ -103,6 +106,9 @@ export const getOptions = ({ text, type }, options) => {
         out: {
           position: {
             name: 'left',
+            args: {
+              y: 22,
+            },
           },
           attrs: {
             '.port-label': {

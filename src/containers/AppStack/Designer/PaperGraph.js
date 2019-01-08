@@ -132,6 +132,31 @@ export default class PaperGraph extends React.PureComponent {
       }
       this.embedsMap[id] = newEmbeds
     })
+    // add link tools
+    /* this.paper.on('link:mouseenter', linkView => {
+      const tools = new joint.dia.ToolsView({
+        tools: [
+          new joint.linkTools.Vertices(),
+          new joint.linkTools.Segments({
+            focusOpacity: 0.5,
+            redundancyRemoval: false,
+            segmentLengthThreshold: 50,
+            snapHandle: false,
+            snapRadius: 10,
+          }),
+          new joint.linkTools.SourceArrowhead(),
+          new joint.linkTools.TargetArrowhead(),
+          new joint.linkTools.SourceAnchor(),
+          new joint.linkTools.TargetAnchor(),
+          new joint.linkTools.Boundary(),
+          new joint.linkTools.Remove(),
+        ],
+      })
+      linkView.addTools(tools)
+    })
+    this.paper.on('link:mouseleave', linkView => {
+      linkView.removeTools()
+    }) */
   }
 
   initDesigner = () => {
@@ -195,7 +220,17 @@ export default class PaperGraph extends React.PureComponent {
         }
         const source = graph.getCell(sourceId)
         const target = graph.getCell(targetId)
-        return source.attributes._link_rules.types.indexOf(target.attributes.type) > -1
+        const isAllowLink = source.attributes._link_rules.types.indexOf(target.attributes.type) > -1
+        if (isAllowLink) {
+          const link = new joint.dia.Link({
+            source: { id: sourceId },
+            target: { id: targetId },
+            connector: { name: 'rounded' },
+            smooth: true,
+          })
+          graph.addCells([ link ])
+        }
+        return false
       },
       validateEmbedding: (childView, parentView) => {
         const isEmbedding = parentView.model instanceof joint.shapes.devs.Application
