@@ -71,6 +71,8 @@ export default class PaperGraph extends React.PureComponent {
     this.graph.initGraph = this.initGraph
     this.graph.idShort = this.idShort
     this.props.onLoad(this.paper, this.graph)
+    // window._paper = this.paper
+    // window._graph = this.graph
     if (readOnly) {
       return
     }
@@ -100,7 +102,15 @@ export default class PaperGraph extends React.PureComponent {
       const fitEmbeds = () => {
         const currentElement = this.graph.getCell(id)
         if (currentElement) {
-          currentElement.fitEmbeds({ deep: true, padding: 48 })
+          currentElement.fitEmbeds({
+            deep: true,
+            padding: {
+              left: 40,
+              top: 36,
+              right: 40,
+              bottom: 36,
+            },
+          })
         }
       }
       const currentOldEmbeds = this.embedsMap[id] || []
@@ -363,6 +373,17 @@ export default class PaperGraph extends React.PureComponent {
     idShortIdMap[resource.id] = _shortId
     this.setState({ idShortIdMap })
     this.addLabelId(resource)
+    // handle embed when dropped
+    if (id !== 'Application') {
+      this.graph.getElements().forEach(element => {
+        if (resource.getBBox().intersect(element.getBBox())) {
+          if (element instanceof joint.shapes.devs.Application) {
+            // now embed the new element into the existing one
+            element.embed(resource);
+          }
+        }
+      })
+    }
 
     this.props.onGraphChange(this.graph.toJSON())
   }
