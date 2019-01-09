@@ -21,7 +21,7 @@ import { connect } from 'dva'
 import { DOCK_DEFAULT_HEADER_SIZE, DOCK_DEFAULT_SIZE } from '../../../utils/constants'
 import { userPortalApi } from '../../../utils/config'
 import { WebSocket } from '@tenx-ui/webSocket'
-import { b64_to_utf8, utf8_to_b64 } from '../../../utils/helper'
+import { b64_to_utf8, utf8_to_b64, getExploreName } from '../../../utils/helper'
 
 const TERM_TIPS_DISABLED = 'term_tips_disabled'
 
@@ -189,12 +189,12 @@ export default class Index extends React.Component {
     })
   }
 
-  renderWS = () => {
+  renderWS = (rows, cols) => {
     const { cluster, project, dockName, dockContainer } = this.props
     if (!dockName || !dockContainer) return null
     const protocol = userPortalApi.protocol === 'http' ? 'ws' : 'wss'
     const wsUrl = `${protocol}://${userPortalApi.host}/api/v1/cluster/${
-      cluster}/namespaces/${project}/pods/${dockName}/exec?container=${dockContainer}`
+      cluster}/namespaces/${project}/pods/${dockName}/exec?container=${dockContainer}&rows=${rows}&cols=${cols}`
     return <WebSocket
       url={wsUrl}
       protocol={'base64.channel.k8s.io'}
@@ -204,6 +204,9 @@ export default class Index extends React.Component {
   }
   render() {
     const { dockSize, dockVisible } = this.props
+    const browserRate = getExploreName() === 'Firefox' ? 0.068 : 0.073
+    const rows = parseInt((dockSize - DOCK_DEFAULT_HEADER_SIZE - 24) * browserRate)
+    const cols = parseInt((document.body.clientWidth - 26) / 6.95)
     return (
       <div>
         <Dock
@@ -223,11 +226,13 @@ export default class Index extends React.Component {
               thirdAddons={[ 'attach' ]}
               options={{
                 cursorBlink: true,
+                rows,
+                cols,
               }}
             />
           </div>
         </Dock>
-        { this.state.showSocket && this.renderWS() }
+        { this.state.showSocket && this.renderWS(rows, cols) }
       </div>
     )
   }
