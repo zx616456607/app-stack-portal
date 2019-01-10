@@ -363,7 +363,7 @@ inputs: []`,
           <Form>
             <FormItem
               {...FormItemLayout}
-              label="堆栈名称"
+              label="模板名称"
             >
               {getFieldDecorator('name', {
                 initialValue: templateDetail && templateDetail.name,
@@ -380,7 +380,7 @@ inputs: []`,
             </FormItem>
             <FormItem
               {...FormItemLayout}
-              label="堆栈描述"
+              label="模板描述"
             >
               {getFieldDecorator('description', {
                 initialValue: templateDetail && templateDetail.description,
