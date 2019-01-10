@@ -194,11 +194,29 @@ inputs: []`,
         return
       }
       const _graph = this.graph.toJSON()
+      // check empty stack
       if (_graph.cells.length === 0) {
         this.setState({ saveStackModal: false })
         notification.info({
           message: '保存堆栈模版失败',
           description: '无效的空白模版',
+        })
+        return
+      }
+      // check if have DeploymentService
+      let isHaveDeploymentService = false
+      _graph.cells.every(cell => {
+        if (cell.type === 'devs.DeploymentService') {
+          isHaveDeploymentService = true
+          return false
+        }
+        return true
+      })
+      if (!isHaveDeploymentService) {
+        this.setState({ saveStackModal: false })
+        notification.info({
+          message: '保存堆栈模版失败',
+          description: '堆栈模版至少要包含一个服务',
         })
         return
       }
