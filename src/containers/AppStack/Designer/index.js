@@ -171,7 +171,9 @@ inputs: []`,
       this.setState({ yamlObj })
       const nodes = yamlObj.nodes || {}
       const inputs = yamlObj.inputs || {}
-      this.graph.getCells().forEach(cell => {
+      let cells = this.graph.getCells()
+      cells = cells.filter(({ attributes: { type } }) => type !== 'link')
+      cells.forEach(cell => {
         const key = this.graph.idShort(cell.id)
         if (!nodes[key]) {
           cell.remove()
