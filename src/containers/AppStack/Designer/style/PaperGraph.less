@@ -51,6 +51,18 @@
   }
   .graph {
     flex-grow: 2;
+    :global {
+      #app-stack-paper {
+        cursor: grab;
+      }
+    }
+    &.grabbing {
+      :global {
+        #app-stack-paper {
+          cursor: grabbing;
+        }
+      }
+    }
     .toolBtns {
       position: absolute;
       z-index: 2;

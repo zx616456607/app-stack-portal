@@ -63,6 +63,7 @@ export default class PaperGraph extends React.PureComponent {
     undoList: [],
     redoList: [],
     yamlBtnTipVisible: false,
+    grabbing: false,
   }
 
   componentDidMount() {
@@ -272,18 +273,21 @@ export default class PaperGraph extends React.PureComponent {
 
     this.paper.on('blank:pointerclick', clearActiveElement)
 
-    // @Todo: 可以用来做画布平移
-    /* this.paper.on('blank:pointermove', e => {
-      console.warn('blank:pointermove', e)
+    // 画布平移
+    this.paper.on('blank:pointerdown', (e, x, y) => {
+      this._pointerX = x
+      this._pointerY = y
+      this.setState({ grabbing: true })
     })
-
-    this.paper.on('blank:mouseover', e => {
-      console.warn('blank:mouseover', e)
+    this.paper.on('blank:pointermove', (e, x, y) => {
+      const { tx: _tx, ty: _ty } = this.paper.translate()
+      const tx = _tx + (x - this._pointerX)
+      const ty = _ty + (y - this._pointerY)
+      this.paper.translate(tx, ty)
     })
-
-    this.paper.on('paper:mouseenter', e => {
-      console.warn('paper:mouseenter', e)
-    }) */
+    this.paper.on('blank:pointerup', () => {
+      this.setState({ grabbing: false })
+    })
   }
 
   initNavigator = () => {
@@ -341,11 +345,15 @@ export default class PaperGraph extends React.PureComponent {
   onResourceDrop = ev => {
     ev.preventDefault()
     // Get the id of the target and add the moved element to the target's DOM
-    const id = ev.dataTransfer.getData('text');
+    const id = ev.dataTransfer.getData('text')
+    const ResourceShape = joint.shapes.devs[id]
+    if (!ResourceShape) {
+      console.warn(`'${id}' resource shape not found.`)
+      return
+    }
     const { tx, ty } = this.paper.translate()
     const { paperScale } = this.state
-    this.paper.translate(0, 0)
-    this.paper.scale(1, 1)
+
     const options = {
       position: {
         x: ev.clientX - this.paperDom.offsetLeft - SIDER_WIDTH - 16,
@@ -355,16 +363,21 @@ export default class PaperGraph extends React.PureComponent {
 
     const {
       size = { width: 40, height: 40 },
-    } = joint.shapes.devs[id].options || {}
+    } = ResourceShape.options || {}
     // 减去元素大小的一半
     options.position.x -= size.width / 2
     options.position.y -= size.height / 2
 
-    const resource = new joint.shapes.devs[id](options)
-    this.graph.addCells([ resource ])
+    // 算上位移
+    options.position.x -= tx
+    options.position.y -= ty
 
-    this.paper.translate(tx, ty)
-    this.paper.scale(paperScale, paperScale)
+    // 除以放缩比
+    options.position.x /= paperScale
+    options.position.y /= paperScale
+
+    const resource = new ResourceShape(options)
+    this.graph.addCells([ resource ])
 
     const { idShortIdMap } = this.state
     const _shortId = this.idShort(resource.id)
@@ -511,7 +524,7 @@ export default class PaperGraph extends React.PureComponent {
   }
 
   render() {
-    const { paperScale, redoList, yamlBtnTipVisible } = this.state
+    const { paperScale, redoList, yamlBtnTipVisible, grabbing } = this.state
     const { onGraphSave, editMode, readOnly } = this.props
     return (
       <Hotkeys
@@ -550,7 +563,7 @@ export default class PaperGraph extends React.PureComponent {
               }
             </div>
           }
-          <div className={styles.graph}>
+          <div className={classnames(styles.graph, { [styles.grabbing]: grabbing })}>
             {
               !readOnly &&
               <div className={styles.toolBtns}>
@@ -573,9 +586,9 @@ export default class PaperGraph extends React.PureComponent {
                 <Button icon="delete" onClick={this.clearGraph}>
                   清空设计
                 </Button>
-                <Button icon="layout" onClick={this.layout} disabled>
+                {/* <Button icon="layout" onClick={this.layout} disabled>
                   自动布局
-                </Button>
+                </Button> */}
                 <Button
                   icon="gateway"
                   onClick={() => {
@@ -584,10 +597,11 @@ export default class PaperGraph extends React.PureComponent {
                       minScale: PAPER_SCALE_MIN,
                     })
                     const { sx } = this.paper.scale()
-                    this.setState({ paperScale: sx })
+                    this.setState({
+                      paperScale: sx,
+                    })
                     // @Todo: 位置需要居中
                   }}
-                  disabled
                 >
                   适应屏幕
                 </Button>
