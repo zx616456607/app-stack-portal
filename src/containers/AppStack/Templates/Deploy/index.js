@@ -16,7 +16,7 @@ import {
   Card, Form, Input, Collapse, Table, Button, notification, InputNumber,
   Select,
 } from 'antd'
-import { Link } from 'react-router-dom'
+import UnifiedLink, { push as unifiedPush } from '../../../../components/UnifiedLink'
 import { connect } from 'dva'
 import Loader from '@tenx-ui/loader'
 import yamlParser from 'js-yaml'
@@ -388,7 +388,7 @@ class StackTemplateDeploy extends React.Component {
         notification.success({
           message: '启动应用堆栈成功',
         })
-        history.push(`/app-stack/appStackDetail/${name}/events`)
+        unifiedPush(`/app-stack/appStackDetail/${name}/events`, history)
       } catch (error) {
         const { response } = error || {}
         const { code, details } = response || {}
@@ -504,9 +504,9 @@ class StackTemplateDeploy extends React.Component {
                 </div>
               </div>
               <div className={styles.btnGroup}>
-                <Link to="/app-stack/templates">
+                <UnifiedLink to="/app-stack/templates">
                   <Button>取消</Button>
-                </Link>
+                </UnifiedLink>
                 <Button type="primary" onClick={this.appStackStart} loading={btnLoading}>
                 启动应用堆栈
                 </Button>

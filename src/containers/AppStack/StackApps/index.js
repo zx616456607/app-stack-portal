@@ -15,12 +15,12 @@ import React from 'react'
 import QueueAnim from 'rc-queue-anim'
 import { connect } from 'dva'
 import { Card, Button, notification } from 'antd'
-import { Link } from 'react-router-dom'
 import { Stack as StackIcon } from '@tenx-ui/icon'
 import { Circle as CircleIcon } from '@tenx-ui/icon'
 import Loader from '@tenx-ui/loader'
 import Ellipsis from '@tenx-ui/ellipsis'
 import styles from './style/index.less'
+import UnifiedLink from '../../../components/UnifiedLink'
 
 @connect(state => {
   const { appStack, loading, app } = state
@@ -35,9 +35,6 @@ class StackApps extends React.Component {
       size: 0,
     }
     this.getAppStackList(query)
-  }
-  componentDidCatch(error, info) {
-    console.warn('StackApps componentDidCatch', error, info)
   }
   getAppStackList = query => {
     const { dispatch, cluster } = this.props
@@ -94,9 +91,9 @@ class StackApps extends React.Component {
     return <QueueAnim
       id="appStack"
     >
-      <Link to="app-stack/templates">
+      <UnifiedLink to="/app-stack/templates">
         <Button type="primary" icon="plus" key="button">部署堆栈</Button>
-      </Link>
+      </UnifiedLink>
       <div className={styles.appStackContent}>
         {
           stacksLoading ?
@@ -111,7 +108,7 @@ class StackApps extends React.Component {
                   <div className={styles.noData}>暂无数据</div>
                   :
                   appStackList.map(v => <Card hoverable key={v.name} className={styles.listItem}>
-                    <Link to={`/app-stack/appStackDetail/${v.name}`} className={styles.itemTop}>
+                    <UnifiedLink to={`/app-stack/appStackDetail/${v.name}`} className={styles.itemTop}>
                       <div className={styles.itemImg}>
                         <StackIcon className={styles.stackIcon}/>
                       </div>
@@ -134,7 +131,7 @@ class StackApps extends React.Component {
 
                         </div>
                       </div>
-                    </Link>
+                    </UnifiedLink>
                     <div className={styles.itemBottom}>
                       <div>
                         <h5>应用</h5>

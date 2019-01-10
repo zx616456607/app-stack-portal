@@ -172,13 +172,6 @@ function RouterConfig({ history, app }) {
         import('./models/appStack'),
       ],
     },
-    {
-      path: '/app-stack/designer/:name/:mode',
-      component: () => import('./containers/AppStack/Designer'),
-      models: () => [
-        import('./models/appStack'),
-      ],
-    },
   ]
   return (
     <ConnectedRouter history={history}>

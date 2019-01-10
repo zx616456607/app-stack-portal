@@ -16,7 +16,7 @@ import styles from './style/index.less'
 import { connect } from 'react-redux'
 import { getDeepValue, cpuFormat, memoryFormat } from '../../../../../utils/helper'
 import TimeHover from '@tenx-ui/time-hover'
-import { Link } from 'react-router-dom'
+import UnifiedLink from '../../../../../components/UnifiedLink'
 
 const Search = Input.Search
 const SUPPORT_WORK_LOAD = [ 'Deployment', 'Service', 'StatefulSet', 'Job', 'CronJob', 'Pod' ]
@@ -107,7 +107,7 @@ class StackElements extends React.Component {
       dataIndex: 'name',
       render: (name, { kind }) => {
         if (SUPPORT_WORK_LOAD.indexOf(kind) > -1) {
-          return <Link to={`/${kind}/${name}`}>{name}</Link>
+          return <UnifiedLink to={`/${kind}/${name}`}>{name}</UnifiedLink>
         }
         return name
       },

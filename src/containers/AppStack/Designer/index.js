@@ -20,6 +20,8 @@ import yamlParser from 'js-yaml'
 import styles from './style/index.less'
 import YamlDock from './YamlDock'
 import PaperGraph from './PaperGraph'
+import { push as unifiedPush } from '../../../components/UnifiedLink'
+
 
 const FormItem = Form.Item
 const APP_STACK_LOCAL_STORAGE_KEY = '_app_stack_graph'
@@ -279,7 +281,7 @@ inputs: []`,
         this.graph.clear()
 
         this._removeGraphObjFromLS()
-        history.push('/app-stack/templates')
+        unifiedPush('/app-stack/templates', history)
       } catch (error) {
         if (error.status === 409) {
           notification.warn({

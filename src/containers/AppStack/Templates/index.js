@@ -14,7 +14,7 @@ import React from 'react'
 import QueueAnim from 'rc-queue-anim'
 import { Card, Button, Menu, Dropdown, Icon, notification, Tooltip } from 'antd'
 import { connect } from 'dva'
-import { Link } from 'react-router-dom'
+import UnifiedLink from '../../../components/UnifiedLink'
 import styles from './style/index.less'
 import Loader from '@tenx-ui/loader'
 import Ellipsis from '@tenx-ui/ellipsis'
@@ -96,9 +96,9 @@ class Templates extends React.Component {
       id="stackTemplate"
     >
       <div>
-        <Link to="/app-stack/designer">
+        <UnifiedLink to="/app-stack/designer">
           <Button icon="plus" type="primary">设计堆栈</Button>
-        </Link>
+        </UnifiedLink>
         {
           templateLoading ?
             <Loader
@@ -144,13 +144,13 @@ class Templates extends React.Component {
                         </Tooltip>
                       </div>
                       <div>
-                        <Link to={`/app-stack/designer/${v.name}/edit`}>
+                        <UnifiedLink to={`/app-stack/designer/${v.name}/edit`}>
                           <Button style={{ marginRight: 8 }}>设计</Button>
-                        </Link>
+                        </UnifiedLink>
                         <span>
-                          <Link to={`/app-stack/templates/${v.name}/deploy`}>
+                          <UnifiedLink to={`/app-stack/templates/${v.name}/deploy`}>
                             <Button type="primary">部署</Button>
-                          </Link>
+                          </UnifiedLink>
                         </span>
                       </div>
                     </div>
