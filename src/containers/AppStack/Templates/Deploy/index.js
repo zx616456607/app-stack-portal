@@ -65,7 +65,7 @@ class StackTemplateDeploy extends React.Component {
   state = {
     templateContent: {},
     templateInputs: {},
-    collapseActiveKey: [],
+    collapseActiveKeys: [],
     btnLoading: false,
   }
 
@@ -193,11 +193,8 @@ class StackTemplateDeploy extends React.Component {
       }
       const templateInputs = {}
       const loadByBackend = []
-      Object.entries(inputs).forEach(([ _shortId, input ], index) => {
+      Object.entries(inputs).forEach(([ _shortId, input ]) => {
         Object.entries(input).forEach(([ key, inputObj ]) => {
-          if (index === 0) {
-            this.setState({ collapseActiveKey: [ inputObj.label ] })
-          }
           if (inputObj.backend) {
             const { configType } = inputObj
             loadByBackend.push(getAppstackConfigs({
@@ -224,7 +221,12 @@ class StackTemplateDeploy extends React.Component {
           return 0
         })
       })
-      this.setState({ templateContent, templateInputs })
+      this.setState({
+        templateContent,
+        templateInputs,
+        // 默认展开所有 panel，否者未展开 panel 中的 form 表单不会渲染
+        collapseActiveKeys: Object.keys(templateInputs),
+      })
       await Promise.all(loadByBackend).catch(() => {
         notification.warn({
           message: '获取后端可续参数失败',
@@ -417,14 +419,14 @@ class StackTemplateDeploy extends React.Component {
   }
 
   onCollapseChange = keys => {
-    this.setState({ collapseActiveKey: keys })
+    this.setState({ collapseActiveKeys: keys })
   }
 
   render() {
     const { match, loading, form } = this.props
     const { getFieldDecorator } = form
     const templateDetailLoading = loading.effects['appStack/fetchAppStackTemplateDetail']
-    const { templateInputs, collapseActiveKey, btnLoading } = this.state
+    const { templateInputs, collapseActiveKeys, btnLoading } = this.state
     return <QueueAnim
       id="tempStackDetail"
     >
@@ -486,7 +488,7 @@ class StackTemplateDeploy extends React.Component {
                 <div className={styles.configContent}>
                   <Collapse
                     bordered={false}
-                    activeKey={collapseActiveKey}
+                    activeKey={collapseActiveKeys}
                     onChange={this.onCollapseChange}
                   >
                     {
