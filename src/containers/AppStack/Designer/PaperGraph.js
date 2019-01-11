@@ -28,9 +28,9 @@ import { RESOURCE_LIST } from './shapes'
 
 const isProd = process.env.NODE_ENV === 'production'
 const SIDER_WIDTH = isProd ? 0 : 200
-const PAPER_SCALE_MAX = 5
-const PAPER_SCALE_MIN = 0.1
-const PAPER_SCALE_STEP = 0.1
+const PAPER_SCALE_MAX = 3
+const PAPER_SCALE_MIN = 0.01
+const PAPER_SCALE_STEP = 0.01
 const noop = () => {}
 
 export default class PaperGraph extends React.PureComponent {
@@ -54,8 +54,9 @@ export default class PaperGraph extends React.PureComponent {
   }
 
   embedsMap = {}
-
   activeElement = undefined
+  _pointerX = undefined
+  _pointerY = undefined
 
   state = {
     paperScale: 1,
@@ -69,6 +70,7 @@ export default class PaperGraph extends React.PureComponent {
   componentDidMount() {
     const { onGraphChange, readOnly } = this.props
     this.initDesigner()
+    this.initNavigator()
     this.graph.initGraph = this.initGraph
     this.graph.idShort = this.idShort
     this.props.onLoad(this.paper, this.graph)
@@ -77,7 +79,6 @@ export default class PaperGraph extends React.PureComponent {
     if (readOnly) {
       return
     }
-    this.initNavigator()
     // ~ add undo/redo support
     const _addUndoList = () => {
       const _graph = this.graph.toJSON()
@@ -259,35 +260,48 @@ export default class PaperGraph extends React.PureComponent {
       }, */
     })
 
+    // ~ 元素 active 状态支持
     const clearActiveElement = () => {
       this.graph.getCells().map(cell => cell.attr('.body/strokeWidth', 1))
       this.activeElement = undefined
     }
-
     this.paper.on('element:pointerclick', elementView => {
       clearActiveElement()
       const element = elementView.model
       element.attr('.body/strokeWidth', 2)
       this.activeElement = element
     })
-
     this.paper.on('blank:pointerclick', clearActiveElement)
 
-    // 画布平移
+
+    // ~ 画布平移
     this.paper.on('blank:pointerdown', (e, x, y) => {
       this._pointerX = x
       this._pointerY = y
       this.setState({ grabbing: true })
     })
     this.paper.on('blank:pointermove', (e, x, y) => {
-      const { tx: _tx, ty: _ty } = this.paper.translate()
-      const tx = _tx + (x - this._pointerX)
-      const ty = _ty + (y - this._pointerY)
-      this.paper.translate(tx, ty)
+      // graph 中无元素则不平移，否则鹰眼视图会有偏移
+      if (!this.graph.getBBox()) {
+        return
+      }
+      const tx = x - this._pointerX
+      const ty = y - this._pointerY
+      this.graph.translate(tx, ty)
+      this._pointerX = x
+      this._pointerY = y
     })
     this.paper.on('blank:pointerup', () => {
       this.setState({ grabbing: false })
     })
+  }
+
+  scalePaper = paperScale => {
+    this.paper.scale(paperScale)
+    this.setState({ paperScale })
+    if (this.navigatorPaper) {
+      this.navigatorPaper.scale(paperScale * 0.1)
+    }
   }
 
   initNavigator = () => {
@@ -299,14 +313,14 @@ export default class PaperGraph extends React.PureComponent {
       // a Graph model we want to render into the paper
       model: this.graph,
       // the dimensions of the rendered paper (in pixels)
-      width: 150,
+      width: 200,
       height: 150,
       // the size of the grid to which elements are aligned.
       // affects the granularity of element movement
       gridSize: 1,
       interactive: false,
     })
-    this.navigatorPaper.scale(0.1, 0.1);
+    this.navigatorPaper.scale(0.1, 0.1)
   }
 
   addLabelId = cell => {
@@ -364,14 +378,13 @@ export default class PaperGraph extends React.PureComponent {
     const {
       size = { width: 40, height: 40 },
     } = ResourceShape.options || {}
+
     // 减去元素大小的一半
     options.position.x -= size.width / 2
     options.position.y -= size.height / 2
-
     // 算上位移
     options.position.x -= tx
     options.position.y -= ty
-
     // 除以放缩比
     options.position.x /= paperScale
     options.position.y /= paperScale
@@ -455,8 +468,7 @@ export default class PaperGraph extends React.PureComponent {
       default:
         break
     }
-    this.paper.scale(paperScale)
-    this.setState({ paperScale })
+    this.scalePaper(paperScale)
   }
 
   clearGraph = () => {
@@ -593,13 +605,12 @@ export default class PaperGraph extends React.PureComponent {
                   icon="gateway"
                   onClick={() => {
                     this.paper.scaleContentToFit({
-                      maxScale: 2,
+                      padding: 200,
+                      maxScale: 1.5,
                       minScale: PAPER_SCALE_MIN,
                     })
                     const { sx } = this.paper.scale()
-                    this.setState({
-                      paperScale: sx,
-                    })
+                    this.scalePaper(sx)
                     // @Todo: 位置需要居中
                   }}
                 >
@@ -634,10 +645,7 @@ export default class PaperGraph extends React.PureComponent {
                 max={PAPER_SCALE_MAX}
                 step={PAPER_SCALE_STEP}
                 marks={{ 1: '1x' }}
-                onChange={scale => {
-                  this.paper.scale(scale, scale)
-                  this.setState({ paperScale: scale })
-                }}
+                onChange={this.scalePaper}
                 tipFormatter={value => `${value}x`}
                 vertical
               />
@@ -660,16 +668,13 @@ export default class PaperGraph extends React.PureComponent {
             >
               <div className="loading">loading ...</div>
             </div>
-            {
-              !readOnly &&
-              <div
-                id="app-stack-paper-navigator"
-                className={styles.navigatorPaper}
-                key="navigator-paper"
-              >
-                <div className="loading">loading ...</div>
-              </div>
-            }
+            <div
+              id="app-stack-paper-navigator"
+              className={styles.navigatorPaper}
+              key="navigator-paper"
+            >
+              <div className="loading">loading ...</div>
+            </div>
           </div>
         </div>
       </Hotkeys>
