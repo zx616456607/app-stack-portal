@@ -207,23 +207,6 @@ inputs: []`,
         })
         return
       }
-      // check if have DeploymentService
-      let isHaveDeploymentService = false
-      _graph.cells.every(cell => {
-        if (cell.type === 'devs.DeploymentService') {
-          isHaveDeploymentService = true
-          return false
-        }
-        return true
-      })
-      if (!isHaveDeploymentService) {
-        this.setState({ saveStackModal: false })
-        notification.info({
-          message: '保存堆栈模版失败',
-          description: '堆栈模版至少要包含一个服务',
-        })
-        return
-      }
       // check link
       let linkCheckPassed = true
       const links = _graph.cells.filter(({ type }) => type === 'link')
