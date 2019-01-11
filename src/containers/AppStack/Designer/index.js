@@ -268,7 +268,7 @@ inputs: []`,
       } catch (error) {
         if (error.status === 409) {
           notification.warn({
-            message: `堆栈 ${name} 已存在，请使用其他名称`,
+            message: `堆栈模版 ${name} 已存在，请使用其他名称`,
           })
           return
         }
@@ -358,11 +358,15 @@ inputs: []`,
                   {
                     required: true,
                     whitespace: true,
-                    message: '请输入堆栈名称',
+                    message: '请输入模板名称',
+                  },
+                  {
+                    max: 200,
+                    message: '模板名称长度不能超过 200 个字符',
                   },
                 ],
               })(
-                <Input disabled={this.editMode} placeholder="请输入堆栈名称" />
+                <Input disabled={this.editMode} placeholder="请输入模板名称" />
               )}
             </FormItem>
             <FormItem
@@ -371,8 +375,14 @@ inputs: []`,
             >
               {getFieldDecorator('description', {
                 initialValue: templateDetail && templateDetail.description,
+                rules: [
+                  {
+                    max: 125,
+                    message: '模板描述长度不能超过 125 个字符',
+                  },
+                ],
               })(
-                <Input.TextArea placeholder="请输入堆栈描述" />
+                <Input.TextArea placeholder="请输入模板描述" />
               )}
             </FormItem>
           </Form>

@@ -476,7 +476,12 @@ class StackTemplateDeploy extends React.Component {
                   >
                     {
                       getFieldDecorator('description', {
-                        // initialValue: templateDetail && templateDetail.description,
+                        rules: [
+                          {
+                            max: 125,
+                            message: '堆栈描述长度不能超过 125 个字符',
+                          },
+                        ],
                       })(<TextArea placeholder="请输入堆栈描述"/>)
                     }
                   </FormItem>
