@@ -108,7 +108,7 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
           panelWidths={[
             { resize: 'stretch' },
             {
-              size: this.props.editorWarn.length === 0 ? 0 : this.state.warnWrapHeight,
+              size: this.state.warnWrapHeight,
               minSize: 0,
               resize: 'dynamic',
             },
