@@ -100,6 +100,9 @@ export default {
       })
       const instances = []
       pods.map(pod => instances.push(pod.metadata.name))
+      if (instances.length === 0) {
+        return
+      }
       const res = yield call(getNativeLogs, {
         cluster, body,
         instances: instances.join(','),

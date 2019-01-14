@@ -119,6 +119,9 @@ class Monitor extends React.PureComponent {
       type,
       ...this.formatTimeRange(currentValue),
     }
+    if (!name) {
+      return
+    }
     return dispatch({
       type: 'nativeDetail/fetchMonitor',
       payload: {
@@ -152,6 +155,9 @@ class Monitor extends React.PureComponent {
     if (monitorType === 'Pod') {
       const { id } = match.params
       name = id
+    }
+    if (!name) {
+      return
     }
     return dispatch({
       type: 'nativeDetail/fetchRealTimeMonitor',
@@ -260,13 +266,16 @@ class Monitor extends React.PureComponent {
   render() {
     const { loading, currentValue, freshInterval, realTimeChecked, realTimeLoading } = this.state
     const { monitor, realTimeMonitor } = this.props
+    if (loading) {
+      return <div className="loading">
+        <Spin size={'large'}/>
+      </div>
+    }
     return (
       <div className={styles.serviceMonitor}>
         {
-          loading ?
-            <div className="loading">
-              <Spin size={'large'}/>
-            </div>
+          isEmpty(monitor) || isEmpty(monitor[METRICS_CPU]) ?
+            <div className="empty-text" style={{ textAlign: 'center' }}>暂无数据</div>
             :
             <Metric
               value={currentValue}
