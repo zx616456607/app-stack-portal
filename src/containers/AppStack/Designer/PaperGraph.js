@@ -57,6 +57,7 @@ export default class PaperGraph extends React.PureComponent {
   activeElement = undefined
   _pointerX = undefined
   _pointerY = undefined
+  _lastEmbedParentId = undefined
 
   state = {
     paperScale: 1,
@@ -65,6 +66,21 @@ export default class PaperGraph extends React.PureComponent {
     redoList: [],
     yamlBtnTipVisible: false,
     grabbing: false,
+  }
+
+  fitEmbeds = id => {
+    const currentElement = this.graph.getCell(id)
+    if (currentElement) {
+      currentElement.fitEmbeds({
+        deep: true,
+        padding: {
+          left: 40,
+          top: 36,
+          right: 40,
+          bottom: 36,
+        },
+      })
+    }
   }
 
   componentDidMount() {
@@ -101,25 +117,15 @@ export default class PaperGraph extends React.PureComponent {
     // ~ add application resize support
     this.graph.on('change:embeds', (element, newEmbeds) => {
       const { id } = element
-      const fitEmbeds = () => {
-        const currentElement = this.graph.getCell(id)
-        if (currentElement) {
-          currentElement.fitEmbeds({
-            deep: true,
-            padding: {
-              left: 40,
-              top: 36,
-              right: 40,
-              bottom: 36,
-            },
-          })
-        }
-      }
+      this._lastEmbedParentId = id
       const currentOldEmbeds = this.embedsMap[id] || []
       // [embed-label-handle-part-2] change child input label to app_name label when isEmbedding
       const parentInputLabel = getDeepValue(element, [ 'attributes', '_app_stack_input', 'app_name', 'label' ])
       newEmbeds.forEach(embedId => {
         const currentElement = this.graph.getCell(embedId)
+        if (!currentElement) {
+          return
+        }
         const childInput = currentElement.attributes._app_stack_input || {}
         Object.keys(childInput).forEach(key => {
           if (parentInputLabel) {
@@ -131,16 +137,18 @@ export default class PaperGraph extends React.PureComponent {
       const movedOutEmbeds = currentOldEmbeds.filter(embed => newEmbeds.indexOf(embed) < 0)
       movedOutEmbeds.forEach(embedId => {
         const currentElement = this.graph.getCell(embedId)
+        if (!currentElement) {
+          return
+        }
         const childInput = currentElement.attributes._app_stack_input || {}
         Object.keys(childInput).forEach(key => {
           childInput[key].label = '其他配置'
         })
       })
       onGraphChange(this.graph.toJSON)
-      if (newEmbeds && newEmbeds.length <= currentOldEmbeds.length) {
-        this.fitEmbedsTimeout = setTimeout(fitEmbeds, 5000)
-      } else {
-        fitEmbeds()
+      // 仅新元素移入时自适应，移出时的自适应放在拖动结束后
+      if (newEmbeds.length > currentOldEmbeds.length) {
+        this.fitEmbeds(id)
       }
       this.embedsMap[id] = newEmbeds
     })
@@ -169,6 +177,11 @@ export default class PaperGraph extends React.PureComponent {
     this.paper.on('link:mouseleave', linkView => {
       linkView.removeTools()
     }) */
+  }
+
+  _isApplication = model => {
+    const { Application } = joint.shapes.devs
+    return model instanceof Application
   }
 
   initDesigner = () => {
@@ -245,10 +258,20 @@ export default class PaperGraph extends React.PureComponent {
         return false
       },
       validateEmbedding: (childView, parentView) => {
-        const isEmbedding = parentView.model instanceof joint.shapes.devs.Application
-          && !(childView.model instanceof joint.shapes.devs.Application)
-        // resizes the `Application` shape,
-        // so it visually contains all shapes embedded in.
+        const parentIsApp = this._isApplication(parentView.model)
+        const childIsApp = this._isApplication(childView.model)
+        const isEmbedding = parentIsApp && !childIsApp
+        let { id: parentId } = parentView.model
+        if (!parentIsApp) {
+          // 如果将元素移动到了非 app 元素上，则通过非 app 元素的 parent 来判断
+          parentId = parentView.model.attributes.parent
+          if (parentId) {
+            const parentCell = this.graph.getCell(parentId)
+            if (parentCell && childView.model.getBBox().intersect(parentCell.getBBox())) {
+              parentCell.embed(childView.model)
+            }
+          }
+        }
         return isEmbedding
       },
       validateConnection(sourceView, sourceMagnet, targetView, targetMagnet) {
@@ -273,7 +296,6 @@ export default class PaperGraph extends React.PureComponent {
     })
     this.paper.on('blank:pointerclick', clearActiveElement)
 
-
     // ~ 画布平移
     this.paper.on('blank:pointerdown', (e, x, y) => {
       this._pointerX = x
@@ -293,6 +315,11 @@ export default class PaperGraph extends React.PureComponent {
     })
     this.paper.on('blank:pointerup', () => {
       this.setState({ grabbing: false })
+    })
+
+    // ~ 拖动结束后做下 fitEmbeds
+    this.paper.on('element:pointerup', () => {
+      this.fitEmbeds(this._lastEmbedParentId)
     })
   }
 
