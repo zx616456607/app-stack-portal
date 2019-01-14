@@ -21,6 +21,7 @@ import Ellipsis from '@tenx-ui/ellipsis'
 import * as modal from '@tenx-ui/modal'
 import { StackTemplate as StackTemplateIcon } from '@tenx-ui/icon'
 import { calcuDate, formatDate } from '../../../utils/helper'
+import stackTemplate from '../../../assets/img/AppStack/stackTemplate.png'
 
 @connect(state => {
   const { appStack, loading } = state
@@ -109,7 +110,17 @@ class Templates extends React.Component {
             <div className={styles.templateList}>
               {
                 appStackTemps.length === 0 ?
-                  <div className={styles.noData}>暂无数据</div>
+                  <div className={styles.noData}>
+                    <div className={styles.noDataInner}>
+                      <img src={stackTemplate} alt=""/>
+                      <p>
+                        您还没有堆栈模板，设计一个吧！
+                        <UnifiedLink to="/app-stack/designer">
+                          <Button type="primary" key="no-data-button">设计堆栈</Button>
+                        </UnifiedLink>
+                      </p>
+                    </div>
+                  </div>
                   :
                   appStackTemps.map(v => <Card hoverable key={v.name} className={styles.listItem}>
                     <div className={styles.itemTag}>堆栈模板</div>
