@@ -54,7 +54,7 @@ export default class PaperGraph extends React.PureComponent {
   }
 
   embedsMap = {}
-  activeElement = undefined
+  _activeElement = undefined
   _pointerX = undefined
   _pointerY = undefined
   _lastEmbedParentId = undefined
@@ -184,6 +184,11 @@ export default class PaperGraph extends React.PureComponent {
     return model instanceof Application
   }
 
+  _clearActiveElements = () => {
+    this.graph.getCells().map(cell => cell.attr('.body/strokeWidth', 1))
+    this._activeElement = undefined
+  }
+
   initDesigner = () => {
     // 进场动画结束后再显示 tooltip，否则会有位移
     setTimeout(() => {
@@ -284,17 +289,13 @@ export default class PaperGraph extends React.PureComponent {
     })
 
     // ~ 元素 active 状态支持
-    const clearActiveElement = () => {
-      this.graph.getCells().map(cell => cell.attr('.body/strokeWidth', 1))
-      this.activeElement = undefined
-    }
     this.paper.on('element:pointerclick', elementView => {
-      clearActiveElement()
+      this._clearActiveElements()
       const element = elementView.model
       element.attr('.body/strokeWidth', 2)
-      this.activeElement = element
+      this._activeElement = element
     })
-    this.paper.on('blank:pointerclick', clearActiveElement)
+    this.paper.on('blank:pointerclick', this._clearActiveElements)
 
     // ~ 画布平移
     this.paper.on('blank:pointerdown', (e, x, y) => {
@@ -438,6 +439,11 @@ export default class PaperGraph extends React.PureComponent {
       })
     }
 
+    // 将刚添加的元素设为 active 状态
+    this._clearActiveElements()
+    resource.attr('.body/strokeWidth', 2)
+    this._activeElement = resource
+
     this.props.onGraphChange(this.graph.toJSON())
   }
 
@@ -451,7 +457,7 @@ export default class PaperGraph extends React.PureComponent {
     switch (keyName) {
       case 'delete':
       case 'backspace':
-        this.activeElement && this.activeElement.remove()
+        this._activeElement && this._activeElement.remove()
         onGraphChange(this.graph.toJSON())
         break
       case 'ctrl+z':

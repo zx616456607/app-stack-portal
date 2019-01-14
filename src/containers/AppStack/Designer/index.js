@@ -311,7 +311,6 @@ inputs: []`,
           style={{
             marginBottom: (yamlDockVisible ? yamlDockSize : 0),
           }}
-          // onEnd={this.initDesigner}
         >
           <PaperGraph
             key="designer"
