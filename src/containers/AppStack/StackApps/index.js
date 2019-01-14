@@ -21,6 +21,7 @@ import Loader from '@tenx-ui/loader'
 import Ellipsis from '@tenx-ui/ellipsis'
 import styles from './style/index.less'
 import UnifiedLink from '../../../components/UnifiedLink'
+import stack from '../../../assets/img/AppStack/stack.png'
 
 @connect(state => {
   const { appStack, loading, app } = state
@@ -76,7 +77,7 @@ class StackApps extends React.Component {
     }
     if (serviceCount === stopped) {
       status = {
-        text: '堆栈停止',
+        text: '未启动',
         color: '#f85a5a',
       }
     }
@@ -105,7 +106,17 @@ class StackApps extends React.Component {
             <div className={styles.templateList}>
               {
                 appStackList.length === 0 ?
-                  <div className={styles.noData}>暂无数据</div>
+                  <div className={styles.noData}>
+                    <div className={styles.noDataInner}>
+                      <img src={stack} alt=""/>
+                      <p>
+                        您还没有堆栈，部署一个吧！
+                        <UnifiedLink to="/app-stack/templates">
+                          <Button type="primary" key="no-data-button">部署堆栈</Button>
+                        </UnifiedLink>
+                      </p>
+                    </div>
+                  </div>
                   :
                   appStackList.map(v => <Card hoverable key={v.name} className={styles.listItem}>
                     <UnifiedLink to={`/app-stack/appStackDetail/${v.name}`} className={styles.itemTop}>
@@ -168,4 +179,5 @@ class StackApps extends React.Component {
   }
 }
 
+//
 export default StackApps
