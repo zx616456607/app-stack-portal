@@ -77,7 +77,7 @@ class StackApps extends React.Component {
     }
     if (serviceCount === stopped) {
       status = {
-        text: '堆栈停止',
+        text: '未启动',
         color: '#f85a5a',
       }
     }
@@ -179,4 +179,5 @@ class StackApps extends React.Component {
   }
 }
 
+//
 export default StackApps
