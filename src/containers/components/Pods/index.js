@@ -108,7 +108,6 @@ export default class Pods extends React.PureComponent {
   _renderColumn = (history, cron, cb) => {
     const res = [{
       title: cron ? '普通任务名称' : '容器名称',
-      width: '15%',
       key: 'name',
       render: data => (
         <Link
@@ -120,7 +119,6 @@ export default class Pods extends React.PureComponent {
       ),
     }, {
       title: '状态',
-      width: '10%',
       key: 'status',
       render: data => {
         const { phase, availableReplicas, replicas } = getStatus(data, cron ? 'Job' : 'Pod')
@@ -129,24 +127,20 @@ export default class Pods extends React.PureComponent {
     }]
     ;!cron && res.push({
       title: '镜像',
-      width: '20%',
       key: 'image',
       render: data => <Ellipsis length={30}>{this.getImages(data)}</Ellipsis>,
     }, {
       title: '访问地址',
-      width: '20%',
       key: 'address',
       render: data => ((data.status && data.status.podIP) ? <Ellipsis>{data.status.podIP}</Ellipsis> : '-'),
     })
     res.push({
       title: '创建时间',
-      width: '15%',
       key: 'time',
       render: data => moment(data.metadata.creationTimestamp).fromNow(),
     })
     !cron && res.push({
       title: '操作',
-      width: '15%',
       key: 'action',
       render: data => {
         const { phase } = getStatus(data, cron ? 'Job' : 'Pod')
@@ -229,6 +223,7 @@ export default class Pods extends React.PureComponent {
             columns={this._renderColumn(history, cron, this.iframeCb)}
             pagination={false}
             loading={loading.effects['nativeDetail/fetchPodsList']}
+            className="table-flex"
           />
         </Queue>
       </Page>
