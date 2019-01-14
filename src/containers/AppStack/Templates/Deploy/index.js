@@ -82,13 +82,22 @@ class StackTemplateDeploy extends React.Component {
     const { type, description } = input
     switch (type) {
       case 'select':
-        return <Select placeholder={description}>
-          {
-            this.getSelectOptions(input).map(({ name, id }) =>
-              <Option key={id}>{name}</Option>
-            )
-          }
-        </Select>
+        return (
+          <Select
+            showSearch
+            dropdownMatchSelectWidth={false}
+            placeholder={description}
+            filterOption={(value, option) =>
+              option.props.children.toLowerCase().indexOf(value.toLowerCase()) >= 0
+            }
+          >
+            {
+              this.getSelectOptions(input).map(({ name, id }) =>
+                <Option key={id}>{name}</Option>
+              )
+            }
+          </Select>
+        )
       case 'number':
         return <InputNumber placeholder={description} style={{ width: '100%' }} />
       default:
@@ -100,14 +109,17 @@ class StackTemplateDeploy extends React.Component {
     {
       title: '参数名称',
       dataIndex: 'key',
+      width: '20%',
     },
     {
       title: '参数类型',
       dataIndex: 'kind',
+      width: '20%',
     },
     {
       title: '参数值',
       dataIndex: 'default',
+      width: '40%',
       render: (value, input) => {
         const { form } = this.props
         const { getFieldDecorator } = form
@@ -132,6 +144,7 @@ class StackTemplateDeploy extends React.Component {
     {
       title: '参数描述',
       dataIndex: 'description',
+      width: '20%',
     },
   ]
 
