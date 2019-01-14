@@ -84,15 +84,17 @@ const defaultEdgeConfig = {
   isAnimated: true,
 }
 
-function formateEdgesAndNodes(appStack: any, onClick: (lname: string, e: any) => void): any[] {
+function formateEdgesAndNodes(appStack: any, onClick: (lname: string, e: any) => void, notIncludesApp): any[] {
   const edgeEdge: any[] = []
   const NodeArray: any[] = []
-  Object.entries(appStack).forEach(([appNode, dpNodeArray]) => {
-    NodeArray.push(Object.assign({}, defaultAppConfig, { id: `app-${appNode}`, label: appNode }))
-    dpNodeArray.forEach(dpNode => {
+  // 整理deployment 数据的函数
+  function formateDp(dpArray: any[], appNode?: string): void {
+    dpArray.forEach(dpNode => {
       const name = getDeepValue(dpNode, ['metadata', 'name'])
       NodeArray.push(Object.assign({}, defaultDpConfig, { id: `deployment-${name}`, label: name, onClick }))
-      edgeEdge.push(Object.assign({}, defaultEdgeConfig, { source: `app-${appNode}`, target: `deployment-${name}` }))
+      if (appNode) {
+        edgeEdge.push(Object.assign({}, defaultEdgeConfig, { source: `app-${appNode}`, target: `deployment-${name}` }))
+      }
       const podsArray = getDeepValue(dpNode, ['pods']) || []
       podsArray.forEach(pods => {
         const podsName = getDeepValue(pods, [ 'metadata', 'name' ])
@@ -105,7 +107,12 @@ function formateEdgesAndNodes(appStack: any, onClick: (lname: string, e: any) =>
         edgeEdge.push(Object.assign({}, defaultEdgeConfig, { source: `deployment-${name}`, target: cmName }))
       })
     });
+  }
+  Object.entries(appStack).forEach(([appNode, dpNodeArray]) => {
+    NodeArray.push(Object.assign({}, defaultAppConfig, { id: `app-${appNode}`, label: appNode }))
+    formateDp(dpNodeArray as any[], appNode)
   })
+  formateDp(notIncludesApp)
   return [edgeEdge, NodeArray]
 }
 
@@ -123,6 +130,7 @@ export default class ResourceTopology extends React.Component<RTProps, RTState> 
     const deployments: any[] = getDeepValue(this.props.appStackDetail, ['deployments']) || []
     const appStack: any = {}
     const appArray: string[] = []
+    const notIncludesApp: any[] = [] // 用于存放没有app的dp
     deployments.forEach((dp) => {
       const appName: string = getDeepValue(dp, ['metadata', 'labels', 'system/appName'])
       if (appName) {
@@ -132,9 +140,11 @@ export default class ResourceTopology extends React.Component<RTProps, RTState> 
         } else {
           appStack[appName].push(dp)
         }
+      } else {
+        notIncludesApp.push(dp)
       }
     })
-    const [ edgesArray, nodeArray] = formateEdgesAndNodes(appStack, this.onNodeClick)
+    const [ edgesArray, nodeArray] = formateEdgesAndNodes(appStack, this.onNodeClick, notIncludesApp)
     this.setState({ nodeArray, edgesArray })
   }
   findPods(name: string): any {
