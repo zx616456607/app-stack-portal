@@ -159,7 +159,7 @@ class StackAppsDetail extends React.Component {
 
         if (stoppedList.length === deployments.length) {
           status = {
-            txt: '堆栈停止',
+            txt: '未启动',
             color: '#f85a5a',
           }
           return
