@@ -406,20 +406,60 @@ class StackTemplateDeploy extends React.Component {
         unifiedPush(`/app-stack/appStackDetail/${name}/events`, history)
       } catch (error) {
         const { response } = error || {}
-        const { code, details } = response || {}
-        if (code === 409 && details.kind === 'stackName') {
-          setFields({
-            stackName: {
-              value: name,
-              errors: [ new Error(`堆栈 ${name} 已存在，请更换为其他名称`) ],
-            },
+        const { code, details, message } = response || {}
+        if (code === 409) {
+          const { kind, name: name409 } = details
+          let keys409 = Object.keys(values).filter(key => values[key] === name409)
+          let typeText
+          switch (kind) {
+            case 'AppStack': {
+              keys409 = [ 'stackName' ]
+              typeText = '堆栈'
+              break
+            }
+            case 'AppName': {
+              typeText = '应用'
+              keys409 = keys409.filter(key => key.indexOf('app_name') > -1)
+              break
+            }
+            case 'Deployment': {
+              typeText = '服务'
+              keys409 = keys409.filter(key => key.indexOf('deployment_name') > -1)
+              break
+            }
+            case 'Service': {
+              typeText = '服务发现'
+              keys409 = keys409.filter(key => key.indexOf('service_name') > -1)
+              break
+            }
+            case 'ConfigMap': {
+              typeText = '服务配置'
+              keys409 = keys409.filter(key => key.indexOf('configMap_name') > -1)
+              break
+            }
+            default:
+              notification.warn({
+                message: '启动应用堆栈失败',
+                description: message,
+              })
+              return
+          }
+          keys409.forEach(key => {
+            setFields({
+              [key]: {
+                value: name409,
+                errors: [ new Error(`${typeText} ${name409} 已存在，请更换为其他名称`) ],
+              },
+            })
           })
-          this.stackNameRef.focus()
-          // validateFieldsAndScroll([ 'stackName' ])
           notification.warn({
             message: '启动应用堆栈失败',
-            description: `堆栈 ${name} 已存在`,
+            description: `${typeText} ${name409} 已存在`,
           })
+          const element = document.getElementById(keys409[0])
+          if (element) {
+            element.focus()
+          }
           return
         }
         notification.warn({
@@ -480,7 +520,7 @@ class StackTemplateDeploy extends React.Component {
                             },
                           },
                         ],
-                      })(<Input ref={ref => { this.stackNameRef = ref }} placeholder="请输入堆栈名称"/>)
+                      })(<Input placeholder="请输入堆栈名称"/>)
                     }
                   </FormItem>
                   <FormItem
