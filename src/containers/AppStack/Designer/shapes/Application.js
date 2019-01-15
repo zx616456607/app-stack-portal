@@ -109,6 +109,12 @@ const options = {
       text: '-',
     },
   },
+  inPorts: [],
+  outPorts: [],
+  ports: {
+    groups: null,
+    items: [],
+  },
   _deploy_2_yaml: false,
   _link_rules: {
     required: false,

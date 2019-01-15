@@ -36,7 +36,9 @@ const mapStateToProps = state => {
 export default class AppStackDesigner extends React.Component {
   state = {
     templateYamlStr: `nodes: []
-inputs: []`,
+inputs: []
+_graph: {}
+_paper: {}`,
     inputYamlStr: '',
     yamlObj: {},
     createBtnLoading: false,
@@ -102,9 +104,9 @@ inputs: []`,
           payload: ({ name }),
         })
         const { templateDetail } = this.props
-        const { _graph } = JSON.parse(templateDetail.content)
+        const { _graph, nodes, inputs, _paper } = JSON.parse(templateDetail.content)
         if (_graph && _graph.cells) {
-          this.graph.initGraph(_graph)
+          this.graph.initGraph(_graph, nodes, inputs, _paper)
         }
       } catch (error) {
         console.warn(error)
@@ -152,6 +154,8 @@ inputs: []`,
         yamlObj.inputs[_shortId] = _app_stack_input
       }
     })
+    yamlObj._graph = this.graph.minifyGraph(this.graph.toJSON())
+    yamlObj._paper = this.graph.getPaperConfig()
     this.setState({
       yamlObj,
       templateYamlStr: yamlParser.safeDump(yamlObj),
@@ -173,6 +177,10 @@ inputs: []`,
       this.setState({ yamlObj })
       const nodes = yamlObj.nodes || {}
       const inputs = yamlObj.inputs || {}
+
+      // 根据用户输入的 _graph yaml 生成对应 graph
+      this.graph.initGraph(yamlObj._graph, nodes, inputs, yamlObj._paper)
+
       let cells = this.graph.getCells()
       cells = cells.filter(({ attributes: { type } }) => type !== 'link')
       cells.forEach(cell => {
@@ -187,6 +195,10 @@ inputs: []`,
       })
     } catch (error) {
       console.warn('parse yaml failed', error)
+      notification.warn({
+        message: '解析 yaml 失败',
+        description: error.message,
+      })
     }
   }
 
@@ -239,9 +251,10 @@ inputs: []`,
       this.setState({ saveStackBtnLoading: true })
       const { name } = body
       const { yamlObj } = this.state
+      // save paper scale, tranlate info
+      yamlObj._paper = this.graph.getPaperConfig()
       body.content = JSON.stringify({
         ...yamlObj,
-        _graph,
       })
       try {
         await dispatch({

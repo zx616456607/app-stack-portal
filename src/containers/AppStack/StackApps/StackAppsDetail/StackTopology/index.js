@@ -35,7 +35,8 @@ export default class StackTopology extends React.Component {
       <PaperGraph
         readOnly={true}
         onLoad={(paper, graph) => {
-          graph.fromJSON(appStacksDetail.templateObj._graph)
+          const { _graph, nodes, inputs, _paper } = appStacksDetail.templateObj
+          graph.initGraph(_graph, nodes, inputs, _paper)
         }}
       />
     </div>

@@ -25,6 +25,7 @@ import { getDeepValue } from '../../../utils/helper'
 import './style/joint-custom.less'
 import styles from './style/PaperGraph.less'
 import { RESOURCE_LIST } from './shapes'
+import { idShort, minifyGraph, fullGraph } from './shapes/_base'
 
 const isProd = process.env.NODE_ENV === 'production'
 const SIDER_WIDTH = isProd ? 0 : 200
@@ -53,7 +54,7 @@ export default class PaperGraph extends React.PureComponent {
     toogleYamlDockVisible: noop,
   }
 
-  embedsMap = {}
+  _embedsMap = {}
   _activeElement = undefined
   _pointerX = undefined
   _pointerY = undefined
@@ -89,6 +90,9 @@ export default class PaperGraph extends React.PureComponent {
     this.initNavigator()
     this.graph.initGraph = this.initGraph
     this.graph.idShort = this.idShort
+    this.graph.minifyGraph = this.minifyGraph
+    this.graph.fullGraph = this.fullGraph
+    this.graph.getPaperConfig = this.getPaperConfig
     this.props.onLoad(this.paper, this.graph)
     // window._paper = this.paper
     // window._graph = this.graph
@@ -107,18 +111,21 @@ export default class PaperGraph extends React.PureComponent {
     }
     this.graph.on('change', () => {
       _addUndoList()
+      onGraphChange(this.graph.toJSON())
     })
     this.graph.on('add', () => {
       _addUndoList()
+      onGraphChange(this.graph.toJSON())
     })
     this.graph.on('remove', () => {
       _addUndoList()
+      onGraphChange(this.graph.toJSON())
     })
     // ~ add application resize support
     this.graph.on('change:embeds', (element, newEmbeds) => {
       const { id } = element
       this._lastEmbedParentId = id
-      const currentOldEmbeds = this.embedsMap[id] || []
+      const currentOldEmbeds = this._embedsMap[id] || []
       // [embed-label-handle-part-2] change child input label to app_name label when isEmbedding
       const parentInputLabel = getDeepValue(element, [ 'attributes', '_app_stack_input', 'app_name', 'label' ])
       newEmbeds.forEach(embedId => {
@@ -145,12 +152,12 @@ export default class PaperGraph extends React.PureComponent {
           childInput[key].label = '其他配置'
         })
       })
-      onGraphChange(this.graph.toJSON)
+      onGraphChange(this.graph.toJSON())
       // 仅新元素移入时自适应，移出时的自适应放在拖动结束后
       if (newEmbeds.length > currentOldEmbeds.length) {
         this.fitEmbeds(id)
       }
-      this.embedsMap[id] = newEmbeds
+      this._embedsMap[id] = newEmbeds
     })
     // add link tools
     /* this.paper.on('link:mouseenter', linkView => {
@@ -360,8 +367,12 @@ export default class PaperGraph extends React.PureComponent {
     this.paper.findViewByModel(cell).update()
   }
 
-  initGraph = graph => {
+  initGraph = (graph, nodes, inputs, paper) => {
     const { onGraphChange } = this.props
+    // full graph by nodes and inputs
+    if (nodes && inputs) {
+      graph = this.fullGraph(graph, nodes, inputs)
+    }
     this.graph.fromJSON(graph)
     // add init graph to undoList
     if (this.state.undoList.length === 0 && graph.cells.length > 0) {
@@ -375,11 +386,18 @@ export default class PaperGraph extends React.PureComponent {
       idShortIdMap[cell.id] = _shortId
       this.addLabelId(cell)
     })
+    // init paper scale, tranlate
+    if (paper) {
+      const { scale, translate: { tx, ty } } = paper
+      this.paper.scale(scale || 1)
+      this.setState({ paperScale: scale || 1 })
+      this.paper.translate(tx, ty)
+    }
     this.setState({ idShortIdMap }, () => onGraphChange(graph))
     // [embed-label-handle-part-1] init embeds map
     graph.cells.forEach(({ id, embeds }) => {
       if (embeds && embeds.length > 0) {
-        this.embedsMap[id] = embeds
+        this._embedsMap[id] = embeds
       }
     })
   }
@@ -443,14 +461,18 @@ export default class PaperGraph extends React.PureComponent {
     this._clearActiveElements()
     resource.attr('.body/strokeWidth', 2)
     this._activeElement = resource
-
-    this.props.onGraphChange(this.graph.toJSON())
   }
 
-  idShort = id => id.split('-')[0]
+  idShort = idShort
+  minifyGraph = minifyGraph
+  fullGraph = fullGraph
+  getPaperConfig = () => ({
+    scale: (this.paper.scale()).sx,
+    translate: this.paper.translate(),
+  })
 
   onKeyDown = (keyName, e) => {
-    const { readOnly, onGraphSave, onGraphChange } = this.props
+    const { readOnly, onGraphSave } = this.props
     if (readOnly) {
       return
     }
@@ -458,7 +480,6 @@ export default class PaperGraph extends React.PureComponent {
       case 'delete':
       case 'backspace':
         this._activeElement && this._activeElement.remove()
-        onGraphChange(this.graph.toJSON())
         break
       case 'ctrl+z':
       case 'command+z': {
@@ -512,7 +533,6 @@ export default class PaperGraph extends React.PureComponent {
       width: 420,
       onOk() {
         self.graph.clear()
-        self.props.onGraphChange(self.graph.toJSON())
       },
       onCancel() {},
     })

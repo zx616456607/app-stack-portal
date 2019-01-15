@@ -25,10 +25,12 @@ export default {
     '@font-size-base': '12px',
   },
   browserslist: [
-    '>1%',
-    'last 4 versions',
+    'last 8 Chrome versions',
+    'last 4 Firefox versions',
+    'last 3 Safari versions',
+    'last 4 Edge versions',
     'Firefox ESR',
-    'not ie < 9',
+    'Chrome >= 55'
   ],
   html: {
     template: './src/index.ejs',

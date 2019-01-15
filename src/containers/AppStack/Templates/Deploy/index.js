@@ -26,6 +26,7 @@ import cloneDeep from 'lodash/cloneDeep'
 import _set from 'lodash/set'
 import { getDeepValue, k8sNameCheck } from '../../../../utils/helper'
 import * as _builtInFunction from '../../Designer/shapes/_builtInFunction'
+import { fullGraph } from '../../Designer/shapes/_base'
 
 const FormItem = Form.Item
 const Option = Select.Option
@@ -196,7 +197,7 @@ class StackTemplateDeploy extends React.Component {
       await appStackTemplateDetail(match.params.name)
       const { templateDetail } = this.props
       const templateContent = JSON.parse(templateDetail.content)
-      const { inputs, nodes } = templateContent
+      const { inputs, nodes, _graph } = templateContent
       if (!nodes) {
         notification.warn({
           message: '解析堆栈异常',
@@ -204,6 +205,10 @@ class StackTemplateDeploy extends React.Component {
         })
         return
       }
+
+      // full graph by nodes and inputs for deploy use
+      templateContent._graph = fullGraph(_graph, nodes, inputs)
+
       const templateInputs = {}
       const loadByBackend = []
       Object.entries(inputs).forEach(([ _shortId, input ]) => {
@@ -256,7 +261,7 @@ class StackTemplateDeploy extends React.Component {
   _idShort = id => id.split('-')[0]
 
   appStackStart = () => {
-    const { form, deployAppstack, cluster, history } = this.props
+    const { form, deployAppstack, cluster, history, templateDetail } = this.props
     const { validateFieldsAndScroll, setFields } = form
     validateFieldsAndScroll(async (err, values) => {
       if (err) {
@@ -322,7 +327,7 @@ class StackTemplateDeploy extends React.Component {
         }
         _replace(template)
       }
-      // replate template values
+      // replace template values
       templateContent._graph.cells.forEach(cell => {
         const { _app_stack_template, id, parent } = cell
         const _shortId = this._idShort(id)
@@ -396,7 +401,7 @@ class StackTemplateDeploy extends React.Component {
           cluster,
           body: {
             description: values.description,
-            content: JSON.stringify(templateContent),
+            content: templateDetail.content,
             k8sManifest: k8sManifest.map(template => yamlParser.safeDump(template)).join('---\n'),
           },
         })
@@ -417,7 +422,7 @@ class StackTemplateDeploy extends React.Component {
               typeText = '堆栈'
               break
             }
-            case 'AppName': {
+            case 'Application': {
               typeText = '应用'
               keys409 = keys409.filter(key => key.indexOf('app_name') > -1)
               break
