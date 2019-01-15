@@ -12,7 +12,7 @@
 
 import React from 'react'
 import QueueAnim from 'rc-queue-anim'
-import { Card, Button, Menu, Dropdown, Icon, notification, Tooltip } from 'antd'
+import { Card, Button, Menu, Dropdown, Icon, notification, Tooltip, Input } from 'antd'
 import { connect } from 'dva'
 import UnifiedLink from '../../../components/UnifiedLink'
 import styles from './style/index.less'
@@ -23,11 +23,16 @@ import { StackTemplate as StackTemplateIcon } from '@tenx-ui/icon'
 import { calcuDate, formatDate } from '../../../utils/helper'
 import stackTemplate from '../../../assets/img/AppStack/stackTemplate.png'
 
+const Search = Input.Search;
+
 @connect(state => {
   const { appStack, loading } = state
   return { appStack, loading }
 })
 class Templates extends React.Component {
+  state = {
+    keyWord: '',
+  }
   componentDidMount() {
     const query = {
       from: 0,
@@ -87,8 +92,18 @@ class Templates extends React.Component {
       },
     })
   }
+  searchTemplate = keyWord => {
+    this.setState({ keyWord })
+    const query = {
+      from: 0,
+      size: 0,
+      filter: `name,${keyWord}`,
+    }
+    this.getTemplates(query)
+  }
   render() {
     const { loading, appStack } = this.props
+    const { keyWord } = this.state
     const templateLoading = loading.effects['appStack/fetchAppStackTemplate']
     const { templateList } = appStack
     let appStackTemps = []
@@ -97,9 +112,16 @@ class Templates extends React.Component {
       id="stackTemplate"
     >
       <div>
-        <UnifiedLink to="/app-stack/designer">
-          <Button icon="plus" type="primary">设计堆栈</Button>
-        </UnifiedLink>
+        <div className={styles.templateTop}>
+          <UnifiedLink to="/app-stack/designer">
+            <Button icon="plus" type="primary">设计堆栈</Button>
+          </UnifiedLink>
+          <Search
+            placeholder="输入模板名称进行搜索"
+            onSearch={value => this.searchTemplate(value)}
+            style={{ width: 200 }}
+          />
+        </div>
         {
           templateLoading ?
             <Loader
@@ -113,12 +135,17 @@ class Templates extends React.Component {
                   <div className={styles.noData}>
                     <div className={styles.noDataInner}>
                       <img src={stackTemplate} alt=""/>
-                      <p>
-                        您还没有堆栈模板，设计一个吧！
-                        <UnifiedLink to="/app-stack/designer">
-                          <Button type="primary" key="no-data-button">设计堆栈</Button>
-                        </UnifiedLink>
-                      </p>
+                      {
+                        keyWord ?
+                          <p>暂无数据</p>
+                          :
+                          <p>
+                            您还没有堆栈模板，设计一个吧！
+                            <UnifiedLink to="/app-stack/designer">
+                              <Button type="primary" key="no-data-button">设计堆栈</Button>
+                            </UnifiedLink>
+                          </p>
+                      }
                     </div>
                   </div>
                   :
