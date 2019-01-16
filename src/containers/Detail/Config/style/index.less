@@ -40,7 +40,8 @@
       display: flex;
       margin: @padding-small @padding-large 0 @padding-large;
       .cell {
-        width: 33%;
+        width: calc(~'33% - 16px');
+        margin-right: @padding-small;
         .title {
           font-size: 15px;
         }

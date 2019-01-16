@@ -270,9 +270,9 @@ class Config extends React.PureComponent {
       {
         Array.isArray(cell.value)
           ? cell.value.map((c, j) => (
-            <div key={j} className={styles.text}>{c}</div>
+            <pre key={j} className={styles.text}>{c}</pre>
           ))
-          : <div className={styles.text}>{cell.value}</div>
+          : <pre className={styles.text}>{cell.value}</pre>
       }
     </div>
   ))
