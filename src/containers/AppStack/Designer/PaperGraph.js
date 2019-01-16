@@ -107,6 +107,7 @@ export default class PaperGraph extends React.PureComponent {
         const { undoList } = this.state
         undoList.push(_graph)
         this.setState({ undoList, redoList: [] })
+        // [graph2yaml] when graph change, add or remove
         onGraphChange(_graph)
       }, 300)
     }
@@ -150,6 +151,7 @@ export default class PaperGraph extends React.PureComponent {
           childInput[key].label = '其他配置'
         })
       })
+      // [graph2yaml] when input label changed
       onGraphChange(this.graph.toJSON())
       // 仅新元素移入时自适应，移出时的自适应放在拖动结束后
       if (newEmbeds.length > currentOldEmbeds.length) {
@@ -332,6 +334,8 @@ export default class PaperGraph extends React.PureComponent {
   scalePaper = paperScale => {
     this.paper.scale(paperScale)
     this.setState({ paperScale })
+    // [graph2yaml] when paper scale or tanslate
+    this.props.onGraphChange(this.graph.toJSON())
     if (this.navigatorPaper) {
       this.navigatorPaper.scale(paperScale * 0.1)
     }
@@ -391,6 +395,7 @@ export default class PaperGraph extends React.PureComponent {
       this.setState({ paperScale: scale || 1 })
       this.paper.translate(tx, ty)
     }
+    // [graph2yaml] when init graph
     this.setState({ idShortIdMap }, () => onGraphChange(graph))
     // [embed-label-handle-part-1] init embeds map
     graph.cells.forEach(({ id, embeds }) => {
@@ -555,6 +560,7 @@ export default class PaperGraph extends React.PureComponent {
     this.setState({ undoList, redoList })
     const current = undoList[undoList.length - 1] || { cells: [] }
     this.initGraph(current)
+    // [graph2yaml] when undo
     this.props.onGraphChange(current)
   }
 
@@ -567,6 +573,7 @@ export default class PaperGraph extends React.PureComponent {
     undoList.push(pop)
     this.setState({ undoList, redoList })
     this.initGraph(pop)
+    // [graph2yaml] when redo
     this.props.onGraphChange(pop)
   }
 
@@ -662,7 +669,6 @@ export default class PaperGraph extends React.PureComponent {
                     })
                     const { sx } = this.paper.scale()
                     this.scalePaper(sx)
-                    // @Todo: 位置需要居中
                   }}
                 >
                   适应屏幕
