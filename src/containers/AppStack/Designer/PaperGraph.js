@@ -107,19 +107,17 @@ export default class PaperGraph extends React.PureComponent {
         const { undoList } = this.state
         undoList.push(_graph)
         this.setState({ undoList, redoList: [] })
+        onGraphChange(_graph)
       }, 300)
     }
     this.graph.on('change', () => {
       _addUndoList()
-      onGraphChange(this.graph.toJSON())
     })
     this.graph.on('add', () => {
       _addUndoList()
-      onGraphChange(this.graph.toJSON())
     })
     this.graph.on('remove', () => {
       _addUndoList()
-      onGraphChange(this.graph.toJSON())
     })
     // ~ add application resize support
     this.graph.on('change:embeds', (element, newEmbeds) => {
