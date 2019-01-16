@@ -22,7 +22,7 @@ import { Hpa as HpaIcon , Cronjob as CronjobIcon, Deployment as DeploymentIcon,
   Statefulset as StatefulsetIcon, Job as JobIcon, Pod as PodIcon, Service as ServiceIcon,
   Secret as SecretIcon, Pvc as PvcIcon, Configmap as ConfigmapIcon, Insert as InsertIcon,
 } from '@tenx-ui/icon'
-import { getDeepValue } from '../../utils/helper';
+import getDeepValue from '@tenx-ui/utils/lib/getDeepValue'
 import classnames from 'classnames'
 
 const Option = Select.Option;

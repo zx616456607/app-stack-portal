@@ -14,7 +14,7 @@ import styles from './styles/analyzeNameSpace.less'
 import * as modal from '@tenx-ui/modal'
 import '@tenx-ui/modal/assets/index.css'
 import { connect, SubscriptionAPI } from 'dva'
-import { getDeepValue } from '../../utils/helper'
+import getDeepValue from '@tenx-ui/utils/lib/getDeepValue'
 import { analyzeYamlBase, dumpArray } from './tool'
 import { yamlString } from './editorType';
 

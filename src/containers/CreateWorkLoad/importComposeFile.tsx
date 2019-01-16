@@ -12,7 +12,7 @@ import { Modal, Form, Radio, notification, Select } from 'antd'
 import { FormComponentProps } from 'antd/es/form'
 import { yamlString } from './editorType'
 import { SubscriptionAPI } from 'dva'
-import { getDeepValue } from '../../utils/helper';
+import getDeepValue from '@tenx-ui/utils/lib/getDeepValue'
 import debounce from 'lodash/debounce'
 
 const Option = Select.Option

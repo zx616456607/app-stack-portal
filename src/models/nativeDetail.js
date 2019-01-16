@@ -26,7 +26,7 @@ import {
   formatMonitorName,
   formatPodMonitor,
 } from '../utils/helper'
-import { getDeepValue } from '../utils/helper'
+import getDeepValue from '@tenx-ui/utils/lib/getDeepValue'
 import cloneDeep from 'lodash/cloneDeep'
 import { DOCK_DEFAULT_SIZE } from '../utils/constants'
 

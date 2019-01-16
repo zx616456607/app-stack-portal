@@ -18,7 +18,7 @@ import { connect, SubscriptionAPI } from 'dva'
 import yaml from 'js-yaml'
 import { yamlString } from './editorType'
 import Editor from './editor'
-import { getDeepValue } from '../../utils/helper';
+import getDeepValue from '@tenx-ui/utils/lib/getDeepValue'
 import { analyzeYamlBase } from './tool'
 import { confirm } from '@tenx-ui/modal'
 

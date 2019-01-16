@@ -15,7 +15,8 @@
 import React from 'react'
 import styles from './style/index.less'
 import { Divider, Tooltip, Select } from 'antd'
-import { cpuFormat, getDeepValue, memoryFormat } from '../../../utils/helper'
+import { cpuFormat, memoryFormat } from '../../../utils/helper'
+import getDeepValue from '@tenx-ui/utils/lib/getDeepValue'
 import { connect } from 'dva'
 import { Authority as SecretIcon } from '@tenx-ui/icon'
 const Option = Select.Option

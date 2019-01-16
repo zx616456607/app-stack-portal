@@ -10,7 +10,7 @@
 import * as React from 'react'
 import RelationChart from '@tenx-ui/relation-chart'
 import { connect } from 'dva'
-import { getDeepValue } from '../../../../../utils/helper'
+import getDeepValue from '@tenx-ui/utils/lib/getDeepValue'
 import Detail from './detail'
 import { findDOMNode } from 'react-dom';
 

@@ -19,7 +19,7 @@ import {
   loadSample,
   checkProjectIstio,
 } from '../services/createNativeResource'
-import { getDeepValue } from '../utils/helper';
+import getDeepValue from '@tenx-ui/utils/lib/getDeepValue'
 
 interface YamlValuePar {
   payload: {

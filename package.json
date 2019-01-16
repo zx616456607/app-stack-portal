@@ -44,6 +44,7 @@
     "@tenx-ui/return-button": "^0.0.4",
     "@tenx-ui/select-with-checkbox": "^0.0.6",
     "@tenx-ui/time-hover": "^1.1.3",
+    "@tenx-ui/utils": "^1.0.0",
     "@tenx-ui/webSocket": "^1.1.2",
     "@tenx-ui/xterm": "^0.0.1",
     "antd": "^3.11.6",

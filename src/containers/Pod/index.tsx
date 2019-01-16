@@ -21,8 +21,9 @@ import { withRouter, RouteComponentProps, Link } from 'dva/router'
 import { connect, SubscriptionAPI } from 'dva'
 import moment from 'moment'
 import {
-  formatDate, getDeepValue,
+  formatDate,
 } from '../../utils/helper'
+import getDeepValue from '@tenx-ui/utils/lib/getDeepValue'
 import { getPodStatus } from '../../utils/status_identify'
 import NativeStatus from '../../components/NativeStatus'
 import ImagePopCard from '../../components/ImagePopCard'
