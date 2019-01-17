@@ -202,16 +202,6 @@ function toDate(date) {
 }
 
 /**
- * safely get deep value in a Nested Object or Array
- * @param {object | array} target the obj or array you need to read value from
- * @param {array} propsList the propsList you read
- * @return {any} if read error, return null
- * @example getDeepValue(userList, ['group', 0, 'name'])
- */
-const getDeepValue = (target, propsList) => propsList.reduce(
-  (result, prop) => ((result && result[prop]) ? result[prop] : null), target)
-
-/**
  * parse k8s size string to object
  *
  * @param {string} [sizeStr=''] '1Gi'
@@ -652,7 +642,6 @@ export {
   encodeImageFullname,
   formatDate,
   calcuDate,
-  getDeepValue,
   parseK8sSize,
   getBuildStatusTextAndClass,
   getServiceStatus,
