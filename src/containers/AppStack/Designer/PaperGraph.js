@@ -32,6 +32,7 @@ const SIDER_WIDTH = isProd ? 0 : 200
 const PAPER_SCALE_MAX = 3
 const PAPER_SCALE_MIN = 0.01
 const PAPER_SCALE_STEP = 0.01
+const NAVIGATOR_SCALE = 0.1
 const noop = () => {}
 
 export default class PaperGraph extends React.PureComponent {
@@ -337,7 +338,14 @@ export default class PaperGraph extends React.PureComponent {
     // [graph2yaml] when paper scale or tanslate
     this.props.onGraphChange(this.graph.toJSON())
     if (this.navigatorPaper) {
-      this.navigatorPaper.scale(paperScale * 0.1)
+      this.navigatorPaper.scale(paperScale * NAVIGATOR_SCALE)
+    }
+  }
+
+  translateNavigatorPaper = () => {
+    if (this.navigatorPaper) {
+      const { tx, ty } = this.paper.translate()
+      this.navigatorPaper.translate(tx * NAVIGATOR_SCALE, ty * NAVIGATOR_SCALE)
     }
   }
 
@@ -357,7 +365,7 @@ export default class PaperGraph extends React.PureComponent {
       gridSize: 1,
       interactive: false,
     })
-    this.navigatorPaper.scale(0.1, 0.1)
+    this.navigatorPaper.scale(NAVIGATOR_SCALE)
   }
 
   addLabelId = cell => {
@@ -391,9 +399,9 @@ export default class PaperGraph extends React.PureComponent {
     // init paper scale, tranlate
     if (paper) {
       const { scale, translate: { tx, ty } } = paper
-      this.paper.scale(scale || 1)
-      this.setState({ paperScale: scale || 1 })
+      this.scalePaper(scale || 1)
       this.paper.translate(tx, ty)
+      this.translateNavigatorPaper()
     }
     // [graph2yaml] when init graph
     this.setState({ idShortIdMap }, () => onGraphChange(graph))
@@ -669,6 +677,7 @@ export default class PaperGraph extends React.PureComponent {
                     })
                     const { sx } = this.paper.scale()
                     this.scalePaper(sx)
+                    this.translateNavigatorPaper()
                   }}
                 >
                   适应屏幕
