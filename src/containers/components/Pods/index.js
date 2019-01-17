@@ -22,7 +22,7 @@ import Ellipsis from '@tenx-ui/ellipsis'
 import { getStatus } from '../../../utils/status_identify'
 import NativeStatus from '../../../components/NativeStatus'
 import { confirm } from '@tenx-ui/modal'
-import { getDeepValue } from '../../../utils/helper'
+import getDeepValue from '@tenx-ui/utils/lib/getDeepValue'
 import styles from '../../Pod/styles/index.less'
 import classnames from 'classnames'
 

@@ -27,7 +27,7 @@ import PanelGroup from 'react-panelgroup'
 import AnalyzeNameSpace from './analyzeNameSpace'
 import { Import as ImportIcon } from '@tenx-ui/icon'
 import '@tenx-ui/icon/assets/index.css'
-import { getDeepValue } from '../../utils/helper';
+import getDeepValue from '@tenx-ui/utils/lib/getDeepValue'
 const {  Sider, Content } = Layout
 interface EditorProps extends SubscriptionAPI {
   onBeforeChange: (value: yamlString) => void;

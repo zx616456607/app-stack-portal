@@ -10,7 +10,7 @@
  * @date 2018-11-29
  */
 
-import { getDeepValue } from '../../../../utils/helper'
+import getDeepValue from '@tenx-ui/utils/lib/getDeepValue'
 
 const APP_STACK_LABEL = 'system/appstack'
 
