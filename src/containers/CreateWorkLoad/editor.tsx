@@ -109,7 +109,7 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
             { resize: 'stretch' },
             {
               size: this.state.warnWrapHeight,
-              minSize: 0,
+              minSize: 36,
               resize: 'dynamic',
             },
           ]}
@@ -141,7 +141,11 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
               />
             }
           })
-        }</div>
+        }{
+          this.props.editorWarn.length === 0 &&
+          <div className={styles.noError}>暂未发现错误</div>
+        }
+        </div>
         </PanelGroup>
         </div>
         <EditorBottom
@@ -212,6 +216,7 @@ const EditorHeader = ({
       className={styles.editHeader}
       ref={headRef}
     >
+      <div className={styles.headTitle}>YAML</div>
       <Tooltip title={'导入编排'}>
       <div className={styles.editIcon} onClick={plusOnclick}>
       <ImportIcon

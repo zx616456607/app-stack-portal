@@ -14,39 +14,72 @@
 
 .Sample {
   width: 100%;
-  overflow-y: auto;
+  :global {
+    .ant-select-selection__choice {
+      background-color: #3d3d3d !important;
+      border-radius: 6px !important;
+      color: rgba(255, 255, 255, 0.65);
+      border: 0;
+    }
+    .ant-select-selection {
+      background-color: #272727 !important;
+      border-color: rgba(255, 255, 255, 0.25);
+    }
+    .ant-select-selection--multiple .ant-select-selection__rendered > ul > li {
+      height: 21px;
+    }
+  }
 }
 .Preview {
   width: 100%;
   overflow-y: auto;
+  background-color: #272727;
 }
 .SampleHeader {
-  font-size: 16px;
-  height: 40px;
-  line-height: 40px;
+  font-size: 14px;
+  height: 36px;
+  line-height: 36px;
   padding-left: @padding-base;
   border: 1px solid #252525;
   border-top: none;
-  color: @font-color-4;
+  color: rgba(255, 255, 255, 0.65);
+  background-color: #444;
+  cursor: pointer;
 }
 .contentWrap {
-  padding: @padding-medium @padding-small;
+  background-color: #272727;
+  height: 100%;
+  overflow-y: auto;
+  padding-bottom: 36px;
 }
+.editorSelector {
+  padding: 12px;
+  border-bottom: 1px dashed rgba(255, 255, 255, 0.45);
+}
+
 .SampleNode {
   color: @font-color-4;
-  padding-top: @padding-base;
+  padding: 12px;
+  border-bottom: 1px dashed rgba(255, 255, 255, 0.45);
+
+  &:last-child {
+    border-bottom: none;
+  }
 }
 .nodeTitle {
   display: flex;
   height: 40px;
   justify-content: space-between;
   align-items: center;
-  font-size: 14px;
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.85);
 }
 .comments {
   line-height: 30px;
   padding-left: 16px;
-  color: @font-color-3;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.45);
 }
 .insert {
   cursor: pointer;
@@ -72,7 +105,7 @@
 .previewNode {
   cursor: pointer;
   &:hover {
-    background-color: #515561;
+    background-color: #3c3c3c;
   }
   &:active {
     background-color: #444;
