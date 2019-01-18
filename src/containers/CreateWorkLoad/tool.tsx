@@ -38,7 +38,8 @@ export interface ToolProps extends SubscriptionAPI, RouteComponentProps {
 interface ToolState {
   sampleInfo: {
     [index: string]: Array<Node>,
-  }
+  },
+  heightBottom: number,
 }
 interface Node {
   id: number
@@ -51,6 +52,7 @@ interface Node {
 class Tool extends React.Component<ToolProps, ToolState> {
   state = {
     sampleInfo: {} as { [index: string]: Array<Node> },
+    heightBottom: 200,
   }
   async componentDidMount() {
     const payload = { cluster: this.props.cluster }
@@ -65,8 +67,22 @@ class Tool extends React.Component<ToolProps, ToolState> {
   }
   render() {
     return(
-      <div className={styles.toolWrap}>
-        <PanelGroup direction="column" borderColor="#252525">
+      <div className={styles.toolWrap} ref="toolWrap">
+        <PanelGroup
+          direction="column"
+          panelWidths={[
+            { resize: 'stretch', minSize: 36 },
+            {
+              size: this.state.heightBottom,
+              minSize: 36,
+              resize: 'dynamic',
+            },
+          ]}
+          onUpdate={(res) => {
+            const heightBottom = getDeepValue(res, [1, 'size'])
+            this.setState({ heightBottom })
+          }}
+        >
           {
             !this.props.collapsed ?
           <Sample
@@ -74,6 +90,7 @@ class Tool extends React.Component<ToolProps, ToolState> {
             cluster={this.props.cluster}
             dispatch={this.props.dispatch}
             editorWarn={this.props.editorWarn}
+            onTitleClick={() => this.setState({ heightBottom: 36 })}
           /> : <div/>
           }{
             !this.props.collapsed ?
@@ -83,6 +100,7 @@ class Tool extends React.Component<ToolProps, ToolState> {
             editorNode={this.props.editorNode}
             dispatch={this.props.dispatch}
             history={this.props.history}
+            onPreviewClick={() => this.setState({ heightBottom: this.refs.toolWrap.offsetHeight - 36 })}
           /> : <div/>}
         </PanelGroup>
       </div>
@@ -103,6 +121,7 @@ interface SampleProps extends RouteComponentProps, SubscriptionAPI {
     [index: string]: Array<Node>,
   }
   editorWarn: any[]
+  onTitleClick: () => void
 }
 interface SampleState {
   value: string[],
@@ -137,13 +156,17 @@ class SampleInner extends React.Component<SampleProps, SampleState> {
     const uniqSelectArray = uniqById(selectArray)
     return(
       <div className={styles.Sample}>
-        <div className={styles.SampleHeader}>
+        <div
+          className={styles.SampleHeader}
+          onClick={this.props.onTitleClick}
+        >
           Yaml 辅助工具
         </div>
         <div className={styles.contentWrap}>
         {
           this.state.value &&
         <Select
+          className={styles.editorSelector}
           mode="multiple"
           style={{ width: '100%' }}
           placeholder="请选择资源类型"
@@ -448,6 +471,7 @@ interface PreviewProps extends SubscriptionAPI {
   aceEditor: AceEditor
   value: yamlString
   editorNode: HTMLDivElement
+  onPreviewClick: () => void
 }
 interface PreviewState {
 
@@ -519,7 +543,7 @@ class Preview extends React.Component<PreviewProps, PreviewState> {
     const previewNode = this.analyzeYamlPreview1(this.props.value)
     return(
       <div className={styles.Preview}>
-        <div className={styles.SampleHeader}>
+        <div className={styles.SampleHeader} onClick={this.props.onPreviewClick}>
           概览
         </div>
         {
