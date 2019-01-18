@@ -470,6 +470,7 @@ class StackTemplateDeploy extends React.Component {
         }
         notification.warn({
           message: '启动应用堆栈失败',
+          description: message,
         })
       } finally {
         this.setState({ btnLoading: false })
@@ -562,6 +563,7 @@ class StackTemplateDeploy extends React.Component {
                             columns={this.columns}
                             dataSource={inputs}
                             pagination={false}
+                            rowKey={({ key, _shortId }) => `${_shortId}-${key}`}
                           />
                         </Panel>
                       })
