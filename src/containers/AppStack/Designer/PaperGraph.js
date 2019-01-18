@@ -25,7 +25,7 @@ import getDeepValue from '@tenx-ui/utils/lib/getDeepValue'
 import './style/joint-custom.less'
 import styles from './style/PaperGraph.less'
 import { RESOURCE_LIST } from './shapes'
-import { idShort, minifyGraph, fullGraph } from './shapes/_base'
+import { idShort, minifyGraph, fullGraph } from './shapes'
 
 const isProd = process.env.NODE_ENV === 'production'
 const SIDER_WIDTH = isProd ? 0 : 200

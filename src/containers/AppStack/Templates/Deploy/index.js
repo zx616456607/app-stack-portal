@@ -27,7 +27,7 @@ import _set from 'lodash/set'
 import { k8sNameCheck } from '../../../../utils/helper'
 import getDeepValue from '@tenx-ui/utils/lib/getDeepValue'
 import * as _builtInFunction from '../../Designer/shapes/_builtInFunction'
-import { fullGraph } from '../../Designer/shapes/_base'
+import { fullGraph } from '../../Designer/shapes'
 
 const FormItem = Form.Item
 const Option = Select.Option
