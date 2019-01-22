@@ -12,7 +12,7 @@
 
 import React from 'react'
 import QueueAnim from 'rc-queue-anim'
-import { Card, Button, Menu, Dropdown, Icon, notification, Tooltip, Input } from 'antd'
+import { Card, Button, Menu, Dropdown, Icon, notification, Tooltip, Input, Pagination } from 'antd'
 import { connect } from 'dva'
 import UnifiedLink from '../../../components/UnifiedLink'
 import styles from './style/index.less'
@@ -32,11 +32,13 @@ const Search = Input.Search;
 class Templates extends React.Component {
   state = {
     keyWord: '',
+    pSize: 10,
+    currentPage: 1,
   }
   componentDidMount() {
     const query = {
       from: 0,
-      size: 0,
+      size: this.state.pSize,
     }
     this.getTemplates(query)
   }
@@ -94,33 +96,56 @@ class Templates extends React.Component {
   }
   searchTemplate = keyWord => {
     this.setState({ keyWord })
+    const { pSize } = this.state
     const query = {
       from: 0,
-      size: 0,
+      size: pSize,
       filter: `name,${keyWord}`,
+    }
+    this.getTemplates(query)
+  }
+  changePage = (page, pageSize) => {
+    const query = {
+      from: (page - 1) * pageSize,
+      size: pageSize,
     }
     this.getTemplates(query)
   }
   render() {
     const { loading, appStack } = this.props
-    const { keyWord } = this.state
+    const { keyWord, pSize } = this.state
     const templateLoading = loading.effects['appStack/fetchAppStackTemplate']
-    const { templateList } = appStack
+    const { template } = appStack
     let appStackTemps = []
-    if (templateList) appStackTemps = templateList
+    let total = 0
+    if (template) {
+      appStackTemps = template.list
+      total = template.total
+    }
     return <QueueAnim
       id="stackTemplate"
     >
       <div>
         <div className={styles.templateTop}>
-          <UnifiedLink to="/app-stack/designer">
-            <Button icon="plus" type="primary">设计堆栈</Button>
-          </UnifiedLink>
-          <Search
-            placeholder="输入模板名称进行搜索"
-            onSearch={value => this.searchTemplate(value)}
-            style={{ width: 200 }}
-          />
+          <div>
+            <UnifiedLink to="/app-stack/designer">
+              <Button icon="plus" type="primary">设计堆栈</Button>
+            </UnifiedLink>
+            <Search
+              placeholder="输入模板名称进行搜索"
+              onSearch={value => this.searchTemplate(value)}
+              style={{ width: 200 }}
+            />
+          </div>
+          <div className={styles.pagination}>
+            <span>共计{total}条</span>
+            <Pagination
+              size="small"
+              pageSize={pSize}
+              onChange={this.changePage}
+              total={total}/>
+          </div>
+
         </div>
         {
           templateLoading ?
