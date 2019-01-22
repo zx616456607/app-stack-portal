@@ -80,7 +80,10 @@ export default {
       yield put({
         type: 'appStackList',
         payload: {
-          appStacks: res.data.appStacks,
+          appStacks: {
+            list: res.data.appStacks,
+            total: res.data.total,
+          },
         },
       })
     },
@@ -90,7 +93,11 @@ export default {
         yield put({
           type: 'appStackTemplateList',
           payload: {
-            templateList: res.data.appStacks,
+            template: {
+              list: res.data.appStacks,
+              total: res.data.total,
+            },
+
           },
         })
       }

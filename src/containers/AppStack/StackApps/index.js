@@ -14,7 +14,7 @@
 import React from 'react'
 import QueueAnim from 'rc-queue-anim'
 import { connect } from 'dva'
-import { Card, Button, notification } from 'antd'
+import { Card, Button, notification, Input, Pagination } from 'antd'
 import { Stack as StackIcon } from '@tenx-ui/icon'
 import { Circle as CircleIcon } from '@tenx-ui/icon'
 import Loader from '@tenx-ui/loader'
@@ -23,13 +23,17 @@ import styles from './style/index.less'
 import UnifiedLink from '../../../components/UnifiedLink'
 import stack from '../../../assets/img/AppStack/stack.png'
 
+const Search = Input.Search;
+
 @connect(state => {
   const { appStack, loading, app } = state
   const { project, cluster } = app
   return { appStack, loading, project, cluster }
 })
 class StackApps extends React.Component {
-  state = {}
+  state = {
+    pSize: 10,
+  }
   componentDidMount() {
     const query = {
       from: 0,
@@ -83,18 +87,62 @@ class StackApps extends React.Component {
     }
     return status
   }
+  changePage = (page, pageSize) => {
+    const query = {
+      from: (page - 1) * pageSize,
+      size: pageSize,
+    }
+    this.getAppStackList(query)
+  }
+  searchAppStack = keyWord => {
+    this.setState({ keyWord })
+    const { pSize } = this.state
+    const query = keyWord ? {
+      from: 0,
+      size: pSize,
+      filter: `name contains ${keyWord}`,
+    } : {
+      from: 0,
+      size: pSize,
+    }
+    this.getAppStackList(query)
+  }
+
   render() {
     const { loading, appStack } = this.props
+    const { pSize } = this.state
     const stacksLoading = loading.effects['appStack/fetchAppStackList']
     const { appStacks } = appStack
     let appStackList = []
-    if (appStacks) appStackList = appStacks
+    let total = 0
+    if (appStacks) {
+      appStackList = appStacks.list
+      total = appStacks.total
+    }
+
     return <QueueAnim
       id="appStack"
     >
-      <UnifiedLink to="/app-stack/templates">
-        <Button type="primary" icon="plus" key="button">部署堆栈</Button>
-      </UnifiedLink>
+      <div className={styles.appStackTop}>
+        <div>
+          <UnifiedLink to="/app-stack/templates">
+            <Button type="primary" icon="plus" key="button">部署堆栈</Button>
+          </UnifiedLink>
+          <Search
+            placeholder="输入模板名称进行搜索"
+            onSearch={value => this.searchAppStack(value)}
+            style={{ width: 200 }}
+          />
+        </div>
+        <div className={styles.pagination}>
+          <span>共计{total}条</span>
+          <Pagination
+            size="small"
+            pageSize={pSize}
+            onChange={this.changePage}
+            total={total}/>
+        </div>
+      </div>
       <div className={styles.appStackContent}>
         {
           stacksLoading ?
