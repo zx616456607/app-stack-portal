@@ -96,11 +96,11 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
           onSearchClick={() => { this.Ace.execCommand('find') }}
         />
         <Layout
-          style={{ height: this.state.fullScreen ? 'calc( 100vh - 30px )' : 'calc( 100vh - 102px )' }}
+          style={{ height: this.state.fullScreen ? 'calc( 100vh - 38px )' : 'calc( 100vh - 102px )' }}
         >
         <Content>
         <div
-         style={{ height: this.state.fullScreen ? 'calc( 100vh - 78px )' : 'calc( 100vh - 150px )' }}
+         style={{ height: this.state.fullScreen ? 'calc( 100vh - 86px )' : 'calc( 100vh - 150px )' }}
         >
         <PanelGroup
           direction="column"
