@@ -51,7 +51,7 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
     Exportvisible: false,
     Importvisible: false,
     collapsed: false,
-    warnWrapHeight: 80,
+    warnWrapHeight: 120,
   }
   editorNode: HTMLDivElement
   innerNode: HTMLDivElement
@@ -217,6 +217,12 @@ const EditorHeader = ({
       ref={headRef}
     >
       <div className={styles.headTitle}>YAML</div>
+      <Tooltip title={'搜索'}>
+      <div className={styles.editIcon}  onClick={onSearchClick}>
+      <Icon type="search" />
+      搜索
+      </div>
+      </Tooltip>
       <Tooltip title={'导入编排'}>
       <div className={styles.editIcon} onClick={plusOnclick}>
       <ImportIcon
@@ -242,19 +248,14 @@ const EditorHeader = ({
       工具
       </div>
       </Tooltip>
-      <Tooltip title={'搜索'}>
-      <div className={styles.editIcon}  onClick={onSearchClick}>
-      <Icon type="search" />
-      搜索
-      </div>
-      </Tooltip>
       <Tooltip title={fullScreen ? '退出全屏' : '全屏'}>
+      <div  onClick={toggleFullScreen} className={styles.editIcon}>
       <Icon
-        type={fullScreen ? 'fullscreen-exit' : 'fullscreen'}
+        type={fullScreen ? 'shrink' : 'arrows-alt'}
         theme="outlined"
-        onClick={toggleFullScreen}
         className={styles.fullEditIcon}
       />
+      </div>
       </Tooltip>
     </div>
   )
