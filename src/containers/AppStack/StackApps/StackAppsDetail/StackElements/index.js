@@ -15,6 +15,7 @@ import { Button, Table, Input, notification, Row, Col } from 'antd'
 import styles from './style/index.less'
 import { connect } from 'react-redux'
 import { cpuFormat, memoryFormat } from '../../../../../utils/helper'
+import autoFitFS from '@tenx-ui/utils/lib/autoFitFS'
 import getDeepValue from '@tenx-ui/utils/lib/getDeepValue'
 import TimeHover from '@tenx-ui/time-hover'
 import UnifiedLink from '../../../../../components/UnifiedLink'
@@ -22,6 +23,8 @@ import UnifiedLink from '../../../../../components/UnifiedLink'
 const Search = Input.Search
 const SUPPORT_WORK_LOAD = [ 'Deployment', 'Service', 'StatefulSet', 'Job', 'CronJob', 'Pod' ]
 
+
+@autoFitFS(70)
 @connect(state => {
   const { appStack, loading, app } = state
   const { cluster } = app
@@ -149,7 +152,7 @@ class StackElements extends React.Component {
     const { stackElements, loading } = this.props
     const { searchValue } = this.state
     const filterStackElements = stackElements.filter(({ name }) => (name || '').indexOf(searchValue) > -1)
-    return <div id="stackElements">
+    return <div id="stackElements" style={{ minHeight: this.props.autoFitFsH }}>
       <div className={styles.operation} style={filterStackElements.length === 0 ? { position: 'relative' } : null}>
         <div className={styles.operationLeft}>
           <Button icon="sync" onClick={this.refresh}>刷新</Button>

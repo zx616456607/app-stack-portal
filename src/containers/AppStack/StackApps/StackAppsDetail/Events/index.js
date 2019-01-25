@@ -19,9 +19,10 @@ import {
 import TimeHover from '@tenx-ui/time-hover'
 import Ellipsis from '@tenx-ui/ellipsis'
 import cloneDeep from 'lodash/cloneDeep'
+import autoFitFS from '@tenx-ui/utils/lib/autoFitFS'
 
 const Panel = Collapse.Panel
-
+@autoFitFS(70)
 @connect(state => {
   const { appStack, loading, app } = state
   const { cluster } = app
@@ -62,7 +63,7 @@ export default class Events extends React.PureComponent {
 
   render() {
     const { appStackEvents } = this.props
-    return <div className={styles.stackEvents}>
+    return <div className={styles.stackEvents} style={{ minHeight: this.props.autoFitFsH }}>
       <div className={styles.operation}>
         <Button icon="sync" onClick={this.loadEvents}>刷新</Button>
       </div>
