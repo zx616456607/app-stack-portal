@@ -13,6 +13,7 @@ import { connect } from 'dva'
 import getDeepValue from '@tenx-ui/utils/lib/getDeepValue'
 import Detail from './detail'
 import { findDOMNode } from 'react-dom';
+import autoFitFS from '@tenx-ui/utils/lib/autoFitFS'
 
 const config = {
   rankdir: 'LR',
@@ -25,6 +26,7 @@ const config = {
 
 interface RTProps {
   appStackDetail: any;
+  autoFitFsH: number
 }
 
 interface RTState {
@@ -116,6 +118,7 @@ function formateEdgesAndNodes(appStack: any, onClick: (lname: string, e: any) =>
   return [edgeEdge, NodeArray]
 }
 
+@autoFitFS(70)
 @connect(mapStateToProps)
 export default class ResourceTopology extends React.Component<RTProps, RTState> {
   relationChart: React.ReactDOM
@@ -199,7 +202,7 @@ export default class ResourceTopology extends React.Component<RTProps, RTState> 
         graphConfigs={config}
         nodes={this.state.nodeArray}
         edges={this.state.edgesArray}
-        SvgHeight={'800px'}
+        SvgHeight={this.props.autoFitFsH}
         onSvgClick={this.onRelationChartClick}
         ref={(node) => this.relationChart = node}
         fullScreenMode={(full) => this.fullScreen = full}

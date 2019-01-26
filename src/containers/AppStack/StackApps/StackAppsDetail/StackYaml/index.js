@@ -7,7 +7,9 @@ import 'brace/mode/yaml'
 import 'brace/snippets/yaml'
 import 'brace/theme/monokai'
 import yamlParser from 'js-yaml'
+import autoFitFS from '@tenx-ui/utils/lib/autoFitFS'
 
+@autoFitFS(110)
 @connect(state => {
   const { appStack } = state
   let { appStacksDetail } = appStack
@@ -63,12 +65,13 @@ export default class StackYaml extends React.PureComponent {
       <li ref="activeLine" className={styles.activeLine}></li>
     </ul>
     return (
-      <div style={{ height: 500 }} id="yamlEditor" className={styles.yamlEditor}>
+      <div id="yamlEditor" className={styles.yamlEditor}>
         <TenxEditor
           name="stack-yaml"
           headerExtraContent={header}
           value={yamlValue}
           readOnly={true}
+          height={this.props.autoFitFsH}
         />
       </div>
     )
