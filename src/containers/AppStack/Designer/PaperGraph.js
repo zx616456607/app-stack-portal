@@ -601,9 +601,15 @@ export default class PaperGraph extends React.PureComponent {
     })
   }
 
+  onSaveClick = () => {
+    // [KK-2594] 点击保存时清除 element active 状态
+    this._clearActiveElements()
+    this.props.onGraphSave(this.graph.toJSON())
+  }
+
   render() {
     const { paperScale, redoList, yamlBtnTipVisible, grabbing } = this.state
-    const { onGraphSave, editMode, readOnly } = this.props
+    const { editMode, readOnly } = this.props
     return (
       <Hotkeys
         keyName="delete,backspace,ctrl+z,command+z,ctrl+shift+z,command+shift+z,ctrl+s,command+s"
@@ -682,7 +688,7 @@ export default class PaperGraph extends React.PureComponent {
                 >
                   适应屏幕
                 </Button>
-                <Button icon="save" onClick={() => onGraphSave(this.graph.toJSON())}>
+                <Button icon="save" onClick={this.onSaveClick}>
                   {
                     editMode ? '保存更新' : '保存并提交'
                   }
