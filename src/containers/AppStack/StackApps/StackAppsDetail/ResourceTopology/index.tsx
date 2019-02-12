@@ -118,7 +118,7 @@ function formateEdgesAndNodes(appStack: any, onClick: (lname: string, e: any) =>
   return [edgeEdge, NodeArray]
 }
 
-@autoFitFS(70)
+@autoFitFS(50)
 @connect(mapStateToProps)
 export default class ResourceTopology extends React.Component<RTProps, RTState> {
   relationChart: React.ReactDOM

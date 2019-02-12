@@ -19,14 +19,14 @@ import Loader from '@tenx-ui/loader'
 import '@tenx-ui/loader/assets/index.css'
 import * as MyLayout from '../../components/Layout'
 import { BackTop, Layout, notification } from 'antd'
-import { footerText } from '../../utils/config'
+// import { footerText } from '../../utils/config'
 import { Helmet } from 'react-helmet'
 import classnames from 'classnames'
 import { withRouter } from 'dva/router'
 import './style/App.less'
 import contentStyles from './style/content.less'
 
-const { Content, Footer, Sider } = Layout
+const { Content, Sider } = Layout
 const { Header, styles } = MyLayout
 
 let lastHref
@@ -134,9 +134,9 @@ class App extends React.Component {
               <Content className={contentClass}>
                 {children}
               </Content>
-              <Footer >
+              {/* <Footer >
                 {footerText}
-              </Footer>
+              </Footer> */}
             </Layout>
           </Layout>
         </div>

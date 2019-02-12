@@ -9,7 +9,7 @@ import 'brace/theme/monokai'
 import yamlParser from 'js-yaml'
 import autoFitFS from '@tenx-ui/utils/lib/autoFitFS'
 
-@autoFitFS(110)
+@autoFitFS(90)
 @connect(state => {
   const { appStack } = state
   let { appStacksDetail } = appStack
