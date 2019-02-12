@@ -24,7 +24,7 @@ const Search = Input.Search
 const SUPPORT_WORK_LOAD = [ 'Deployment', 'Service', 'StatefulSet', 'Job', 'CronJob', 'Pod' ]
 
 
-@autoFitFS(70)
+@autoFitFS(50)
 @connect(state => {
   const { appStack, loading, app } = state
   const { cluster } = app

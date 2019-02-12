@@ -22,7 +22,7 @@ import cloneDeep from 'lodash/cloneDeep'
 import autoFitFS from '@tenx-ui/utils/lib/autoFitFS'
 
 const Panel = Collapse.Panel
-@autoFitFS(70)
+@autoFitFS(50)
 @connect(state => {
   const { appStack, loading, app } = state
   const { cluster } = app
