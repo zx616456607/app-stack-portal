@@ -32,7 +32,7 @@ const Search = Input.Search;
 })
 class StackApps extends React.Component {
   state = {
-    pSize: 10,
+    pSize: 12,
   }
   componentDidMount() {
     const query = {

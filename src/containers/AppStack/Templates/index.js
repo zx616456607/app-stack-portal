@@ -32,7 +32,7 @@ const Search = Input.Search;
 class Templates extends React.Component {
   state = {
     keyWord: '',
-    pSize: 10,
+    pSize: 12,
     currentPage: 1,
   }
   componentDidMount() {
@@ -78,7 +78,7 @@ class Templates extends React.Component {
           if (res && res.code === 200) {
             const query = {
               from: 0,
-              size: 0,
+              size: this.state.pSize,
             }
             this.getTemplates(query)
             notification.success({ message: '删除成功' })
