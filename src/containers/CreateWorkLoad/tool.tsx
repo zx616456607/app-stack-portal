@@ -40,6 +40,7 @@ interface ToolState {
     [index: string]: Array<Node>,
   },
   heightBottom: number,
+  extend: boolean,
 }
 interface Node {
   id: number
@@ -53,6 +54,7 @@ class Tool extends React.Component<ToolProps, ToolState> {
   state = {
     sampleInfo: {} as { [index: string]: Array<Node> },
     heightBottom: 200,
+    extend: false,
   }
   async componentDidMount() {
     const payload = { cluster: this.props.cluster }
@@ -64,6 +66,11 @@ class Tool extends React.Component<ToolProps, ToolState> {
     }
     const { data } = res || { data: {} }
     this.setState({ sampleInfo: data })
+  }
+  togleExtend = () => {
+    this.setState( {
+      heightBottom: this.state.extend ? this.refs.toolWrap.offsetHeight - 36 : 36,
+      extend: !this.state.extend } )
   }
   render() {
     return(
@@ -90,7 +97,7 @@ class Tool extends React.Component<ToolProps, ToolState> {
             cluster={this.props.cluster}
             dispatch={this.props.dispatch}
             editorWarn={this.props.editorWarn}
-            onTitleClick={() => this.setState({ heightBottom: 36 })}
+            onTitleClick={this.togleExtend}
           /> : <div/>
           }{
             !this.props.collapsed ?
@@ -100,7 +107,7 @@ class Tool extends React.Component<ToolProps, ToolState> {
             editorNode={this.props.editorNode}
             dispatch={this.props.dispatch}
             history={this.props.history}
-            onPreviewClick={() => this.setState({ heightBottom: this.refs.toolWrap.offsetHeight - 36 })}
+            onPreviewClick={this.togleExtend}
           /> : <div/>}
         </PanelGroup>
       </div>
@@ -165,6 +172,7 @@ class SampleInner extends React.Component<SampleProps, SampleState> {
         <div className={styles.contentWrap}>
         {
           this.state.value &&
+        <div className={styles.editorSelectorWrap}>
         <Select
           className={styles.editorSelector}
           mode="multiple"
@@ -173,12 +181,14 @@ class SampleInner extends React.Component<SampleProps, SampleState> {
           value={this.state.value}
           onChange={this.handleChange}
           getPopupContainer={(node) => (node as HTMLElement)}
+          dropdownMatchSelectWidth
         >
           {
             Object.keys(this.props.sampleInfo).map((value) =>
             <Option key={value} value={value}>{value}</Option>)
           }
         </Select>
+        </div>
         }{
           uniqSelectArray
           .map((node, index) => <SampleNode
