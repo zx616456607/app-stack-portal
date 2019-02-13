@@ -37,7 +37,7 @@ class StackApps extends React.Component {
   componentDidMount() {
     const query = {
       from: 0,
-      size: 0,
+      size: this.state.pSize,
     }
     this.getAppStackList(query)
   }
