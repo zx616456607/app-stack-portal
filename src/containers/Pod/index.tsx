@@ -36,6 +36,7 @@ import compact from 'lodash/compact'
 import Terminal from '../Detail/Terminal'
 import styles from './styles/index.less'
 import TenxIcon from '@tenx-ui/icon/es/_old'
+import ResourceBanner from '../../components/ResourceBanner'
 const Search = Input.Search
 
 function getColumns(self): Array<any> {
@@ -389,6 +390,9 @@ class Pod extends React.Component<PodProps, PodState> {
     return (
     <Page>
       <QueueAnim>
+        <ResourceBanner resourceType={[ 'container' ]} key="ResourceBanner">
+        {'( 容器是应用管理创建的Pod资源, 通过Pod配额控制 )'}
+        </ResourceBanner>
         <div className="layout-content-btns" key="btns">
         {/* <Button
           type={'primary'}
