@@ -14,7 +14,6 @@
 
 import React from 'react'
 import { Pagination, Table, Dropdown, Menu, Button, notification } from 'antd'
-import Page from '@tenx-ui/page'
 import Queue from 'rc-queue-anim'
 import { Link } from 'dva/router'
 import moment from 'moment'
@@ -25,7 +24,9 @@ import { confirm } from '@tenx-ui/modal'
 import getDeepValue from '@tenx-ui/utils/lib/getDeepValue'
 import styles from '../../Pod/styles/index.less'
 import classnames from 'classnames'
+import autoFitFS from '@tenx-ui/utils/lib/autoFitFS'
 
+@autoFitFS(50)
 export default class Pods extends React.PureComponent {
   state = {
     current: 1,
@@ -200,7 +201,7 @@ export default class Pods extends React.PureComponent {
     const { data = [], history, cron, refreshPodList, loading } = this.props
     const { current, size } = this.state
     return (
-      <Page>
+      <div style={{ minHeight: this.props.autoFitFsH }}>
         <Queue>
           <div className="layout-content-btns" key="btns">
             <Button type="primary" icon="reload" onClick={refreshPodList}>刷新</Button>
@@ -226,7 +227,7 @@ export default class Pods extends React.PureComponent {
             className="table-flex"
           />
         </Queue>
-      </Page>
+      </div>
     )
   }
 }

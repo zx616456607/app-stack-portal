@@ -14,14 +14,15 @@ import styles from './style/index.less'
 import classnames from 'classnames'
 import Ellipsis from '@tenx-ui/ellipsis'
 import moment from 'moment'
-
+import autoFitFS from '@tenx-ui/utils/lib/autoFitFS'
 interface EventProps extends SubscriptionAPI {
   cluster: string;
   name: string;
   type: string;
   events: any[];
+  autoFitFsH: number;
 }
-
+@autoFitFS(50)
 class Event extends React.Component<EventProps, {}> {
   async componentDidMount() {
     const { dispatch, name, cluster, type } = this.props
@@ -79,7 +80,7 @@ class Event extends React.Component<EventProps, {}> {
   render() {
     const { events } = this.props
     return (
-      <Timeline>
+      <Timeline style={{ minHeight: this.props.autoFitFsH }}>
         {this.renderItem(events)}
       </Timeline>
     )

@@ -16,7 +16,6 @@ import React from 'react'
 import { connect } from 'dva'
 import { Switch, Route, routerRedux } from 'dva/router'
 import { Tabs, notification, Spin } from 'antd'
-import Page from '@tenx-ui/page'
 import DetailHeader from './Header/index'
 import styles from './style/index.less'
 import Terminal from './Terminal'
@@ -150,7 +149,7 @@ class NativeDetail extends React.PureComponent {
     return (
       <div>
         <DetailHeader/>
-        <Page inner className={styles.page}>
+        <div className={styles.page}>
           <div>
             <Tabs
               activeKey={this.getActiveKey(pathname, routes)}
@@ -177,7 +176,7 @@ class NativeDetail extends React.PureComponent {
             dockVisible &&
             <Terminal/>
           }
-        </Page>
+        </div>
       </div>
     )
   }

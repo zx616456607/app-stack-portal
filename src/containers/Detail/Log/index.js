@@ -19,10 +19,11 @@ import moment from 'moment'
 import { DEFAULT_TIME_FORMAT } from '../../../utils/constants'
 import TenxLogs from '@tenx-ui/logs'
 import styles from './style/index.less'
+import autoFitFS from '@tenx-ui/utils/lib/autoFitFS'
 
 const mapStateToProps =
   ({ nativeDetail: { logs: { logs = [], count = 0 }, name } }) => ({ logs, count, name })
-
+@autoFitFS(50)
 @connect(mapStateToProps)
 class Log extends React.PureComponent {
   async componentDidMount() {
@@ -76,9 +77,11 @@ class Log extends React.PureComponent {
   render() {
     this.getColorLogs()
     return (
-      <TenxLogs
-        ref={ref => (this.logRef = ref)}
-      />
+      <div style={{ height: this.props.autoFitFsH }} className={styles.TenxLogs}>
+        <TenxLogs
+          ref={ref => (this.logRef = ref)}
+        />
+      </div>
     )
   }
 }
