@@ -19,6 +19,7 @@ import TenxLogs from '@tenx-ui/logs'
 import { formatDate } from '../../../utils/helper'
 import { ecma48SgrEscape } from '../../../utils/ecma48_sgr_escape'
 import styles from './style/PodLogWebsocket.less'
+import autoFitFS from '@tenx-ui/utils/lib/autoFitFS'
 
 const RETRY_TIMEOUT = 5000
 export const MAX_LOGS_NUMBER = 500
@@ -32,7 +33,7 @@ const mapState = ({ app: { watchToken, cluster, project, user }, nativeDetail })
     project,
   }
 }
-
+@autoFitFS(50)
 @connect(mapState)
 export default class PodLogSocket extends React.PureComponent {
   static propTypes = {
@@ -155,7 +156,7 @@ export default class PodLogSocket extends React.PureComponent {
   }
   render() {
     return (
-      <div>
+      <div style={{ height: this.props.autoFitFsH }} className={styles.TenxLogs}>
         <TenxLogs
           ref={ref => (this.logRef = ref)}
           logs={[

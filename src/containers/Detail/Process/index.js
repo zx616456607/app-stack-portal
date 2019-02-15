@@ -17,14 +17,14 @@ import { connect } from 'dva'
 import { withRouter } from 'dva/router'
 import { notification, Table } from 'antd'
 import Queue from 'rc-queue-anim'
-import Page from '@tenx-ui/page'
 import getDeepValue from '@tenx-ui/utils/lib/getDeepValue'
 import Ellipsis from '@tenx-ui/ellipsis'
 import { Circle as CircleIcon } from '@tenx-ui/icon'
 import moment from 'moment'
 import { DEFAULT_TIME_FORMAT } from '../../../utils/constants'
 import styles from './style/index.less'
-
+import autoFitFS from '@tenx-ui/utils/lib/autoFitFS'
+@autoFitFS(50)
 class ProcessContainer extends React.PureComponent {
   async componentDidMount() {
     const { dispatch } = this.props
@@ -208,7 +208,7 @@ class ProcessContainer extends React.PureComponent {
   render() {
     const { data, loading } = this.props
     return (
-      <Page>
+      <div className={styles.page} style={{ minHeight: this.props.autoFitFsH }}>
         <Queue>
           <Table
             rowKey={(item, i) => i}
@@ -219,7 +219,7 @@ class ProcessContainer extends React.PureComponent {
             loading={loading.effects['nativeDetail/fetchPodDetail']}
           />
         </Queue>
-      </Page>
+      </div>
     )
   }
 }

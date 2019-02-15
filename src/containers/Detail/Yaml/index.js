@@ -20,9 +20,11 @@ import { connect } from 'dva'
 import 'brace/mode/yaml'
 import 'brace/snippets/yaml'
 import 'brace/theme/monokai'
+import autoFitFS from '@tenx-ui/utils/lib/autoFitFS'
 
 const dvaStates = ({ nativeDetail: { detailData, type } }) => ({ data: detailData, type })
 
+@autoFitFS(90)
 @connect(dvaStates)
 export default class YamlTab extends React.PureComponent {
 
@@ -53,13 +55,12 @@ export default class YamlTab extends React.PureComponent {
     }
     const value = { apiVersion, kind: type, ...data }
     return (
-      <div style={{ height: 500 }} >
-        <TenxEditor
-          value={yaml.dump(value)}
-          readOnly={true}
-          onChange={yamlStr => this.setState({ yamlStr })}
-        />
-      </div>
+      <TenxEditor
+        value={yaml.dump(value)}
+        readOnly={true}
+        onChange={yamlStr => this.setState({ yamlStr })}
+        height={this.props.autoFitFsH}
+      />
     )
   }
 }

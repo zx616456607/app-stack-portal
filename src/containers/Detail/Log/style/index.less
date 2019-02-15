@@ -24,3 +24,13 @@
 .noLog {
   margin-left: @padding-large;
 }
+.TenxLogs {
+  :global {
+    .tenx-ui-logs-body {
+      min-height: 0;
+    }
+    .ReactVirtualized__Grid {
+      height: auto !important;
+    }
+  }
+}
