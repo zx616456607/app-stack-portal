@@ -41,10 +41,10 @@ class StackApps extends React.Component {
     }
     this.getAppStackList(query)
   }
-  getAppStackList = query => {
+  getAppStackList = async query => {
     const { dispatch, cluster } = this.props
     try {
-      dispatch({
+      await dispatch({
         type: 'appStack/fetchAppStackList',
         payload: {
           cluster,
