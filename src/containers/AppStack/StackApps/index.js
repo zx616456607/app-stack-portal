@@ -35,11 +35,7 @@ class StackApps extends React.Component {
     pSize: 12,
   }
   componentDidMount() {
-    const query = {
-      from: 0,
-      size: this.state.pSize,
-    }
-    this.getAppStackList(query)
+    this.loadData()
   }
   getAppStackList = async query => {
     const { dispatch, cluster } = this.props
@@ -107,7 +103,13 @@ class StackApps extends React.Component {
     }
     this.getAppStackList(query)
   }
-
+  loadData = () => {
+    const query = {
+      from: 0,
+      size: this.state.pSize,
+    }
+    this.getAppStackList(query)
+  }
   render() {
     const { loading, appStack } = this.props
     const { pSize } = this.state
@@ -128,6 +130,7 @@ class StackApps extends React.Component {
           <UnifiedLink to="/app-stack/templates">
             <Button type="primary" icon="plus" key="button">部署堆栈</Button>
           </UnifiedLink>
+          <Button type="default" icon="reload" key="reload" onClick={this.loadData}>刷新</Button>
           <Search
             placeholder="输入模板名称进行搜索"
             onSearch={value => this.searchAppStack(value)}
