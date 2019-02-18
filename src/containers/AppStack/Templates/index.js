@@ -36,11 +36,7 @@ class Templates extends React.Component {
     currentPage: 1,
   }
   componentDidMount() {
-    const query = {
-      from: 0,
-      size: this.state.pSize,
-    }
-    this.getTemplates(query)
+    this.loadData()
   }
   componentDidCatch(error, info) {
     console.warn('Templates componentDidCatch', error, info)
@@ -111,6 +107,13 @@ class Templates extends React.Component {
     }
     this.getTemplates(query)
   }
+  loadData = () => {
+    const query = {
+      from: 0,
+      size: this.state.pSize,
+    }
+    this.getTemplates(query)
+  }
   render() {
     const { loading, appStack } = this.props
     const { keyWord, pSize } = this.state
@@ -131,6 +134,7 @@ class Templates extends React.Component {
             <UnifiedLink to="/app-stack/designer">
               <Button icon="plus" type="primary">设计堆栈</Button>
             </UnifiedLink>
+            <Button type="default" icon="reload" key="reload" onClick={this.loadData}>刷新</Button>
             <Search
               placeholder="输入模板名称进行搜索"
               onSearch={value => this.searchTemplate(value)}
