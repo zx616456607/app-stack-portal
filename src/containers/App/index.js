@@ -29,6 +29,16 @@ import contentStyles from './style/content.less'
 const { Content, Sider } = Layout
 const { Header, styles } = MyLayout
 
+const isPageInIframe = window.self !== window.top
+const handleDocMounseDown = () => {
+  // 将 iframe 的 mousedown 事件传递给父容器，用来关闭父容器的弹出层等
+  const evt = new MouseEvent('mousedown', {
+    bubbles: true,
+    cancelable: true,
+  })
+  window.parent.document.dispatchEvent(evt)
+}
+
 let lastHref
 
 class App extends React.Component {
@@ -41,6 +51,9 @@ class App extends React.Component {
   }
 
   async componentDidMount() {
+    if (isPageInIframe) {
+      document.addEventListener('mousedown', handleDocMounseDown)
+    }
     this.mainContainer = document.getElementById('mainContainer')
     const { dispatch, history } = this.props
     if (window.parent.appStackIframeCallBack) {
@@ -60,6 +73,12 @@ class App extends React.Component {
   componentDidUpdate(prevProps) {
     if (this.props.app.locationPathname !== prevProps.app.locationPathname) {
       this.mainContainer && (this.mainContainer.scrollTop = 0)
+    }
+  }
+
+  componentWillUnmount() {
+    if (isPageInIframe) {
+      document.removeEventListener('mousedown', handleDocMounseDown)
     }
   }
 
