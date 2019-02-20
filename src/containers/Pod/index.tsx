@@ -390,9 +390,11 @@ class Pod extends React.Component<PodProps, PodState> {
     return (
     <Page>
       <QueueAnim>
-        <ResourceBanner resourceType={[ 'container' ]} key="ResourceBanner">
-        {'( 容器是应用管理创建的Pod资源, 通过Pod配额控制 )'}
-        </ResourceBanner>
+        <ResourceBanner
+          resourceType={[ 'container' ]}
+          key="ResourceBanner"
+          infoConfig={{ container: '容器是应用管理创建的Pod资源, 通过Pod配额控制' }}
+        />
         <div className="layout-content-btns" key="btns">
         {/* <Button
           type={'primary'}
