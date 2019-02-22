@@ -8,12 +8,13 @@
  * @date Tuesday November 20th 2018
  */
 import * as React from 'react'
-import { Modal, Form, Radio, notification, Select } from 'antd'
+import { Modal as CModal, Form, Radio, notification, Select } from 'antd'
 import { FormComponentProps } from 'antd/es/form'
 import { yamlString } from './editorType'
 import { SubscriptionAPI } from 'dva'
 import getDeepValue from '@tenx-ui/utils/lib/getDeepValue'
 import debounce from 'lodash/debounce'
+import AutoContainer from '../../components/autoContainer'
 
 const Option = Select.Option
 const FormItem = Form.Item
@@ -27,6 +28,7 @@ const formItemLayout = {
   },
 };
 
+const Modal = AutoContainer(CModal)
 interface FileProps extends FormComponentProps, SubscriptionAPI {
   visible: boolean;
   setVisible: (value: boolean) => void;

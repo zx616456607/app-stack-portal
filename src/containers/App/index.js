@@ -18,7 +18,7 @@ import { connect } from 'dva'
 import Loader from '@tenx-ui/loader'
 import '@tenx-ui/loader/assets/index.css'
 import * as MyLayout from '../../components/Layout'
-import { BackTop, Layout, notification } from 'antd'
+import { BackTop, Layout, notification, ConfigProvider } from 'antd'
 // import { footerText } from '../../utils/config'
 import { Helmet } from 'react-helmet'
 import classnames from 'classnames'
@@ -138,26 +138,30 @@ class App extends React.Component {
           {/* <link rel="icon" href={logo} type="image/x-icon" /> */}
         </Helmet>
         <div className={classStr}>
-          <Layout className={styles.dark}>
-            <Sider
-              className={styles.fixedSider}
-              trigger={null}
-              collapsible
-              collapsed={siderFold}
-            >
-              {siderProps.menu.length === 0 ? null : <MyLayout.Sider {...siderProps} />}
-            </Sider>
-            <Layout style={{ minHeight: '100vh' }} id="mainContainer">
-              <BackTop target={() => document.getElementById('mainContainer')} />
-              <Header {...headerProps} />
-              <Content className={contentClass}>
-                {children}
-              </Content>
-              {/* <Footer >
-                {footerText}
-              </Footer> */}
+          <ConfigProvider
+            // prefixCls={'unified-nav'}
+          >
+            <Layout className={styles.dark}>
+              <Sider
+                className={styles.fixedSider}
+                trigger={null}
+                collapsible
+                collapsed={siderFold}
+              >
+                {siderProps.menu.length === 0 ? null : <MyLayout.Sider {...siderProps} />}
+              </Sider>
+              <Layout style={{ minHeight: '100vh' }} id="mainContainer">
+                <BackTop target={() => document.getElementById('mainContainer')} />
+                <Header {...headerProps} />
+                <Content className={contentClass} style={{ overflow: 'hidden' }}>
+                  {children}
+                </Content>
+                {/* <Footer >
+                  {footerText}
+                </Footer> */}
+              </Layout>
             </Layout>
-          </Layout>
+          </ConfigProvider>
         </div>
       </div>
     )
