@@ -16,7 +16,7 @@ import React from 'react'
 import styles from './style/StatefulSetHeader.less'
 import { Button, Popover } from 'antd'
 import { connect } from 'dva'
-import { routerRedux, Link } from 'dva/router'
+import UnifiedLink, { historyPush } from '@tenx-ui/utils/es/UnifiedLink'
 import getDeepValue from '@tenx-ui/utils/lib/getDeepValue'
 import moment from 'moment'
 import { DEFAULT_TIME_FORMAT } from '../../../utils/constants'
@@ -29,15 +29,23 @@ import CronJobIcon from '../../../assets/img/detailHeaderIcon/CronJob.png'
 import JobIcon from '../../../assets/img/detailHeaderIcon/Job.png'
 import StatefulSetIcon from '../../../assets/img/detailHeaderIcon/StatefulSet.png'
 
-const toYamlEditor = (dispatch, name, type) => {
-  dispatch(routerRedux.push({
-    pathname: '/createWorkLoad',
+const toYamlEditor = (name, type) => {
+  historyPush({
+    pathname: '/workloads/createWorkLoad',
     search: queryString.stringify({
       edit: true,
       name,
       type,
     }),
-  }))
+  })
+  // dispatch(routerRedux.push({
+  //   pathname: '/createWorkLoad',
+  //   search: queryString.stringify({
+  //     edit: true,
+  //     name,
+  //     type,
+  //   }),
+  // }))
 }
 
 const popoverContent = (rules, title) => (
@@ -84,9 +92,6 @@ class DetailHeader extends React.PureComponent {
       this.iframeCallback = window.parent.appStackIframeCallBack
     }
   }
-  iframeCb = pathname => {
-    this.iframeCallback && this.iframeCallback('redirect', { pathname })
-  }
   renderPodOwner = data => {
     const replicaset = ((getDeepValue(data, 'metadata.ownerReferences'.split('.')) || []).map(item => item.name)).join(',')
     const resourceOwner = getDeepValue(data, 'metadata.annotations.createController'.split('.'))
@@ -102,11 +107,10 @@ class DetailHeader extends React.PureComponent {
         <span className={styles.upLabel}>上级资源: &nbsp;</span>
         {type && name && (
           <React.Fragment>
-            <Link
-              onClick={() => this.iframeCb(`/app-stack/${type}`)}
-              to={`/${type}/${name}`}>
+            <UnifiedLink
+              to={`/workloads/${type}/${name}`}>
               <Ellipsis length={15}>{name}</Ellipsis>
-            </Link>
+            </UnifiedLink>
             <span>/</span>
           </React.Fragment>
         )}
@@ -148,7 +152,7 @@ class DetailHeader extends React.PureComponent {
     })
   }
   render() {
-    const { data, dispatch, name, type } = this.props
+    const { data, name, type } = this.props
     if (!data.metadata) return <div/>
     return (
       <div className={classnames({
@@ -356,7 +360,7 @@ class DetailHeader extends React.PureComponent {
           }
           <Button
             disabled={ type === 'Pod' && getStatus(data, type).phase === 'Succeeded'}
-            onClick={() => toYamlEditor(dispatch, name, type)} type="primary"> 编辑 Yaml</Button>
+            onClick={() => toYamlEditor(name, type)} type="primary"> 编辑 Yaml</Button>
         </div>
       </div>
     )

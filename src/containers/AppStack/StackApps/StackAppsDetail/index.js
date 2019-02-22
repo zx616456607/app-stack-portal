@@ -19,6 +19,7 @@ import * as modal from '@tenx-ui/modal'
 import Loader from '@tenx-ui/loader'
 import { getServiceStatus } from '../../../../utils/helper'
 import { Switch, Route, routerRedux } from 'dva/router'
+import { historyPush } from '@tenx-ui/utils/es/UnifiedLink'
 
 const TabPane = Tabs.TabPane
 const childRoutes = [
@@ -239,7 +240,7 @@ class StackAppsDetail extends React.Component {
             this.setState({
               delModal: false,
             })
-            this.props.history.push('/app-stack')
+            historyPush.push('/app-stack')
             notification.success({ message: '删除成功' })
           } else {
             notification.warn({ message: '删除失败' })

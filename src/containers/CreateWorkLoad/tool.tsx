@@ -24,6 +24,7 @@ import { Hpa as HpaIcon , Cronjob as CronjobIcon, Deployment as DeploymentIcon,
 } from '@tenx-ui/icon'
 import getDeepValue from '@tenx-ui/utils/lib/getDeepValue'
 import classnames from 'classnames'
+import { getUnifiedHistory } from '@tenx-ui/utils/es/UnifiedLink'
 
 const Option = Select.Option;
 const resourceKind = [ 'Deployment', 'StatefulSet', 'Job', 'CronJob' ] // 这四种资源适用去掉sider, 插入字段
@@ -106,7 +107,7 @@ class Tool extends React.Component<ToolProps, ToolState> {
             value={this.props.value}
             editorNode={this.props.editorNode}
             dispatch={this.props.dispatch}
-            history={this.props.history}
+            history={getUnifiedHistory()}
             onPreviewClick={this.togleExtend}
           /> : <div/>}
         </PanelGroup>

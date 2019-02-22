@@ -20,7 +20,7 @@ import yamlParser from 'js-yaml'
 import styles from './style/index.less'
 import YamlDock from './YamlDock'
 import PaperGraph from './PaperGraph'
-import { push as unifiedPush } from '../../../components/UnifiedLink'
+import { historyPush } from '@tenx-ui/utils/es/UnifiedLink'
 
 
 const FormItem = Form.Item
@@ -203,7 +203,7 @@ _paper: {}`,
   }
 
   onStackSave = () => {
-    const { form, dispatch, history } = this.props
+    const { form, dispatch } = this.props
     const { validateFields } = form
     validateFields(async (err, body) => {
       if (err) {
@@ -277,7 +277,7 @@ _paper: {}`,
         this.graph.clear()
 
         this._removeGraphObjFromLS()
-        unifiedPush('/app-stack/templates', history)
+        historyPush('/app-stack/templates')
       } catch (error) {
         if (error.status === 409) {
           notification.warn({

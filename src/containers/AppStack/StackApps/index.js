@@ -20,7 +20,7 @@ import { Circle as CircleIcon } from '@tenx-ui/icon'
 import Loader from '@tenx-ui/loader'
 import Ellipsis from '@tenx-ui/ellipsis'
 import styles from './style/index.less'
-import UnifiedLink from '../../../components/UnifiedLink'
+import UnifiedLink from '@tenx-ui/utils/es/UnifiedLink'
 import stack from '../../../assets/img/AppStack/stack.png'
 
 const Search = Input.Search;

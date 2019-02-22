@@ -28,6 +28,8 @@ import AnalyzeNameSpace from './analyzeNameSpace'
 import { Import as ImportIcon } from '@tenx-ui/icon'
 import '@tenx-ui/icon/assets/index.css'
 import getDeepValue from '@tenx-ui/utils/lib/getDeepValue'
+import { getUnifiedHistory } from '@tenx-ui/utils/es/UnifiedLink'
+
 const {  Sider, Content } = Layout
 interface EditorProps extends SubscriptionAPI {
   onBeforeChange: (value: yamlString) => void;
@@ -79,6 +81,7 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
   }
   render() {
     const eidtorCN = classnames(styles.editor, { [styles.fullScreen]: this.state.fullScreen })
+    const unifiedHistory = getUnifiedHistory()
     return (
       <div
         className={eidtorCN}
@@ -149,7 +152,7 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
         </PanelGroup>
         </div>
         <EditorBottom
-          onCancelClick={() => history.back()}
+          onCancelClick={() => unifiedHistory.goBack()}
           onSavelick={this.props.createOrEditNative}
           editflag={this.props.editflag}
         />
@@ -173,7 +176,7 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
             visible={this.state.Exportvisible}
             setVisible={this.setExportvisible}
             dispatch={this.props.dispatch}
-            history={this.props.history}
+            history={unifiedHistory}
             yamlValue={this.props.value}
             getContainer={() => this.state.fullScreen ? this.innerNode : document.body}
         />
@@ -182,7 +185,7 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
           visible={this.state.Importvisible}
           setVisible={this.setImportvisible}
           dispatch={this.props.dispatch}
-          history={this.props.history}
+          history={unifiedHistory}
           getContainer={() => this.state.fullScreen ? this.innerNode : document.body}
           setYamlValue={this.props.setYamlValue}
         />}

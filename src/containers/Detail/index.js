@@ -14,11 +14,12 @@
 
 import React from 'react'
 import { connect } from 'dva'
-import { Switch, Route, routerRedux } from 'dva/router'
+import { Switch, Route } from 'dva/router'
 import { Tabs, notification, Spin } from 'antd'
 import DetailHeader from './Header/index'
 import styles from './style/index.less'
 import Terminal from './Terminal'
+import { historyPush } from '@tenx-ui/utils/es/UnifiedLink'
 
 const TabPane = Tabs.TabPane
 
@@ -27,12 +28,19 @@ const mapStateToProps = (
 
 @connect(mapStateToProps)
 class NativeDetail extends React.PureComponent {
+  constructor(props) {
+    super(props)
+    const { match: { path } } = this.props
+    this.type = path.split('/').filter(i => i !== '')[1]
+    this.pathPrefix = this.type === 'Service' ? '/net-management' : '/workloads'
+  }
+
   async componentDidMount() {
-    const { match: { params, path }, dispatch } = this.props
+    const { match: { params }, dispatch } = this.props
     await dispatch({
       type: 'nativeDetail/updateState',
       payload: {
-        type: path.split('/').filter(i => i !== '')[0],
+        type: this.type,
         name: params.id,
       },
     })
@@ -51,21 +59,19 @@ class NativeDetail extends React.PureComponent {
     })
   }
   onTabChange = (key, id, dispatch, type) => {
-    let _pathname = `/${type}/${id}/${key}`
+    let _pathname = `${this.pathPrefix}/${type}/${id}/${key}`
     if (key === 'default') {
       _pathname = _pathname.replace(/\/default$/, '')
     }
-    dispatch(routerRedux.push({
-      pathname: _pathname,
-    }))
+    historyPush(_pathname)
   }
   getActiveKey = (pathname, routes) => {
     let activeKey = 'default'
     const pathList = pathname.split('/').filter(item => item !== '')
-    if (pathList.length > 2) {
+    if (pathList.length > 3) {
       const rtList = []
       routes.map(rt => rtList.push(rt.tabKey))
-      activeKey = rtList.includes(pathList[2]) ? pathList[2] : 'default'
+      activeKey = rtList.includes(pathList[3]) ? pathList[3] : 'default'
     }
     return activeKey
   }
@@ -73,7 +79,7 @@ class NativeDetail extends React.PureComponent {
     const res = []
     if (type === 'Pod') {
       res.push({
-        path: `/${type}/:id`,
+        path: `${this.pathPrefix}/${type}/:id`,
         component: require('./Config').default,
         tabName: '配置',
         tabKey: 'default',
@@ -81,12 +87,12 @@ class NativeDetail extends React.PureComponent {
     }
     if (type !== 'Pod') {
       res.push({
-        path: `/${type}/:id`,
+        path: `${this.pathPrefix}/${type}/:id`,
         component: require('./Pods').default,
         tabName: type === 'CronJob' ? '执行记录' : 'Pods',
         tabKey: 'default',
       }, {
-        path: `/${type}/:id/yaml`,
+        path: `${this.pathPrefix}/${type}/:id/yaml`,
         component: require('./Yaml').default,
         tabName: 'Yaml',
         tabKey: 'yaml',
@@ -94,7 +100,7 @@ class NativeDetail extends React.PureComponent {
     }
     if (type !== 'CronJob') { // [KK-1585]
       res.push({
-        path: `/${type}/:id/monitor`,
+        path: `${this.pathPrefix}/${type}/:id/monitor`,
         component: require('./Monitor').default,
         tabName: '监控',
         tabKey: 'monitor',
@@ -103,7 +109,7 @@ class NativeDetail extends React.PureComponent {
     }
     if (type === 'Pod') {
       res.push({
-        path: `/${type}/:id/log`,
+        path: `${this.pathPrefix}/${type}/:id/log`,
         component: require('./PodLog').default,
         tabName: '日志',
         tabKey: 'log',
@@ -111,13 +117,13 @@ class NativeDetail extends React.PureComponent {
     }
     if (type !== 'Pod') {
       res.push({
-      //   path: `/${type}/:id/alarm`,
+      //   path: `${this.pathPrefix}/${type}/:id/alarm`,
       //   component: require('./Alarm').default,
       //   tabName: '告警',
       //   tabKey: 'alarm',
       //   tabDisabled: true,
       // }, {
-        path: `/${type}/:id/log`,
+        path: `${this.pathPrefix}/${type}/:id/log`,
         component: require('./Log').default,
         tabName: '日志',
         tabKey: 'log',
@@ -126,14 +132,14 @@ class NativeDetail extends React.PureComponent {
 
     res.push(
       {
-        path: `/${type}/:id/event`,
+        path: `${this.pathPrefix}/${type}/:id/event`,
         component: require('./Event').default,
         tabName: '事件',
         tabKey: 'event',
       })
     if (type === 'Pod') {
       res.push({
-        path: `/${type}/:id/process`,
+        path: `${this.pathPrefix}/${type}/:id/process`,
         component: require('./Process').default,
         tabName: '进程',
         tabKey: 'process',

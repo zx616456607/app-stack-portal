@@ -17,7 +17,8 @@ import { Button, Input, Card, Table, Menu, Dropdown, Pagination, notification, T
 import Page from '@tenx-ui/page'
 import '@tenx-ui/page/assets/index.css'
 import QueueAnim from 'rc-queue-anim'
-import { withRouter, RouteComponentProps, Link } from 'dva/router'
+import { withRouter, RouteComponentProps } from 'dva/router'
+import UnifiedLink from '@tenx-ui/utils/es/UnifiedLink'
 import { connect, SubscriptionAPI } from 'dva'
 import moment from 'moment'
 import {
@@ -35,11 +36,13 @@ import styles from './styles/index.less';
 import classnames from 'classnames'
 import compact from 'lodash/compact'
 import TenxIcon from '@tenx-ui/icon/es/_old'
+import { getUnifiedHistory } from '@tenx-ui/utils/es/UnifiedLink'
+
 // import styles from './styles/index.less'
 const Search = Input.Search
 
 function getColumns(self): Array<any> {
-  const { history } = self.props
+  const unifiedHistory = getUnifiedHistory()
   const sortedInfo = self.state.sortedInfo
   const columns = [{
     title: '名称',
@@ -81,11 +84,11 @@ function getColumns(self): Array<any> {
         osEle = null
       }
       return <div className={styles.nameWrap}>
-      <Link to={`/Deployment/${name}`}>
+      <UnifiedLink to={`/workloads/Deployment/${name}`}>
       <Ellipsis title={name}>
       {name}
     </Ellipsis>
-    </Link>
+    </UnifiedLink>
     {
       record.joinTenxPass === true ?
       <div className={styles.iconWarpper}>
@@ -170,7 +173,7 @@ function getColumns(self): Array<any> {
           overlay={dropdown}
           type="ghost"
           onClick={() =>
-            history.push(`/createWorkLoad?${queryString.stringify(
+            unifiedHistory.push(`/workloads/createWorkLoad?${queryString.stringify(
               { edit: true, type: 'Deployment', name: record.name })}`)}
         >
           查看/编辑Yaml
@@ -347,7 +350,7 @@ class Deployment extends React.Component<DeploymentProps, DeploymentState> {
                     sortedInfo: newSortedInfo as SortedInfo })
   }
   render() {
-    const { history } = this.props
+    const unifiedHistory = getUnifiedHistory()
     const rowSelection = {
       selectedRowKeys: this.state.selectedRowKeys,
       onChange: this.onSelectChange,
@@ -360,7 +363,7 @@ class Deployment extends React.Component<DeploymentProps, DeploymentState> {
         <Button
           type={'primary'}
           icon="plus"
-          onClick={() => history.push('/createWorkLoad?type=Deployment')}
+          onClick={() => unifiedHistory.push('/workloads/createWorkLoad?type=Deployment')}
         >
           Deployment
         </Button>

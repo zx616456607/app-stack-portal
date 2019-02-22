@@ -25,14 +25,14 @@ function RouterConfig({ history, app }) {
   })
   const routes = [
     {
-      path: '/Deployment',
+      path: '/workloads/Deployment',
       component: () => import('./containers/Deployment'),
       models: () => [
         import('./models/nativeResourceList'),
       ],
     },
     {
-      path: '/Deployment/:id',
+      path: '/workloads/Deployment/:id',
       exact: false,
       component: () => import('./containers/Detail'),
       models: () => [
@@ -40,14 +40,14 @@ function RouterConfig({ history, app }) {
       ],
     },
     {
-      path: '/StatefulSet',
+      path: '/workloads/StatefulSet',
       component: () => import('./containers/StatefulSet'),
       models: () => [
         import('./models/nativeResourceList'),
       ],
     },
     {
-      path: '/StatefulSet/:id',
+      path: '/workloads/StatefulSet/:id',
       exact: false,
       component: () => import('./containers/Detail'),
       models: () => [
@@ -55,7 +55,7 @@ function RouterConfig({ history, app }) {
       ],
     },
     {
-      path: '/Job',
+      path: '/workloads/Job',
       exact: true,
       component: () => import('./containers/Job/List'),
       models: () => [
@@ -63,7 +63,7 @@ function RouterConfig({ history, app }) {
       ],
     },
     {
-      path: '/Job/:id',
+      path: '/workloads/Job/:id',
       exact: false,
       component: () => import('./containers/Detail'),
       models: () => [
@@ -71,14 +71,14 @@ function RouterConfig({ history, app }) {
       ],
     },
     {
-      path: '/CronJob',
+      path: '/workloads/CronJob',
       component: () => import('./containers/CronJob/index.tsx'),
       models: () => [
         import('./models/nativeResourceList'),
       ],
     },
     {
-      path: '/CronJob/:id',
+      path: '/workloads/CronJob/:id',
       exact: false,
       component: () => import('./containers/Detail'),
       models: () => [
@@ -86,7 +86,7 @@ function RouterConfig({ history, app }) {
       ],
     },
     {
-      path: '/Pod',
+      path: '/workloads/Pod',
       component: () => import('./containers/Pod/index.tsx'),
       models: () => [
         import('./models/nativeResourceList'),
@@ -94,7 +94,7 @@ function RouterConfig({ history, app }) {
       ],
     },
     {
-      path: '/Pod/:id',
+      path: '/workloads/Pod/:id',
       exact: false,
       component: () => import('./containers/Detail'),
       models: () => [
@@ -102,26 +102,26 @@ function RouterConfig({ history, app }) {
       ],
     },
     {
-      path: '/Service',
+      path: '/net-management/Service',
       component: () => import('./containers/ServiceDiscovery'),
       models: () => [
         import('./models/nativeResourceList'),
       ],
     },
     {
-      path: '/Service/:id',
+      path: '/net-management/Service/:id',
       exact: false,
       component: () => import('./containers/Detail'),
       models: () => [
         import('./models/nativeDetail'),
       ],
     },
-    {
+    /* {
       path: '/test',
       component: () => import('./containers/Test'),
-    },
+    }, */
     {
-      path: '/createWorkLoad',
+      path: '/workloads/createWorkLoad',
       component: () => import('./containers/CreateWorkLoad'),
       models: () => [
         import('./models/createNativeResource'),
@@ -178,7 +178,7 @@ function RouterConfig({ history, app }) {
       <LocaleProvider locale={zhCN}>
         <App>
           <Switch>
-            <Route exact path="/" render={() => (<Redirect to="/StatefulSet" />)} />
+            <Route exact path="/" render={() => (<Redirect to="/workloads/StatefulSet" />)} />
             {
               routes.map(({ path, exact, render, ...dynamics }, key) => {
                 const routeProps = {

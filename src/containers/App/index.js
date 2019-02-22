@@ -25,6 +25,7 @@ import classnames from 'classnames'
 import { withRouter } from 'dva/router'
 import './style/App.less'
 import contentStyles from './style/content.less'
+import { initUnifiedLinkHistory } from '@tenx-ui/utils/es/UnifiedLink'
 
 const { Content, Sider } = Layout
 const { Header, styles } = MyLayout
@@ -51,17 +52,25 @@ class App extends React.Component {
   }
 
   async componentDidMount() {
+    const { dispatch, history } = this.props
+    // ⚠️ 初始化统一的 Link history 后，请使用 `UnifiedLink` 组件以及 `pushHistory` 做跳转 ⚠️
+    // 或者也可以通过 `getUnifiedHistory` 拿到统一后的 `history` 对象做相关操作，请不要使用
+    // `react-router` 注入到组件 `props` 中的 `history` 对象以及 `dva/router` 中的 `routerRedux` 方法
+    initUnifiedLinkHistory(history)
+    if (window.parent.iframeCallBack) {
+      window.parent.iframeCallBack('history', history)
+    }
+
     if (isPageInIframe) {
       document.addEventListener('mousedown', handleDocMounseDown)
     }
+
     this.mainContainer = document.getElementById('mainContainer')
-    const { dispatch, history } = this.props
-    if (window.parent.appStackIframeCallBack) {
-      window.parent.appStackIframeCallBack('appStackPortalHistory', history)
-    }
+
     try {
       await dispatch({ type: 'app/authorize' })
     } catch (error) {
+      console.warn('authorize error', error)
       notification.warn({
         message: '获取 token 失败',
         description: '请刷新页面或重新登录',
