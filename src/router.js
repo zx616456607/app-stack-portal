@@ -129,6 +129,14 @@ function RouterConfig({ history, app }) {
       ],
     },
     {
+      path: '/cluster/createWorkLoad',
+      component: () => import('./containers/CreateWorkLoad'),
+      models: () => [
+        import('./models/createNativeResource'),
+        import('./models/nativeResourceList'),
+      ],
+    },
+    {
       path: '/app-stack',
       component: () => import('./containers/AppStack/StackApps'),
       models: () => [
