@@ -15,7 +15,7 @@
 import React from 'react'
 import { Pagination, Table, Dropdown, Menu, Button, notification } from 'antd'
 import Queue from 'rc-queue-anim'
-import { Link } from 'dva/router'
+import UnifiedLink from '@tenx-ui/utils/es/UnifiedLink'
 import moment from 'moment'
 import Ellipsis from '@tenx-ui/ellipsis'
 import { getStatus } from '../../../utils/status_identify'
@@ -106,17 +106,16 @@ export default class Pods extends React.PureComponent {
       current: pageNum,
     })
   }
-  _renderColumn = (history, cron, cb) => {
+  _renderColumn = cron => {
     const res = [{
       title: cron ? '普通任务名称' : '容器名称',
       key: 'name',
       render: data => (
-        <Link
-          onClick={() => cb(`/app-stack/${cron ? 'Job' : 'Pod'}`)}
-          to={`/${cron ? 'Job' : 'Pod'}/${data.metadata.name}`}
+        <UnifiedLink
+          to={`/workloads/${cron ? 'Job' : 'Pod'}/${data.metadata.name}`}
           style={{ whiteSpace: 'pre' }}>
           <Ellipsis>{data.metadata.name}</Ellipsis>
-        </Link>
+        </UnifiedLink>
       ),
     }, {
       title: '状态',
@@ -194,11 +193,8 @@ export default class Pods extends React.PureComponent {
     })
     return res
   }
-  iframeCb = pathname => {
-    this.iframeCallback && this.iframeCallback('redirect', { pathname })
-  }
   render() {
-    const { data = [], history, cron, refreshPodList, loading } = this.props
+    const { data = [], cron, refreshPodList, loading } = this.props
     const { current, size } = this.state
     return (
       <div style={{ minHeight: this.props.autoFitFsH }}>
@@ -221,7 +217,7 @@ export default class Pods extends React.PureComponent {
             dataSource={data.filter(
               (item, index) => index < (current * size) && index >= ((current - 1) * size)
             )}
-            columns={this._renderColumn(history, cron, this.iframeCb)}
+            columns={this._renderColumn(cron)}
             pagination={false}
             loading={loading.effects['nativeDetail/fetchPodsList']}
             className="table-flex"

@@ -17,7 +17,8 @@ import { Button, Input, Card, Table, Menu, Dropdown, Pagination, notification, T
 import Page from '@tenx-ui/page'
 import '@tenx-ui/page/assets/index.css'
 import QueueAnim from 'rc-queue-anim'
-import { withRouter, RouteComponentProps, Link } from 'dva/router'
+import { withRouter, RouteComponentProps } from 'dva/router'
+import UnifiedLink from '@tenx-ui/utils/es/UnifiedLink'
 import { connect, SubscriptionAPI } from 'dva'
 import moment from 'moment'
 import {
@@ -37,10 +38,10 @@ import Terminal from '../Detail/Terminal'
 import styles from './styles/index.less'
 import TenxIcon from '@tenx-ui/icon/es/_old'
 import ResourceBanner from '../../components/ResourceBanner'
+import { getUnifiedHistory } from '@tenx-ui/utils/es/UnifiedLink'
 const Search = Input.Search
 
 function getColumns(self): Array<any> {
-  const { history } = self.props
   const sortedInfo = self.state.sortedInfo
   const columns = [{
     title: '名称',
@@ -81,11 +82,11 @@ function getColumns(self): Array<any> {
       } else {
         osEle = null
       }
-      return <div className={styles.nameWrap}><Link to={`/Pod/${name}`}>
+      return <div className={styles.nameWrap}><UnifiedLink to={`/workloads/Pod/${name}`}>
         <Ellipsis title={name}>
         {name}
       </Ellipsis>
-      </Link>
+      </UnifiedLink>
       <div className={styles.iconWarpper}>
         {osEle}
       </div>
@@ -249,6 +250,7 @@ class Pod extends React.Component<PodProps, PodState> {
     })
   }
   onMenuChange = async (key, name, self, record) => {
+    const unifiedHistory = getUnifiedHistory()
     if (key === 'delete') {
       this.redistributionPod(name, 'true')
     }
@@ -256,7 +258,7 @@ class Pod extends React.Component<PodProps, PodState> {
       this.redistributionPod(name)
     }
     if (key === 'yaml') {
-      self.props.history.push(`/createWorkLoad?${queryString.stringify(
+      unifiedHistory.push(`/workloads/createWorkLoad?${queryString.stringify(
         { edit: true, type: 'Pod', name: record.name })}`)
     }
   }
@@ -381,7 +383,8 @@ class Pod extends React.Component<PodProps, PodState> {
                     sortedInfo: newSortedInfo as SortedInfo })
   }
   render() {
-    const { history, dockVisible } = this.props
+    const { dockVisible } = this.props
+    // const unifiedHistory = getUnifiedHistory()
     const rowSelection = {
       selectedRowKeys: this.state.selectedRowKeys,
       onChange: this.onSelectChange,
@@ -399,7 +402,7 @@ class Pod extends React.Component<PodProps, PodState> {
         {/* <Button
           type={'primary'}
           icon="plus"
-          onClick={() => history.push('/createWorkLoad?type=Pod')}
+          onClick={() => unifiedHistory.push('/workloads/createWorkLoad?type=Pod')}
         >
           Pod
         </Button> */}

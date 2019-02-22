@@ -17,7 +17,8 @@ import { Button, Input, Card, Table, Menu, Dropdown, Pagination, notification, T
 import Page from '@tenx-ui/page'
 import '@tenx-ui/page/assets/index.css'
 import QueueAnim from 'rc-queue-anim'
-import { withRouter, RouteComponentProps, Link } from 'dva/router'
+import { withRouter, RouteComponentProps } from 'dva/router'
+import UnifiedLink from '@tenx-ui/utils/es/UnifiedLink'
 import { connect, SubscriptionAPI } from 'dva'
 import moment from 'moment'
 import {
@@ -33,22 +34,23 @@ import queryString from 'query-string'
 import Ellipsis from '@tenx-ui/ellipsis'
 import classnames from 'classnames'
 import compact from 'lodash/compact'
+import { getUnifiedHistory } from '@tenx-ui/utils/es/UnifiedLink'
 // import styles from './styles/index.less'
 const Search = Input.Search
 
 function getColumns(self): Array<any> {
-  const { history } = self.props
+  const unifiedHistory = getUnifiedHistory()
   const sortedInfo = self.state.sortedInfo
   const columns = [{
     title: '名称',
     dataIndex: 'name',
     key: 'name',
     render: (name) => {
-      return <Link to={`/StatefulSet/${name}`}>
+      return <UnifiedLink to={`/workloads/StatefulSet/${name}`}>
       <Ellipsis title={name}>
       {name}
     </Ellipsis>
-    </Link>
+    </UnifiedLink>
     },
   }, {
     title: '状态',
@@ -114,7 +116,7 @@ function getColumns(self): Array<any> {
           overlay={dropdown}
           type="ghost"
           onClick={() =>
-            history.push(`/createWorkLoad?${queryString.stringify(
+            unifiedHistory.push(`/workloads/createWorkLoad?${queryString.stringify(
               { edit: true, type: 'StatefulSet', name: record.name })}`)}
         >
           查看/编辑Yaml
@@ -278,7 +280,7 @@ class StatefulSet extends React.Component<StatefulSetProps, StatefulSetState> {
                     sortedInfo: newSortedInfo as SortedInfo })
   }
   render() {
-    const { history } = this.props
+    const unifiedHistory = getUnifiedHistory()
     const rowSelection = {
       selectedRowKeys: this.state.selectedRowKeys,
       onChange: this.onSelectChange,
@@ -291,7 +293,7 @@ class StatefulSet extends React.Component<StatefulSetProps, StatefulSetState> {
         <Button
           type={'primary'}
           icon="plus"
-          onClick={() => history.push('/createWorkLoad?type=StatefulSet')}
+          onClick={() => unifiedHistory.push('/workloads/createWorkLoad?type=StatefulSet')}
         >
           StatefulSet
         </Button>

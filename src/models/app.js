@@ -14,7 +14,7 @@
 /* global location */
 /* eslint no-restricted-globals: ["error", "event"] */
 
-import { routerRedux } from 'dva/router'
+import { historyPush } from '@tenx-ui/utils/es/UnifiedLink'
 import { Icon } from 'antd'
 import config from '../utils/config'
 import { delay } from '../utils/helper'
@@ -61,12 +61,12 @@ function* _authorize(_, { select, call, put }) {
     payload,
   })
   if (redirect) {
-    yield put(routerRedux.replace(redirect))
+    historyPush(redirect)
   } else {
-    yield put(routerRedux.replace({
+    historyPush({
       pathname: locationPathname,
       search: queryString.stringify(otherQuery),
-    }))
+    })
   }
   const { data: user } = yield call(getUserById, jwtToken.userID)
   yield put({
@@ -85,36 +85,36 @@ export default {
         text: 'Deployment',
         icon: <Icon type="bulb" />,
         key: 'Deployment',
-        to: '/Deployment',
+        to: '/workloads/Deployment',
       },
       {
         text: 'StatefulSet',
         icon: <Icon type="bulb" />,
         key: 'StatefulSet',
-        to: '/StatefulSet',
+        to: '/workloads/StatefulSet',
       },
       {
         text: 'Job',
         icon: <Icon type="bulb" />,
         key: 'Job',
-        to: '/Job',
+        to: '/workloads/Job',
       },
       {
         text: 'CronJob',
         icon: <Icon type="bulb" />,
         key: 'CronJob',
-        to: '/CronJob',
+        to: '/workloads/CronJob',
       },
       {
         text: 'Pod',
         icon: <Icon type="bulb" />,
         key: 'Pod',
-        to: '/Pod',
+        to: '/workloads/Pod',
       }, {
         text: 'Service',
         icon: <Icon type="bulb" />,
         key: 'Service',
-        to: '/Service',
+        to: '/net-management/Service',
       },
       {
         text: 'AppStack',
@@ -139,18 +139,18 @@ export default {
           },
         ],
       },
-      {
+      /* {
         text: 'test',
         icon: <Icon type="bulb" />,
         key: 'test',
-        to: '/test',
+        to: '/workloads/test',
       },
       {
         text: '404',
         icon: <Icon type="ie" />,
         key: '404',
-        to: '/404',
-      },
+        to: '/workloads/404',
+      }, */
     ],
     siderFold: window.localStorage.getItem(`${prefix}siderFold`) === 'true',
     locationPathname: '',

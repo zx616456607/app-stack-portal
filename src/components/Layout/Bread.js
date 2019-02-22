@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { Breadcrumb, Icon } from 'antd'
-import { Link } from 'react-router-dom'
+import UnifiedLink from '@tenx-ui/utils/es/UnifiedLink'
 import pathToRegexp from 'path-to-regexp'
 import { queryArray } from '../../utils'
 import styles from './style/Layout.less'
@@ -60,9 +60,9 @@ const Bread = ({ menu, location }) => {
     return (
       <Breadcrumb.Item key={key}>
         {((pathArray.length - 1) !== key)
-          ? <Link to={pathToRegexp.compile(item.route || '')(paramMap) || '#'}>
+          ? <UnifiedLink to={pathToRegexp.compile(item.route || '')(paramMap) || '#'}>
             {content}
-          </Link>
+          </UnifiedLink>
           : content}
       </Breadcrumb.Item>
     )

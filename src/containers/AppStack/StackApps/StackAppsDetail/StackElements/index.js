@@ -18,7 +18,7 @@ import { cpuFormat, memoryFormat } from '../../../../../utils/helper'
 import autoFitFS from '@tenx-ui/utils/lib/autoFitFS'
 import getDeepValue from '@tenx-ui/utils/lib/getDeepValue'
 import TimeHover from '@tenx-ui/time-hover'
-import UnifiedLink from '../../../../../components/UnifiedLink'
+import UnifiedLink from '@tenx-ui/utils/es/UnifiedLink'
 
 const Search = Input.Search
 const SUPPORT_WORK_LOAD = [ 'Deployment', 'Service', 'StatefulSet', 'Job', 'CronJob', 'Pod' ]
@@ -111,7 +111,8 @@ class StackElements extends React.Component {
       dataIndex: 'name',
       render: (name, { kind }) => {
         if (SUPPORT_WORK_LOAD.indexOf(kind) > -1) {
-          return <UnifiedLink to={`/${kind}/${name}`}>{name}</UnifiedLink>
+          const pathPrefix = (kind === 'Service' ? '/net-management' : '/workloads')
+          return <UnifiedLink to={`${pathPrefix}/${kind}/${name}`}>{name}</UnifiedLink>
         }
         return name
       },

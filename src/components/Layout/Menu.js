@@ -12,7 +12,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { Menu } from 'antd'
-import { Link } from 'react-router-dom'
+import UnifiedLink from '@tenx-ui/utils/es/UnifiedLink'
 
 const SubMenu = Menu.SubMenu
 const MenuItem = Menu.Item
@@ -67,10 +67,10 @@ const Menus = ({
     }
     return (
       <MenuItem {...otherProps}>
-        <Link to={to}>
+        <UnifiedLink to={to}>
           {icon}
           {text}
-        </Link>
+        </UnifiedLink>
       </MenuItem>
     )
   }

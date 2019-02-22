@@ -21,6 +21,7 @@ import Editor from './editor'
 import getDeepValue from '@tenx-ui/utils/lib/getDeepValue'
 import { analyzeYamlBase } from './tool'
 import { confirm } from '@tenx-ui/modal'
+import { getUnifiedHistory } from '@tenx-ui/utils/es/UnifiedLink'
 
 interface CreateWorkLoadProps extends RouteComponentProps, SubscriptionAPI {
   cluster: string,
@@ -140,18 +141,19 @@ class CreateWorkLoad extends React.Component<CreateWorkLoadProps, CreateWorkLoad
     const urlCluster = config.cluster
     const cluster = urlCluster === undefined ? this.props.cluster : urlCluster
     const payload = { cluster, yaml: this.props.yamlValue }
+    const unifiedHistory = getUnifiedHistory()
     if (!this.state.editflag) { // 创建
       try {
         if (config.type === 'PodSecurityPolicy') {
           await this.props.dispatch({ type: 'createNative/createPSP', payload })
-          setTimeout( () => history.back(), 600)
+          setTimeout( () => unifiedHistory.goBack(), 600)
           return
         }
         await this.props.dispatch({ type: 'createNative/createNativeResource', payload })
         notification.success({ message: '创建成功', description: '' })
         setTimeout( () => {
           this.props.dispatch({ type: 'createNative/updateYamlValue', payload: { yamlValue: '' } })
-          history.back()
+          unifiedHistory.goBack()
         }, 600)
       } catch (e) {
         const { code, reason, message } = e.response
@@ -169,14 +171,14 @@ class CreateWorkLoad extends React.Component<CreateWorkLoadProps, CreateWorkLoad
       try {
         if (config.type === 'PodSecurityPolicy') {
           await this.props.dispatch({ type: 'createNative/updatePSP', payload })
-          setTimeout( () => history.back(), 600)
+          setTimeout( () => unifiedHistory.goBack(), 600)
           return
         }
         await this.props.dispatch({ type: 'createNative/updateNativeResource', payload })
         notification.success({ message: '更新成功', description: '' })
         setTimeout( () => {
           this.props.dispatch({ type: 'createNative/updateYamlValue', payload: { yamlValue: '' } })
-          history.back()
+          unifiedHistory.goBack()
         }, 600)
       } catch (e) {
         const { code, message } = e.response
@@ -198,7 +200,6 @@ class CreateWorkLoad extends React.Component<CreateWorkLoadProps, CreateWorkLoad
           createOrEditNative={this.createOrEditNative}
           editflag={this.state.editflag}
           dispatch={this.props.dispatch}
-          history={this.props.history}
           setYamlValue={this.setYamlValue}
           editorWarn={this.props.editorWarn}
         />
