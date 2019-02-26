@@ -57,10 +57,6 @@ class App extends React.Component {
     // 或者也可以通过 `getUnifiedHistory` 拿到统一后的 `history` 对象做相关操作，请不要使用
     // `react-router` 注入到组件 `props` 中的 `history` 对象以及 `dva/router` 中的 `routerRedux` 方法
     initUnifiedLinkHistory(history)
-    if (window.parent.iframeCallBack) {
-      window.parent.iframeCallBack('history', history)
-    }
-
     if (isPageInIframe) {
       document.addEventListener('mousedown', handleDocMounseDown)
     }
