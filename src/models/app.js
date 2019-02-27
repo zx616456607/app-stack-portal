@@ -65,7 +65,7 @@ function* _authorize(_, { select, call, put }) {
   } else {
     historyPush({
       pathname: locationPathname,
-      search: queryString.stringify(otherQuery),
+      search: `?${queryString.stringify(otherQuery)}`,
     })
   }
   const { data: user } = yield call(getUserById, jwtToken.userID)
