@@ -1,0 +1,22 @@
+{
+  "service_name": {
+    "label": "原生资源",
+    "description": "Service 名称",
+    "default": ""
+  },
+  "service_port": {
+    "label": "原生资源",
+    "description": "服务端口",
+    "default": ""
+  },
+  "service_protocol": {
+    "label": "原生资源",
+    "description": "服务协议",
+    "default": ""
+  },
+  "service_targetPort": {
+    "label": "原生资源",
+    "description": "目标端口",
+    "default": ""
+  }
+}

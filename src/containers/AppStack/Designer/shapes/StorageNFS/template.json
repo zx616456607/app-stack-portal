@@ -1,0 +1,23 @@
+{
+  "kind": "PersistentVolumeClaim",
+  "apiVersion": "v1",
+  "metadata": {
+    "name": {
+      "get_input": "pvc_name"
+    },
+    "labels": {
+      "system/storageType": "nfs",
+      "system/srType": "share",
+      "system/reclaimPolicy": "retain",
+      "system/fsType": "ext4"
+    }
+  },
+  "spec": {
+    "accessModes": [
+      "ReadWriteMany"
+    ],
+    "storageClassName": {
+      "get_inmap": "storageClass"
+    }
+  }
+}

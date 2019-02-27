@@ -1,0 +1,112 @@
+{
+  "apiVersion": "apps/v1",
+  "kind": "StatefulSet",
+  "metadata": {
+    "name": "statefulSet_name",
+    "annotations": {
+      "sidecar.istio.io/inject": false
+    }
+  },
+  "spec": {
+    "selector": {
+      "matchLabels": {
+        "name": {
+          "get_input": "statefulSet_name"
+        }
+      }
+    },
+    "serviceName": {
+      "get_input": "service_name"
+    },
+    "replicas": {
+      "get_input": "replicas"
+    },
+    "template": {
+      "metadata": {
+        "labels": {
+          "name": {
+            "get_input": "statefulSet_name"
+          }
+        },
+        "annotations": {
+          "sidecar.istio.io/inject": false
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": {
+              "get_input": "container_name"
+            },
+            "image": {
+              "get_input": "image_addr"
+            },
+            "imagePullPolicy": {
+              "get_input": "iamge_pullPolicy"
+            },
+            "ports": [
+              {
+                "containerPort": {
+                  "get_input": "container_port"
+                },
+                "protocol": {
+                  "get_input": "port_protocol"
+                }
+              }
+            ],
+            "resources": {
+              "limits": {
+                "cpu": {
+                  "get_input": "limits_cpu"
+                },
+                "memory": {
+                  "get_input": "limits_memory"
+                }
+              },
+              "requests": {
+                "cpu": {
+                  "get_input": "requests_cpu"
+                },
+                "memory": {
+                  "get_input": "requests_memory"
+                }
+              }
+            },
+            "volumeMounts": [
+              {
+                "name": "volume-1",
+                "mountPath": {
+                  "get_input": "volume-1-_mountPath"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "volumeClaimTemplates": [
+      {
+        "metadata": {
+          "name": {
+            "get_input": "vct1_name"
+          }
+        },
+        "spec": {
+          "accessModes": [
+            "ReadWriteOnce"
+          ],
+          "storageClassName": {
+            "get_inmap": "storageClass"
+          },
+          "resources": {
+            "requests": {
+              "storage": {
+                "get_input": "storage_size"
+              }
+            }
+          }
+        }
+      }
+    ]
+  }
+}

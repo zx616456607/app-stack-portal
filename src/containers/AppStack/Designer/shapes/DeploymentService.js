@@ -86,7 +86,7 @@ let options = {
                   get_input: 'image_addr',
                 },
                 imagePullPolicy: {
-                  get_input: 'iamge_pullPolicy',
+                  get_input: 'image_pullPolicy',
                 },
                 name: {
                   get_input: 'container_name',
@@ -186,7 +186,7 @@ let options = {
       description: '镜像地址',
       default: '192.168.1.52/public/hello-world',
     },
-    iamge_pullPolicy: {
+    image_pullPolicy: {
       label: '原生资源',
       description: '镜像获取策略',
       default: 'Always',
@@ -205,21 +205,6 @@ let options = {
       label: '原生资源',
       description: '端口协议',
       default: 'TCP',
-    },
-    service_port: {
-      label: '原生资源',
-      description: '服务端口',
-      default: 80,
-    },
-    service_protocol: {
-      label: '原生资源',
-      description: '服务协议',
-      default: 'TCP',
-    },
-    service_targetPort: {
-      label: '原生资源',
-      description: '目标端口',
-      default: 80,
     },
     limits_cpu: {
       label: '原生资源',
@@ -240,6 +225,21 @@ let options = {
       label: '原生资源',
       description: '内存最小限制',
       default: '512Mi',
+    },
+    service_port: {
+      label: '原生资源',
+      description: '服务端口',
+      default: 80,
+    },
+    service_protocol: {
+      label: '原生资源',
+      description: '服务协议',
+      default: 'TCP',
+    },
+    service_targetPort: {
+      label: '原生资源',
+      description: '目标端口',
+      default: 80,
     },
   },
 }
