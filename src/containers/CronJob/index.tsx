@@ -119,7 +119,7 @@ function getColumns(self): Array<any> {
           overlay={dropdown}
           type="ghost"
           onClick={() =>
-            unifiedHistory.push(`/workloads/createWorkLoad?${queryString.stringify(
+            unifiedHistory.push(`/workloads/CronJob/createWorkLoad?${queryString.stringify(
               { edit: true, type: 'CronJob', name: record.name })}`)}
         >
           查看/编辑Yaml
@@ -312,7 +312,7 @@ render() {
         <Button
           type={'primary'}
           icon="plus"
-          onClick={() => unifiedHistory.push(`/workloads/createWorkLoad?type=CronJob`)}
+          onClick={() => unifiedHistory.push(`/workloads/CronJob/createWorkLoad?type=CronJob`)}
         >
           CronJob
         </Button>

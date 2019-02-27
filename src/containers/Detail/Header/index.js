@@ -31,7 +31,7 @@ import StatefulSetIcon from '../../../assets/img/detailHeaderIcon/StatefulSet.pn
 
 const toYamlEditor = (name, type) => {
   historyPush({
-    pathname: '/workloads/createWorkLoad',
+    pathname: `/workloads/${type}/createWorkLoad`,
     search: queryString.stringify({
       edit: true,
       name,

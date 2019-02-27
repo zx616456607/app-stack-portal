@@ -116,7 +116,7 @@ function getColumns(self): Array<any> {
           overlay={dropdown}
           type="ghost"
           onClick={() =>
-            unifiedHistory.push(`/workloads/createWorkLoad?${queryString.stringify(
+            unifiedHistory.push(`/workloads/StatefulSet/createWorkLoad?${queryString.stringify(
               { edit: true, type: 'StatefulSet', name: record.name })}`)}
         >
           查看/编辑Yaml
@@ -293,7 +293,7 @@ class StatefulSet extends React.Component<StatefulSetProps, StatefulSetState> {
         <Button
           type={'primary'}
           icon="plus"
-          onClick={() => unifiedHistory.push('/workloads/createWorkLoad?type=StatefulSet')}
+          onClick={() => unifiedHistory.push('/workloads/StatefulSet/createWorkLoad?type=StatefulSet')}
         >
           StatefulSet
         </Button>

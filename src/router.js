@@ -25,6 +25,14 @@ function RouterConfig({ history, app }) {
   })
   const routes = [
     {
+      path: '/workloads/*/createWorkLoad',
+      component: () => import('./containers/CreateWorkLoad'),
+      models: () => [
+        import('./models/createNativeResource'),
+        import('./models/nativeResourceList'),
+      ],
+    },
+    {
       path: '/workloads/Deployment',
       component: () => import('./containers/Deployment'),
       models: () => [
@@ -120,14 +128,6 @@ function RouterConfig({ history, app }) {
       path: '/test',
       component: () => import('./containers/Test'),
     }, */
-    {
-      path: '/workloads/createWorkLoad',
-      component: () => import('./containers/CreateWorkLoad'),
-      models: () => [
-        import('./models/createNativeResource'),
-        import('./models/nativeResourceList'),
-      ],
-    },
     {
       path: '/cluster/createWorkLoad',
       component: () => import('./containers/CreateWorkLoad'),

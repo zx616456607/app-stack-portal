@@ -258,7 +258,7 @@ class Pod extends React.Component<PodProps, PodState> {
       this.redistributionPod(name)
     }
     if (key === 'yaml') {
-      unifiedHistory.push(`/workloads/createWorkLoad?${queryString.stringify(
+      unifiedHistory.push(`/workloads/Pod/createWorkLoad?${queryString.stringify(
         { edit: true, type: 'Pod', name: record.name })}`)
     }
   }

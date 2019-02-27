@@ -107,7 +107,7 @@ function getColumns(self): Array<any> {
           overlay={dropdown}
           type="ghost"
           onClick={() =>
-            unifiedHistory.push(`/workloads/createWorkLoad?${queryString.stringify(
+            unifiedHistory.push(`/workloads/Job/createWorkLoad?${queryString.stringify(
               { edit: true, type: 'Job', name: record.name })}`)}
         >
           查看/编辑Yaml
@@ -282,7 +282,7 @@ class Job extends React.Component<JobProps, JobState> {
         <Button
           type={'primary'}
           icon="plus"
-          onClick={() => unifiedHistory.push('/workloads/createWorkLoad?type=Job')}
+          onClick={() => unifiedHistory.push('/workloads/Job/createWorkLoad?type=Job')}
         >
           Job
         </Button>
