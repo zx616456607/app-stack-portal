@@ -97,7 +97,7 @@
     "label": "原生资源",
     "description": "存储类型",
     "backend": true,
-    "configType": "storageClass",
+    "configType": "ceph",
     "default": "",
     "needCluster": true
   }

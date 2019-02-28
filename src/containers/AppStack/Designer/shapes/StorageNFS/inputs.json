@@ -9,7 +9,7 @@
     "label": "原生资源",
     "description": "存储类型",
     "backend": true,
-    "configType": "storageClass",
+    "configType": "nfs",
     "default": "",
     "needCluster": true
   }
