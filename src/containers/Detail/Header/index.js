@@ -20,7 +20,6 @@ import UnifiedLink, { historyPush } from '@tenx-ui/utils/es/UnifiedLink'
 import getDeepValue from '@tenx-ui/utils/lib/getDeepValue'
 import moment from 'moment'
 import { DEFAULT_TIME_FORMAT } from '../../../utils/constants'
-import queryString from 'query-string'
 import { getStatus } from '../../../utils/status_identify'
 import NativeStatus from '../../../components/NativeStatus'
 import classnames from 'classnames'
@@ -30,13 +29,17 @@ import JobIcon from '../../../assets/img/detailHeaderIcon/Job.png'
 import StatefulSetIcon from '../../../assets/img/detailHeaderIcon/StatefulSet.png'
 
 const toYamlEditor = (name, type) => {
+  let pathname = `/workloads/${type}/yamlEditor/createWorkLoad`
+  if (type === 'Service') {
+    pathname = '/net-management/Service/yamlEditor/createWorkLoad'
+  }
   historyPush({
-    pathname: '/workloads/createWorkLoad',
-    search: queryString.stringify({
+    pathname,
+    params: {
       edit: true,
       name,
       type,
-    }),
+    },
   })
   // dispatch(routerRedux.push({
   //   pathname: '/createWorkLoad',

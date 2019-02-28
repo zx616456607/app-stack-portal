@@ -173,8 +173,10 @@ function getColumns(self): Array<any> {
           overlay={dropdown}
           type="ghost"
           onClick={() =>
-            unifiedHistory.push(`/workloads/createWorkLoad?${queryString.stringify(
-              { edit: true, type: 'Deployment', name: record.name })}`)}
+            unifiedHistory.push({
+              pathname: '/workloads/Deployment/yamlEditor/createWorkLoad',
+              params: { edit: true, type: 'Deployment', name: record.name },
+            })}
         >
           查看/编辑Yaml
         </Dropdown.Button>
@@ -363,7 +365,7 @@ class Deployment extends React.Component<DeploymentProps, DeploymentState> {
         <Button
           type={'primary'}
           icon="plus"
-          onClick={() => unifiedHistory.push('/workloads/createWorkLoad?type=Deployment')}
+          onClick={() => unifiedHistory.push('/workloads/Deployment/yamlEditor/createWorkLoad')}
         >
           Deployment
         </Button>
