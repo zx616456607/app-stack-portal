@@ -21,7 +21,10 @@ let options = {
   _deploy_2_yaml: true,
   _link_rules: {
     required: false,
-    types: [ 'devs.Service', 'devs.ConfigMap' ],
+    types: [
+      'devs.Secret', 'devs.Service', 'devs.StorageGlusterFS', 'devs.StorageNFS',
+      'devs.StoragePrivate', 'devs.ConfigMap',
+    ],
   },
   _app_stack_template: template,
   _app_stack_input: inputs,

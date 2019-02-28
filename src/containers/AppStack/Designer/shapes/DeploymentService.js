@@ -19,7 +19,10 @@ let options = {
   _deploy_2_yaml: true,
   _link_rules: {
     required: false,
-    types: [ 'devs.LBgroup', 'devs.ConfigMap' ],
+    types: [
+      'devs.Secret', 'devs.Service', 'devs.StorageGlusterFS', 'devs.StorageNFS',
+      'devs.StoragePrivate', 'devs.ConfigMap', 'devs.LBgroup',
+    ],
   },
   _app_stack_template: [
     {

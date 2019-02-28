@@ -19,7 +19,10 @@ let options = {
   _deploy_2_yaml: true,
   _link_rules: {
     required: false,
-    types: [ 'devs.Service', 'devs.ConfigMap' ],
+    types: [
+      'devs.CronJob', 'devs.Deployment', 'devs.Job', 'devs.StatefulSet',
+      'devs.DeploymentService',
+    ],
   },
   _app_stack_template: template,
   _app_stack_input: inputs,

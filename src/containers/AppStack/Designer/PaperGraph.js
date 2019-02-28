@@ -192,6 +192,11 @@ export default class PaperGraph extends React.PureComponent {
     return model instanceof Application
   }
 
+  _isDeploymentService = model => {
+    const { DeploymentService } = joint.shapes.devs
+    return model instanceof DeploymentService
+  }
+
   _clearActiveElements = () => {
     this.graph.getCells().map(cell => cell.attr('.body/strokeWidth', 1))
     this._activeElement = undefined
@@ -272,10 +277,12 @@ export default class PaperGraph extends React.PureComponent {
       },
       validateEmbedding: (childView, parentView) => {
         const parentIsApp = this._isApplication(parentView.model)
-        const childIsApp = this._isApplication(childView.model)
-        const isEmbedding = parentIsApp && !childIsApp
+        // const childIsApp = this._isApplication(childView.model)
+        // const isEmbedding = parentIsApp && !childIsApp
+        const childIsDeploymentService = this._isDeploymentService(childView.model)
+        const isEmbedding = parentIsApp && childIsDeploymentService
         let { id: parentId } = parentView.model
-        if (!parentIsApp) {
+        if (!parentIsApp && childIsDeploymentService) {
           // 如果将元素移动到了非 app 元素上，则通过非 app 元素的 parent 来判断
           parentId = parentView.model.attributes.parent
           if (parentId) {
@@ -457,7 +464,8 @@ export default class PaperGraph extends React.PureComponent {
     this.setState({ idShortIdMap })
     this.addLabelId(resource)
     // handle embed when dropped
-    if (id !== 'Application') {
+    // if (id !== 'Application') {
+    if (id === 'DeploymentService') {
       this.graph.getElements().forEach(element => {
         if (resource.getBBox().intersect(element.getBBox())) {
           if (element instanceof joint.shapes.devs.Application) {
@@ -622,28 +630,33 @@ export default class PaperGraph extends React.PureComponent {
             !readOnly &&
             <div className={styles.resourceList} key="resource">
               {
-                RESOURCE_LIST.map(({ id, title, icon, enabled }) =>
-                  <div
-                    draggable={enabled}
-                    key={id}
-                    onDragStart={ev => {
-                      // Add the target element's id to the data transfer object
-                      ev.dataTransfer.setData('text/plain', id)
-                      ev.dropEffect = 'move'
-                    }}
-                    className={classnames({ [styles.enabled]: enabled })}
-                  >
-                    <Row>
-                      <Col className={styles.resourceLeft} span={22}>
-                        {icon}
-                        <span>{title}</span>
-                      </Col>
-                      <Col span={2} className={styles.resourceRight}>
-                        <Icon type="drag" />
-                      </Col>
-                    </Row>
-                  </div>
-                )
+                RESOURCE_LIST.map(({ id: subId, title: subTitle, children }) => <div key={subId}>
+                  <div className={styles.resourceSubTitle}>{subTitle}</div>
+                  {
+                    children.map(({ id, title, icon, enabled }) =>
+                      <div
+                        draggable={enabled}
+                        key={id}
+                        onDragStart={ev => {
+                          // Add the target element's id to the data transfer object
+                          ev.dataTransfer.setData('text/plain', id)
+                          ev.dropEffect = 'move'
+                        }}
+                        className={classnames(styles.resourceItem, { [styles.enabled]: enabled })}
+                      >
+                        <Row>
+                          <Col title={title} className={styles.resourceLeft} span={22}>
+                            {icon}
+                            <span>{title}</span>
+                          </Col>
+                          <Col span={2} className={styles.resourceRight}>
+                            <Icon type="drag" />
+                          </Col>
+                        </Row>
+                      </div>
+                    )
+                  }
+                </div>)
               }
             </div>
           }

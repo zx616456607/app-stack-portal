@@ -15,10 +15,16 @@ import {
   ServiceC as ServiceIcon,
   ConfigmapC as ConfigmapIcon,
   ClusterMeshPortC as ClusterMeshPortIcon,
-  Deployment as DeploymentIcon,
   SercretC as SecretIcon,
+  CronJobC as CronJobIcon,
+  DeploymentC as DeploymentIcon,
+  JobC as JobIcon,
+  K8sServiceC as K8sServiceIcon,
+  StatefulSetC as StatefulSetIcon,
+  StorageGlusterFsC as StorageGlusterFsIcon,
+  StorageNfsC as StorageNfsIcon,
+  StoragePrivateC as StoragePrivateIcon,
 } from '@tenx-ui/icon'
-import { Icon } from 'antd'
 import * as joint from 'jointjs'
 import { linkOptions } from './_base'
 
@@ -87,82 +93,103 @@ export const fullGraph = (minifiedGraph = { cells: [] }, nodes = {}, inputs = {}
 
 export const RESOURCE_LIST = [
   {
-    id: 'Application',
-    icon: <AppIcon />,
-    title: '应用',
-    enabled: true,
+    id: 'AppManage',
+    title: '应用管理',
+    type: 'sub',
+    children: [
+      {
+        id: 'Application',
+        icon: <AppIcon />,
+        title: '应用',
+        enabled: true,
+      },
+      {
+        id: 'DeploymentService',
+        icon: <ServiceIcon />,
+        title: '服务',
+        enabled: true,
+      },
+      {
+        id: 'ConfigMap',
+        icon: <ConfigmapIcon />,
+        title: '服务配置·普通配置',
+        enabled: true,
+      },
+      {
+        id: 'Secret',
+        icon: <SecretIcon />,
+        title: '服务配置·加密配置',
+        enabled: true,
+      },
+      {
+        id: 'LBgroup',
+        icon: <ClusterMeshPortIcon />,
+        title: '集群网络出口',
+        enabled: true,
+      },
+    ],
   },
   {
-    id: 'DeploymentService',
-    icon: <ServiceIcon />,
-    title: '服务',
-    enabled: true,
+    id: 'Workloads',
+    title: '工作负载',
+    type: 'sub',
+    children: [
+      {
+        id: 'Deployment',
+        icon: <DeploymentIcon />,
+        title: 'Deployment',
+        enabled: true,
+      },
+      {
+        id: 'Service',
+        icon: <K8sServiceIcon />,
+        title: 'Service',
+        enabled: true,
+      },
+      {
+        id: 'StatefulSet',
+        icon: <StatefulSetIcon />,
+        title: 'StatefulSet',
+        enabled: true,
+      },
+      {
+        id: 'CronJob',
+        icon: <CronJobIcon />,
+        title: 'CronJob',
+        enabled: true,
+      },
+      {
+        id: 'Job',
+        icon: <JobIcon />,
+        title: 'Job',
+        enabled: true,
+      },
+    ],
   },
   {
-    id: 'ConfigMap',
-    icon: <ConfigmapIcon />,
-    title: '服务配置·普通配置',
-    enabled: true,
-  },
-  {
-    id: 'Secret',
-    icon: <SecretIcon />,
-    title: '服务配置·加密配置',
-    enabled: true,
-  },
-  {
-    id: 'LBgroup',
-    icon: <ClusterMeshPortIcon />,
-    title: '集群网络出口',
-    enabled: true,
-  },
-  {
-    id: 'Deployment',
-    icon: <DeploymentIcon />,
-    title: 'Deployment',
-    enabled: true,
-  },
-  {
-    id: 'Service',
-    icon: <Icon type="appstore" />,
-    title: 'Service',
-    enabled: true,
-  },
-  {
-    id: 'StatefulSet',
-    icon: <Icon type="appstore" />,
-    title: 'StatefulSet',
-    enabled: true,
-  },
-  {
-    id: 'CronJob',
-    icon: <Icon type="appstore" />,
-    title: 'CronJob',
-    enabled: true,
-  },
-  {
-    id: 'Job',
-    icon: <Icon type="appstore" />,
-    title: 'Job',
-    enabled: true,
-  },
-  {
-    id: 'StoragePrivate',
-    icon: <Icon type="appstore" />,
-    title: '存储·独享型',
-    enabled: true,
-  },
-  {
-    id: 'StorageNFS',
-    icon: <Icon type="appstore" />,
-    title: '存储·共享型(NFS)',
-    enabled: true,
-  },
-  {
-    id: 'StorageGlusterFS',
-    icon: <Icon type="appstore" />,
-    title: '存储·共享型(GlusterFS)',
-    enabled: true,
+    id: 'StorageManage',
+    title: '存储管理',
+    type: 'sub',
+    children: [
+      {
+        id: 'StoragePrivate',
+        icon: <StoragePrivateIcon />,
+        title: '存储·独享型',
+        enabled: true,
+      },
+      {
+        id: 'StorageNFS',
+        icon: <StorageNfsIcon />,
+        title: '存储·共享型(NFS)',
+        enabled: true,
+      },
+      {
+        id: 'StorageGlusterFS',
+        icon: <StorageGlusterFsIcon />,
+        title: '存储·共享型(GlusterFS)',
+        enabled: true,
+      },
+    ],
   },
   /* {
     id: 'service-5',
