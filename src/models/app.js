@@ -14,7 +14,7 @@
 /* global location */
 /* eslint no-restricted-globals: ["error", "event"] */
 
-import { historyPush } from '@tenx-ui/utils/es/UnifiedLink'
+import { getUnifiedHistory } from '@tenx-ui/utils/es/UnifiedLink'
 import { Icon } from 'antd'
 import config from '../utils/config'
 import { delay } from '../utils/helper'
@@ -65,10 +65,11 @@ function* _authorize(_, { select, call, put }) {
     type: 'updateState',
     payload,
   })
+  const unifiedHistory = getUnifiedHistory()
   if (redirect) {
-    historyPush(redirect)
+    unifiedHistory.replace(redirect)
   } else {
-    historyPush({
+    unifiedHistory.replace({
       pathname: locationPathname,
       search: `?${queryString.stringify(otherQuery)}`,
     })
