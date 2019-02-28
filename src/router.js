@@ -25,7 +25,7 @@ function RouterConfig({ history, app }) {
   })
   const routes = [
     {
-      path: '/workloads/*/createWorkLoad',
+      path: '/workloads/:type/yamlEditor/createWorkLoad',
       component: () => import('./containers/CreateWorkLoad'),
       models: () => [
         import('./models/createNativeResource'),
@@ -117,6 +117,14 @@ function RouterConfig({ history, app }) {
       ],
     },
     {
+      path: '/net-management/Service/yamlEditor/createWorkLoad',
+      component: () => import('./containers/CreateWorkLoad'),
+      models: () => [
+        import('./models/createNativeResource'),
+        import('./models/nativeResourceList'),
+      ],
+    },
+    {
       path: '/net-management/Service/:id',
       exact: false,
       component: () => import('./containers/Detail'),
@@ -124,6 +132,7 @@ function RouterConfig({ history, app }) {
         import('./models/nativeDetail'),
       ],
     },
+
     /* {
       path: '/test',
       component: () => import('./containers/Test'),

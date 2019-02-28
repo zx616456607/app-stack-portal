@@ -113,8 +113,10 @@ function getColumns(self): Array<any> {
           overlay={dropdown}
           type="ghost"
           onClick={() =>
-            unifiedHistory.push(`/workloads/createWorkLoad?${queryString.stringify(
-              { edit: true, type: 'Service', name: record.name })}`)}
+            unifiedHistory.push({
+              pathname: '/net-management/Service/yamlEditor/createWorkLoad',
+              params: { edit: true, type: 'Service', name: record.name },
+            })}
         >
           查看/编辑Yaml
         </Dropdown.Button>
@@ -298,7 +300,7 @@ class Service extends React.Component<ServiceProps, ServiceState> {
         <Button
           type={'primary'}
           icon="plus"
-          onClick={() => unifiedHistory.push('/workloads/Service/createWorkLoad?type=Service')}
+          onClick={() => unifiedHistory.push('/net-management/Service/yamlEditor/createWorkLoad')}
         >
           创建服务
         </Button>

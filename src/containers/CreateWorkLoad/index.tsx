@@ -79,17 +79,15 @@ class CreateWorkLoad extends React.Component<CreateWorkLoadProps, CreateWorkLoad
   componentWillUnmount() {
     const payload = { type: 'delete', message: ['all', ''] }
     this.props.dispatch({ type: 'createNative/patchWarn', payload })
-    const { location: { search }  } = this.props
-    const config = queryString.parse(search)
-    const editflag = config.edit || false
+    const { location: { params }  } = this.props
+    const editflag = params && params.edit || false
     if (editflag) {
       this.props.dispatch({ type: 'createNative/updateYamlValue', payload: { yamlValue: '' } })
     }
   }
   composeFileCreate = async () => {
-    const { location: { search }  } = this.props
-    const config = queryString.parse(search)
-    const templateid = config.templateid || false
+    const { location: { params }  } = this.props
+    const templateid = params && params.templateid || false
     if (!templateid) { return }
     const payload = { id: templateid  }
     let res
@@ -102,9 +100,8 @@ class CreateWorkLoad extends React.Component<CreateWorkLoadProps, CreateWorkLoad
     this.props.dispatch({ type: 'createNative/updateYamlValue', payload: { yamlValue: content } })
   }
   async componentDidMount() {
-    const { location: { search }  } = this.props
-    const config = queryString.parse(search)
-    const editflag = config.edit || false
+    const { location: { params }  } = this.props
+    const editflag = params && params.edit || false
     this.setState({ editflag })
     if (editflag === false && this.props.yamlValue !== '') {
       confirm({
@@ -119,12 +116,12 @@ class CreateWorkLoad extends React.Component<CreateWorkLoadProps, CreateWorkLoad
       })
     }
     this.composeFileCreate()
-    if (!config.name || !config.type) { return } // 如果参数不全, 直接返回
-    const payload = { cluster: this.props.cluster, type: config.type, name: config.name }
+    if (!params || !params.name || !params.type) { return } // 如果参数不全, 直接返回
+    const payload = { cluster: this.props.cluster, type: params.type, name: params.name }
     try {
       const res = await
       this.props.dispatch({ type: 'NativeResourceList/getNativeResourceDetail', payload })
-      const K8sConfigJson = { kind: config.type, ...(res as any).data }
+      const K8sConfigJson = { kind: params.type, ...(res as any).data }
       const newPayload = { yamlValue: yaml.dump(K8sConfigJson)  }
       this.props.dispatch({ type: 'createNative/updateYamlValue', payload: newPayload })
     } catch (e) {
@@ -136,15 +133,14 @@ class CreateWorkLoad extends React.Component<CreateWorkLoadProps, CreateWorkLoad
     this.props.dispatch({ type: 'createNative/updateYamlValue', payload: { yamlValue: value } })
   }
   createOrEditNative = async () => {
-    const { location: { search }  } = this.props
-    const config = queryString.parse(search)
-    const urlCluster = config.cluster
+    const { match: { params }  } = this.props
+    const urlCluster = params.cluster
     const cluster = urlCluster === undefined ? this.props.cluster : urlCluster
     const payload = { cluster, yaml: this.props.yamlValue }
     const unifiedHistory = getUnifiedHistory()
     if (!this.state.editflag) { // 创建
       try {
-        if (config.type === 'PodSecurityPolicy') {
+        if (params.type === 'PodSecurityPolicy') {
           await this.props.dispatch({ type: 'createNative/createPSP', payload })
           setTimeout( () => unifiedHistory.goBack(), 600)
           return
@@ -157,7 +153,7 @@ class CreateWorkLoad extends React.Component<CreateWorkLoadProps, CreateWorkLoad
         }, 600)
       } catch (e) {
         const { code, reason, message } = e.response
-        if (code === 409 && reason === 'AlreadyExists') {
+        if (code ===  409 && reason === 'AlreadyExists') {
           return notification.warn({ message: '该资源已经存在', description: reason })
         }
         if (code === 500) {
@@ -169,7 +165,7 @@ class CreateWorkLoad extends React.Component<CreateWorkLoadProps, CreateWorkLoad
     }
     if (this.state.editflag) { // 编辑
       try {
-        if (config.type === 'PodSecurityPolicy') {
+        if (params.type === 'PodSecurityPolicy') {
           await this.props.dispatch({ type: 'createNative/updatePSP', payload })
           setTimeout( () => unifiedHistory.goBack(), 600)
           return
