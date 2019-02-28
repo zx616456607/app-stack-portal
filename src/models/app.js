@@ -26,6 +26,11 @@ import {
   // removeAuthData,
 } from '../services/app'
 import queryString from 'query-string'
+import {
+  AppStack as AppStackIcon,
+  Network as NetworkIcon,
+  Stack as StackIcon,
+} from '@tenx-ui/icon'
 
 const { prefix } = config
 const watcher = { type: 'watcher' }
@@ -82,59 +87,79 @@ export default {
     user: {},
     menu: [
       {
-        text: 'Deployment',
-        icon: <Icon type="bulb" />,
-        key: 'Deployment',
-        to: '/workloads/Deployment',
+        text: '工作负载',
+        icon: <AppStackIcon style={{ marginRight: 8 }} />,
+        key: 'workloads',
+        type: 'SubMenu',
+        children: [
+          {
+            text: 'Deployment',
+            icon: <Icon type="bulb" />,
+            key: 'Deployment',
+            to: '/workloads/Deployment',
+          },
+          {
+            text: 'StatefulSet',
+            icon: <Icon type="bulb" />,
+            key: 'StatefulSet',
+            to: '/workloads/StatefulSet',
+          },
+          {
+            text: 'Job',
+            icon: <Icon type="bulb" />,
+            key: 'Job',
+            to: '/workloads/Job',
+          },
+          {
+            text: 'CronJob',
+            icon: <Icon type="bulb" />,
+            key: 'CronJob',
+            to: '/workloads/CronJob',
+          },
+          {
+            text: 'Pod',
+            icon: <Icon type="bulb" />,
+            key: 'Pod',
+            to: '/workloads/Pod',
+          },
+        ],
       },
       {
-        text: 'StatefulSet',
-        icon: <Icon type="bulb" />,
-        key: 'StatefulSet',
-        to: '/workloads/StatefulSet',
+        text: '服务发现',
+        icon: <NetworkIcon style={{ marginRight: 8 }} />,
+        key: 'net-management',
+        type: 'SubMenu',
+        children: [
+          {
+            text: 'Service',
+            icon: <Icon type="bulb" />,
+            key: 'Service',
+            to: '/net-management/Service',
+          },
+        ],
       },
       {
-        text: 'Job',
-        icon: <Icon type="bulb" />,
-        key: 'Job',
-        to: '/workloads/Job',
-      },
-      {
-        text: 'CronJob',
-        icon: <Icon type="bulb" />,
-        key: 'CronJob',
-        to: '/workloads/CronJob',
-      },
-      {
-        text: 'Pod',
-        icon: <Icon type="bulb" />,
-        key: 'Pod',
-        to: '/workloads/Pod',
-      }, {
-        text: 'Service',
-        icon: <Icon type="bulb" />,
-        key: 'Service',
-        to: '/net-management/Service',
-      },
-      {
-        text: 'AppStack',
-        icon: <Icon type="smile" />,
+        text: '堆栈',
+        icon: <StackIcon style={{ marginRight: 8 }} />,
         key: 'app-stack',
         type: 'SubMenu',
         children: [
           {
             text: '堆栈',
             key: 'app-stack',
+            icon: <Icon type="bulb" />,
             to: '/app-stack',
           },
           {
             text: '堆栈模板',
             key: 'app-stack-templates',
+            icon: <Icon type="bulb" />,
             to: '/app-stack/templates',
           },
           {
             text: 'Designer',
             key: 'designer',
+            icon: <Icon type="bulb" />,
             to: '/app-stack/designer',
           },
         ],

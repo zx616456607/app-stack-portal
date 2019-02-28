@@ -1,0 +1,91 @@
+{
+  "apiVersion": "extensions/v1beta1",
+  "kind": "Deployment",
+  "metadata": {
+    "annotations": {
+      "sidecar.istio.io/inject": "false"
+    },
+    "name": {
+      "get_input": "deployment_name"
+    },
+    "labels": {
+      "system/svcName": {
+        "get_input": "deployment_name"
+      }
+    }
+  },
+  "spec": {
+    "strategy": {
+      "rollingUpdate": {
+        "maxSurge": "10%",
+        "maxUnavailable": 0
+      },
+      "type": "RollingUpdate"
+    },
+    "replicas": {
+      "get_input": "replicas"
+    },
+    "selector": {
+      "matchLabels": {
+        "name": {
+          "get_input": "deployment_name"
+        }
+      }
+    },
+    "template": {
+      "metadata": {
+        "annotations": {
+          "sidecar.istio.io/inject": "false"
+        },
+        "labels": {
+          "name": {
+            "get_input": "deployment_name"
+          }
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "image": {
+              "get_input": "image_addr"
+            },
+            "imagePullPolicy": {
+              "get_input": "image_pullPolicy"
+            },
+            "name": {
+              "get_input": "container_name"
+            },
+            "ports": [
+              {
+                "containerPort": {
+                  "get_input": "container_port"
+                },
+                "protocol": {
+                  "get_input": "port_protocol"
+                }
+              }
+            ],
+            "resources": {
+              "limits": {
+                "cpu": {
+                  "get_input": "limits_cpu"
+                },
+                "memory": {
+                  "get_input": "limits_memory"
+                }
+              },
+              "requests": {
+                "cpu": {
+                  "get_input": "requests_cpu"
+                },
+                "memory": {
+                  "get_input": "requests_memory"
+                }
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

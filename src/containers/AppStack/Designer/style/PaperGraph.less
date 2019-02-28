@@ -20,21 +20,27 @@
   border-radius: @border-radius-mini;
   .resourceList {
     width: @resourceListWidth;
-    & > div {
+    .resourceSubTitle {
+      padding: @padding-small 0 @padding-base @padding-base;
+    }
+    .resourceItem {
       padding: 10px @padding-small;
       border: 1px solid transparent;
       cursor: not-allowed;
       color: @font-color-3;
       user-select: none;
-    }
-    .resourceLeft {
-      & > *:first-child {
-        font-size: @font-size-medium;
-        padding-right: @padding-base;
+      .resourceLeft {
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        & > *:first-child {
+          font-size: @font-size-medium;
+          padding-right: @padding-base;
+        }
       }
-    }
-    .resourceRight {
-      visibility: hidden;
+      .resourceRight {
+        visibility: hidden;
+      }
     }
     .enabled {
       cursor: move;

@@ -1,0 +1,32 @@
+{
+  "kind": "PersistentVolumeClaim",
+  "apiVersion": "v1",
+  "metadata": {
+    "name": {
+      "get_input": "pvc_name"
+    },
+    "labels": {
+      "system/reclaimPolicy": "delete",
+      "system/fsType": {
+        "get_inmap": "fs_type"
+      },
+      "system/storageType": "ceph",
+      "system/srType": "private"
+    }
+  },
+  "spec": {
+    "accessModes": [
+      "ReadWriteOnce"
+    ],
+    "storageClassName": {
+      "get_inmap": "storageClass"
+    },
+    "resources": {
+      "requests": {
+        "storage": {
+          "get_input": "storage_size"
+        }
+      }
+    }
+  }
+}

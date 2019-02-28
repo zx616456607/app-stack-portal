@@ -1,0 +1,16 @@
+{
+  "pvc_name": {
+    "label": "原生资源",
+    "description": "存储名称",
+    "default": ""
+  },
+  "storageClass": {
+    "type": "select",
+    "label": "原生资源",
+    "description": "存储类型",
+    "backend": true,
+    "configType": "storageClass",
+    "default": "",
+    "needCluster": true
+  }
+}

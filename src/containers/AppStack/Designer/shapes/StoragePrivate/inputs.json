@@ -1,0 +1,32 @@
+{
+  "pvc_name": {
+    "label": "原生资源",
+    "description": "存储名称",
+    "default": ""
+  },
+  "storage_size": {
+    "label": "原生资源",
+    "description": "存储大小",
+    "default": "1024Mi"
+  },
+  "storageClass": {
+    "type": "select",
+    "label": "原生资源",
+    "description": "存储类型",
+    "backend": true,
+    "configType": "storageClass",
+    "default": "",
+    "needCluster": true
+  },
+  "fs_type": {
+    "type": "select",
+    "label": "原生资源",
+    "description": "存储格式",
+    "backend": false,
+    "default": "ext4",
+    "candidates": [
+      "ext4",
+      "xfs"
+    ]
+  }
+}

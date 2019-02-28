@@ -1,0 +1,65 @@
+{
+  "apiVersion": "batch/v1beta1",
+  "kind": "CronJob",
+  "metadata": {
+    "name": "cronJob_name",
+    "annotations": {
+      "sidecar.istio.io/inject": false
+    }
+  },
+  "spec": {
+    "schedule": {
+      "get_input": "schedule"
+    },
+    "jobTemplate": {
+      "spec": {
+        "template": {
+          "spec": {
+            "containers": [
+              {
+                "image": {
+                  "get_input": "image_addr"
+                },
+                "imagePullPolicy": {
+                  "get_input": "iamge_pullPolicy"
+                },
+                "name": {
+                  "get_input": "container_name"
+                },
+                "resources": {
+                  "limits": {
+                    "cpu": {
+                      "get_input": "limits_cpu"
+                    },
+                    "memory": {
+                      "get_input": "limits_memory"
+                    }
+                  },
+                  "requests": {
+                    "cpu": {
+                      "get_input": "requests_cpu"
+                    },
+                    "memory": {
+                      "get_input": "requests_memory"
+                    }
+                  }
+                }
+              }
+            ],
+            "restartPolicy": "OnFailure"
+          },
+          "metadata": {
+            "annotations": {
+              "sidecar.istio.io/inject": false
+            }
+          }
+        }
+      },
+      "metadata": {
+        "annotations": {
+          "sidecar.istio.io/inject": false
+        }
+      }
+    }
+  }
+}

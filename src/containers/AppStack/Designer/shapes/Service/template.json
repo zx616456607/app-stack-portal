@@ -1,0 +1,25 @@
+{
+  "apiVersion": "v1",
+  "kind": "Service",
+  "metadata": {
+    "name": {
+      "get_input": "service_name"
+    }
+  },
+  "spec": {
+    "ports": [
+      {
+        "name": "port-name-1",
+        "port": {
+          "get_input": "service_port"
+        },
+        "protocol": {
+          "get_input": "service_protocol"
+        },
+        "targetPort": {
+          "get_input": "service_targetPort"
+        }
+      }
+    ]
+  }
+}
