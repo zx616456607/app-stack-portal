@@ -71,10 +71,25 @@ class StackTemplateDeploy extends React.Component {
     btnLoading: false,
   }
 
-  getSelectOptions = ({ backend, configType }) => {
-    // @Todo: should support defined options in template
+  getSelectOptions = ({ backend, configType, candidates }) => {
     if (!backend) {
-      return []
+      if (!candidates || !Array.isArray(candidates)) {
+        return []
+      }
+      return candidates.map(key => {
+        const keyType = typeof key
+        if (keyType === 'string' || keyType === 'number') {
+          return {
+            id: key,
+            name: key,
+          }
+        }
+        if (!key.id || !key.name) {
+          console.warn('candidates', candidates)
+          throw new Error('The item of candidates should be a string, number or like this: { id: 213, name: \'test\' }')
+        }
+        return key
+      })
     }
     const { appStackConfigs } = this.props
     return appStackConfigs[configType] || []
