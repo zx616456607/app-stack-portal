@@ -9,7 +9,7 @@
     "description": "镜像地址",
     "default": "192.168.1.52/public/pi"
   },
-  "iamge_pullPolicy": {
+  "image_pullPolicy": {
     "label": "原生资源",
     "description": "镜像获取策略",
     "default": "Always"

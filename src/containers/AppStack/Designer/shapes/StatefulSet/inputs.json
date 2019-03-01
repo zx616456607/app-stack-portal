@@ -15,7 +15,7 @@
     "description": "镜像地址",
     "default": "nginx:v1.9.2"
   },
-  "iamge_pullPolicy": {
+  "image_pullPolicy": {
     "label": "原生资源",
     "description": "镜像获取策略",
     "default": "Always"

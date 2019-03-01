@@ -42,7 +42,7 @@
               "get_input": "image_addr"
             },
             "imagePullPolicy": {
-              "get_input": "iamge_pullPolicy"
+              "get_input": "image_pullPolicy"
             },
             "ports": [
               {
