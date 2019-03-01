@@ -41,7 +41,7 @@
     "@tenx-ui/page": "^1.0.2",
     "@tenx-ui/relation-chart": "^0.2.11",
     "@tenx-ui/resource-custom-config": "^0.0.5",
-    "@tenx-ui/resourcebanner": "0.0.7",
+    "@tenx-ui/resourcebanner": "0.0.8",
     "@tenx-ui/return-button": "^0.0.4",
     "@tenx-ui/select-with-checkbox": "^0.0.6",
     "@tenx-ui/time-hover": "^1.1.3",
