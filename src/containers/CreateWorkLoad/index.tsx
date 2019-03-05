@@ -76,18 +76,20 @@ class CreateWorkLoad extends React.Component<CreateWorkLoadProps, CreateWorkLoad
     }, 800);
     this.props.dispatch({ type: 'createNative/updateYamlValue', payload: { yamlValue: value } })
   }
+  getRouteData = () => {
+    const { location: { params, search }  } = this.props
+    return search ? queryString.parse(search) : params
+  }
   componentWillUnmount() {
     const payload = { type: 'delete', message: ['all', ''] }
     this.props.dispatch({ type: 'createNative/patchWarn', payload })
-    const { location: { params }  } = this.props
-    const editflag = params && params.edit || false
+    const editflag = this.getRouteData() && this.getRouteData().edit || false
     if (editflag) {
       this.props.dispatch({ type: 'createNative/updateYamlValue', payload: { yamlValue: '' } })
     }
   }
   composeFileCreate = async () => {
-    const { location: { params }  } = this.props
-    const templateid = params && params.templateid || false
+    const templateid = this.getRouteData() && this.getRouteData().templateid || false
     if (!templateid) { return }
     const payload = { id: templateid  }
     let res
@@ -100,8 +102,8 @@ class CreateWorkLoad extends React.Component<CreateWorkLoadProps, CreateWorkLoad
     this.props.dispatch({ type: 'createNative/updateYamlValue', payload: { yamlValue: content } })
   }
   async componentDidMount() {
-    const { location: { params }  } = this.props
-    const editflag = params && params.edit || false
+    const routeData = this.getRouteData()
+    const editflag = routeData && routeData.edit || false
     this.setState({ editflag })
     if (editflag === false && this.props.yamlValue !== '') {
       confirm({
@@ -116,12 +118,12 @@ class CreateWorkLoad extends React.Component<CreateWorkLoadProps, CreateWorkLoad
       })
     }
     this.composeFileCreate()
-    if (!params || !params.name || !params.type) { return } // 如果参数不全, 直接返回
-    const payload = { cluster: this.props.cluster, type: params.type, name: params.name }
+    if (!routeData || !routeData.name || !routeData.type) { return } // 如果参数不全, 直接返回
+    const payload = { cluster: this.props.cluster, type: routeData.type, name: routeData.name }
     try {
       const res = await
       this.props.dispatch({ type: 'NativeResourceList/getNativeResourceDetail', payload })
-      const K8sConfigJson = { kind: params.type, ...(res as any).data }
+      const K8sConfigJson = { kind: routeData.type, ...(res as any).data }
       const newPayload = { yamlValue: yaml.dump(K8sConfigJson)  }
       this.props.dispatch({ type: 'createNative/updateYamlValue', payload: newPayload })
     } catch (e) {
