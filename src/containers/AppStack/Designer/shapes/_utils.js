@@ -28,6 +28,8 @@ import {
 import * as joint from 'jointjs'
 import { linkOptions } from './_base'
 
+const isProd = process.env.NODE_ENV === 'production'
+
 /**
  * short cell id
  *
@@ -89,6 +91,24 @@ export const fullGraph = (minifiedGraph = { cells: [] }, nodes = {}, inputs = {}
     return Object.assign({}, ResourceShape.options, cell)
   })
   return minifiedGraph
+}
+
+/**
+ * get default registry
+ *
+ * @return {string} default registry url
+ */
+export const getDefaultReigistry = () => {
+  // for dev, change default registry here:
+  if (!isProd) {
+    return '192.168.1.52/'
+  }
+  const initialConfig = window.parent.__INITIAL_CONFIG__ || {}
+  const registryUrl = initialConfig.registryUrl
+  if (!registryUrl) {
+    return ''
+  }
+  return registryUrl + '/'
 }
 
 export const RESOURCE_LIST = [

@@ -12,6 +12,7 @@
 
 import * as joint from 'jointjs'
 import { getOptions } from './_base'
+import { getDefaultReigistry } from './_utils'
 
 let options = {
   inPorts: [ 'in' ],
@@ -187,7 +188,7 @@ let options = {
     image_addr: {
       label: '原生资源',
       description: '镜像地址',
-      default: '192.168.1.52/public/hello-world',
+      default: getDefaultReigistry() + 'system_containers/nginx:1.15.9',
     },
     image_pullPolicy: {
       label: '原生资源',
