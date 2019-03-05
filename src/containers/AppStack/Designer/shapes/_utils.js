@@ -27,6 +27,7 @@ import {
 } from '@tenx-ui/icon'
 import * as joint from 'jointjs'
 import { linkOptions } from './_base'
+import getDeepValue from '@tenx-ui/utils/lib/getDeepValue'
 
 const isProd = process.env.NODE_ENV === 'production'
 
@@ -103,8 +104,7 @@ export const getDefaultReigistry = () => {
   if (!isProd) {
     return '192.168.1.52/'
   }
-  const initialConfig = window.parent.__INITIAL_CONFIG__ || {}
-  const registryUrl = initialConfig.registryUrl
+  const registryUrl = getDeepValue(window, [ 'parent', '__INITIAL_CONFIG__', 'registryUrl' ])
   if (!registryUrl) {
     return ''
   }
