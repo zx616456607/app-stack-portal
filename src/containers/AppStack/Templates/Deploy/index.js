@@ -71,13 +71,44 @@ class StackTemplateDeploy extends React.Component {
     btnLoading: false,
   }
 
-  getSelectOptions = ({ backend, configType }) => {
-    // @Todo: should support defined options in template
+  getSelectOptions = ({ backend, configType, candidates }) => {
     if (!backend) {
-      return []
+      if (!candidates || !Array.isArray(candidates)) {
+        return []
+      }
+      return candidates.map(key => {
+        const keyType = typeof key
+        if (keyType === 'string' || keyType === 'number') {
+          return {
+            id: key,
+            name: key,
+          }
+        }
+        if (!key.id || !key.name) {
+          const error = new Error('The item of candidates should be a string, number or like this: { id: 213, name: \'test\' }')
+          console.warn('candidates', candidates, error)
+          return {
+            id: 'invalid',
+            name: 'invalid candidates',
+            disabled: true,
+          }
+        }
+        return key
+      })
     }
     const { appStackConfigs } = this.props
-    return appStackConfigs[configType] || []
+    let options = appStackConfigs[configType] || []
+    if (!Array.isArray(options)) {
+      console.warn(`${configType} return value must be a array like this: { id: 213, name: \'test\' }`)
+      options = [
+        {
+          id: 'invalid',
+          name: 'invalid appStackConfigs',
+          disabled: true,
+        },
+      ]
+    }
+    return options
   }
 
   renderInput = input => {
@@ -94,8 +125,8 @@ class StackTemplateDeploy extends React.Component {
             }
           >
             {
-              this.getSelectOptions(input).map(({ name, id }) =>
-                <Option key={id}>{name}</Option>
+              this.getSelectOptions(input).map(({ name, id, disabled }) =>
+                <Option key={id} disabled={disabled}>{name}</Option>
               )
             }
           </Select>
@@ -243,12 +274,12 @@ class StackTemplateDeploy extends React.Component {
       this.setState({
         templateContent,
         templateInputs,
-        // 默认展开所有 panel，否者未展开 panel 中的 form 表单不会渲染
+        // 默认展开所有 panel，否则未展开 panel 中的 form 表单不会渲染
         collapseActiveKeys: Object.keys(templateInputs),
       })
       await Promise.all(loadByBackend).catch(() => {
         notification.warn({
-          message: '获取后端可续参数失败',
+          message: '获取后端可选参数失败',
         })
       })
     } catch (error) {

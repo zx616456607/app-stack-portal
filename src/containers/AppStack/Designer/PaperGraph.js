@@ -432,10 +432,11 @@ export default class PaperGraph extends React.PureComponent {
     const { tx, ty } = this.paper.translate()
     const { paperScale } = this.state
 
+    const { scrollLeft, scrollTop } = document.documentElement || document.body
     const options = {
       position: {
-        x: ev.clientX - this.paperDom.offsetLeft - SIDER_WIDTH - 16,
-        y: ev.clientY - this.paperDom.offsetParent.offsetTop,
+        x: scrollLeft + ev.clientX - this.paperDom.offsetLeft - SIDER_WIDTH - 16,
+        y: scrollTop + ev.clientY - this.paperDom.offsetParent.offsetTop,
       },
     }
 
