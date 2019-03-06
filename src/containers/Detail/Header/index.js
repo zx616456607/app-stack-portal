@@ -27,20 +27,15 @@ import Ellipsis from '@tenx-ui/ellipsis'
 import CronJobIcon from '../../../assets/img/detailHeaderIcon/CronJob.png'
 import JobIcon from '../../../assets/img/detailHeaderIcon/Job.png'
 import StatefulSetIcon from '../../../assets/img/detailHeaderIcon/StatefulSet.png'
+import queryString from 'query-string'
 
 const toYamlEditor = (name, type) => {
-  let pathname = `/workloads/${type}/yamlEditor/createWorkLoad`
+  const query = { edit: true, name, type }
+  let pathname = `/workloads/${type}/yamlEditor/createWorkLoad?${queryString.stringify(query)}`
   if (type === 'Service') {
-    pathname = '/net-management/Service/yamlEditor/createWorkLoad'
+    pathname = `/net-management/Service/yamlEditor/createWorkLoad?${queryString.stringify(query)}`
   }
-  historyPush({
-    pathname,
-    params: {
-      edit: true,
-      name,
-      type,
-    },
-  })
+  historyPush(pathname)
   // dispatch(routerRedux.push({
   //   pathname: '/createWorkLoad',
   //   search: queryString.stringify({
