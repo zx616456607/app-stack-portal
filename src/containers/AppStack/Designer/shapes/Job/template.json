@@ -3,7 +3,7 @@
   "kind": "Job",
   "metadata": {
     "annotations": {
-      "sidecar.istio.io/inject": false
+      "sidecar.istio.io/inject": "false"
     },
     "name": {
       "get_input": "job_name"
@@ -14,7 +14,7 @@
     "template": {
       "metadata": {
         "annotations": {
-          "sidecar.istio.io/inject": false
+          "sidecar.istio.io/inject": "false"
         }
       },
       "spec": {
@@ -45,11 +45,14 @@
                 "memory": {
                   "get_input": "requests_memory"
                 }
-              },
-              "command": {
-                "get_input": "command"
               }
-            }
+            },
+            "command": [
+              "perl",
+              "-Mbignum=bpi",
+              "-wle",
+              "print bpi(100)"
+            ]
           }
         ],
         "restartPolicy": "Never"

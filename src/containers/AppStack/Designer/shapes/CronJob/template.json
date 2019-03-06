@@ -4,7 +4,7 @@
   "metadata": {
     "name": "cronJob_name",
     "annotations": {
-      "sidecar.istio.io/inject": false
+      "sidecar.istio.io/inject": "false"
     }
   },
   "spec": {
@@ -44,23 +44,26 @@
                     }
                   }
                 },
-                "command": {
-                  "get_input": "command"
-                }
+                "command": [
+                  "perl",
+                  "-Mbignum=bpi",
+                  "-wle",
+                  "print bpi(100)"
+                ]
               }
             ],
             "restartPolicy": "OnFailure"
           },
           "metadata": {
             "annotations": {
-              "sidecar.istio.io/inject": false
+              "sidecar.istio.io/inject": "false"
             }
           }
         }
       },
       "metadata": {
         "annotations": {
-          "sidecar.istio.io/inject": false
+          "sidecar.istio.io/inject": "false"
         }
       }
     }
