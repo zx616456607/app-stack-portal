@@ -77,8 +77,17 @@ class CreateWorkLoad extends React.Component<CreateWorkLoadProps, CreateWorkLoad
     this.props.dispatch({ type: 'createNative/updateYamlValue', payload: { yamlValue: value } })
   }
   getRouteData = () => {
-    const { location: { params, search }  } = this.props
-    return search ? queryString.parse(search) : params
+    const { location: { search }, match: { params } } = this.props
+    let paramsData
+    if (search) {
+      paramsData = queryString.parse(search)
+      if (params.type) {
+        paramsData.type = params.type
+      }
+    } else {
+      paramsData = params
+    }
+    return paramsData
   }
   componentWillUnmount() {
     const payload = { type: 'delete', message: ['all', ''] }

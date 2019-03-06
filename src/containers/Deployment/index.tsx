@@ -167,16 +167,14 @@ function getColumns(self): Array<any> {
           </Menu.Item> */}
         </Menu>
       );
+      const query = { edit: true, type: 'Deployment', name: record.name }
       return (
         <div className="actionBox commonData" onClick={(e) => e.stopPropagation()}>
         <Dropdown.Button
           overlay={dropdown}
           type="ghost"
           onClick={() =>
-            unifiedHistory.push({
-              pathname: '/workloads/Deployment/yamlEditor/createWorkLoad',
-              params: { edit: true, type: 'Deployment', name: record.name },
-            })}
+            unifiedHistory.push(`/workloads/Deployment/yamlEditor/createWorkLoad?${queryString.stringify(query)}`)}
         >
           查看/编辑Yaml
         </Dropdown.Button>

@@ -117,7 +117,7 @@ function RouterConfig({ history, app }) {
       ],
     },
     {
-      path: '/net-management/Service/yamlEditor/createWorkLoad',
+      path: '/net-management/:type/yamlEditor/createWorkLoad',
       component: () => import('./containers/CreateWorkLoad'),
       models: () => [
         import('./models/createNativeResource'),

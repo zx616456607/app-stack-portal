@@ -88,6 +88,7 @@ function getColumns(self): Array<any> {
     dataIndex: 'operation',
     key: 'operation',
     render: (_, record) => {
+      const query = { edit: true, type: 'Service', name: record.name }
       const dropdown = (
         <Menu className="Moreoperations">
           {/* <Menu.Item key="0" >
@@ -113,10 +114,7 @@ function getColumns(self): Array<any> {
           overlay={dropdown}
           type="ghost"
           onClick={() =>
-            unifiedHistory.push({
-              pathname: '/net-management/Service/yamlEditor/createWorkLoad',
-              params: { edit: true, type: 'Service', name: record.name },
-            })}
+            unifiedHistory.push(`/net-management/Service/yamlEditor/createWorkLoad?${queryString.stringify(query)}`)}
         >
           查看/编辑Yaml
         </Dropdown.Button>
