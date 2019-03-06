@@ -58,6 +58,11 @@ const inputs = {
     description: '内存最小限制',
     default: '512Mi',
   },
+  command: {
+    label: '原生资源',
+    description: '启动命令',
+    default: '["perl",  "-Mbignum=bpi", "-wle", "print bpi(2000)"]',
+  },
 }
 
 export default inputs

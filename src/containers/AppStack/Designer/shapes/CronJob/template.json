@@ -43,6 +43,9 @@
                       "get_input": "requests_memory"
                     }
                   }
+                },
+                "command": {
+                  "get_input": "command"
                 }
               }
             ],

@@ -104,10 +104,11 @@ export const getDefaultReigistry = () => {
   if (!isProd) {
     return '192.168.1.52/'
   }
-  const registryUrl = getDeepValue(window, [ 'parent', '__INITIAL_CONFIG__', 'registryUrl' ])
+  let registryUrl = getDeepValue(window, [ 'parent', '__INITIAL_CONFIG__', 'registryUrl' ])
   if (!registryUrl) {
     return ''
   }
+  registryUrl = registryUrl.replace(/^https?:\/\//, '')
   return registryUrl + '/'
 }
 
