@@ -8,11 +8,7 @@
     "name": {
       "get_input": "deployment_name"
     },
-    "labels": {
-      "system/svcName": {
-        "get_input": "deployment_name"
-      }
-    }
+    "labels": {}
   },
   "spec": {
     "strategy": {

@@ -2,7 +2,9 @@
   "apiVersion": "apps/v1",
   "kind": "StatefulSet",
   "metadata": {
-    "name": "statefulSet_name",
+    "name": {
+      "get_input": "statefulSet_name"
+    },
     "annotations": {
       "sidecar.istio.io/inject": "false"
     }
@@ -71,7 +73,9 @@
             },
             "volumeMounts": [
               {
-                "name": "volume-1",
+                "name": {
+                  "get_input": "vct1_name"
+                },
                 "mountPath": {
                   "get_input": "volume-1-_mountPath"
                 }

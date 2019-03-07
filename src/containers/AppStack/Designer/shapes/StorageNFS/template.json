@@ -18,6 +18,13 @@
     ],
     "storageClassName": {
       "get_inmap": "storageClass"
+    },
+    "resources": {
+      "requests": {
+        "storage": {
+          "get_input": "storage_size"
+        }
+      }
     }
   }
 }

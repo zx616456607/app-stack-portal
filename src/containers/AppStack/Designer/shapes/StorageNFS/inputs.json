@@ -12,5 +12,10 @@
     "configType": "nfs",
     "default": "",
     "needCluster": true
+  },
+  "storage_size": {
+    "label": "原生资源",
+    "description": "存储大小",
+    "default": "1Gi"
   }
 }

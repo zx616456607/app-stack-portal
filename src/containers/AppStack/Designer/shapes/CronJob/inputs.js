@@ -15,7 +15,7 @@ import { getDefaultReigistry } from '../_utils'
 const inputs = {
   cronJob_name: {
     label: '原生资源',
-    description: 'job名称',
+    description: 'CronJob 名称',
     default: '',
   },
   schedule: {
