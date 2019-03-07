@@ -10,7 +10,7 @@
  * @date 2019-03-05
  */
 
-import { getDefaultReigistry } from '../_utils'
+import { getDefaultReigistry, INPUT_SERVICE_PROTOCOL } from '../_utils'
 
 const inputs = {
   statefulSet_name: {
@@ -40,15 +40,14 @@ const inputs = {
     default: 'container-1',
   },
   container_port: {
+    type: 'number',
     label: '原生资源',
     description: '容器端口',
     default: 80,
-    type: 'number',
   },
   port_protocol: {
-    label: '原生资源',
+    ...INPUT_SERVICE_PROTOCOL,
     description: '端口协议',
-    default: 'TCP',
   },
   limits_cpu: {
     label: '原生资源',
@@ -74,27 +73,6 @@ const inputs = {
     label: '原生资源',
     desription: '挂载目录',
     default: '/usr/share/nginx/html',
-  },
-  service_name: {
-    label: '原生资源',
-    description: 'service名称',
-  },
-  service_port: {
-    label: '原生资源',
-    description: '服务端口',
-    default: 80,
-    type: 'number',
-  },
-  service_protocol: {
-    label: '原生资源',
-    description: '服务协议',
-    default: 'TCP',
-  },
-  service_targetPort: {
-    label: '原生资源',
-    description: '目标端口',
-    default: 80,
-    type: 'number',
   },
   vct1_name: {
     label: '原生资源',

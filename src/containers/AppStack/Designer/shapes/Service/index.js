@@ -13,7 +13,7 @@
 import * as joint from 'jointjs'
 import { getOptions } from '../_base'
 import template from './template.json'
-import inputs from './inputs.json'
+import inputs from './inputs'
 
 let options = {
   inPorts: [ 'in' ],

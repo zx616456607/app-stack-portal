@@ -243,3 +243,16 @@ export const RESOURCE_LIST = [
     title: '安全组',
   }, */
 ]
+
+export const INPUT_SERVICE_PROTOCOL = {
+  type: 'select',
+  label: '原生资源',
+  description: '服务协议',
+  default: 'TCP',
+  backend: false,
+  candidates: [
+    'HTTP',
+    'TCP',
+    'UDP',
+  ],
+}

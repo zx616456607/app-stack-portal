@@ -10,7 +10,7 @@
  * @date 2019-03-05
  */
 
-import { getDefaultReigistry } from '../_utils'
+import { getDefaultReigistry, INPUT_SERVICE_PROTOCOL } from '../_utils'
 
 const inputs = {
   deployment_name: {
@@ -40,14 +40,14 @@ const inputs = {
     default: 'container-1',
   },
   container_port: {
+    type: 'number',
     label: '原生资源',
     description: '容器端口',
     default: 80,
   },
   port_protocol: {
-    label: '原生资源',
+    ...INPUT_SERVICE_PROTOCOL,
     description: '端口协议',
-    default: 'TCP',
   },
   limits_cpu: {
     label: '原生资源',

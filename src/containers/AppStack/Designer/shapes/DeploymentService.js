@@ -12,7 +12,7 @@
 
 import * as joint from 'jointjs'
 import { getOptions } from './_base'
-import { getDefaultReigistry } from './_utils'
+import { getDefaultReigistry, INPUT_SERVICE_PROTOCOL } from './_utils'
 
 let options = {
   inPorts: [ 'in' ],
@@ -196,19 +196,20 @@ let options = {
       default: 'Always',
     },
     container_name: {
+      type: 'number',
       label: '原生资源',
       description: '容器名称',
       default: 'container-1',
     },
     container_port: {
+      type: 'number',
       label: '原生资源',
       description: '容器端口',
       default: 80,
     },
     port_protocol: {
-      label: '原生资源',
+      ...INPUT_SERVICE_PROTOCOL,
       description: '端口协议',
-      default: 'TCP',
     },
     limits_cpu: {
       label: '原生资源',
@@ -231,16 +232,16 @@ let options = {
       default: '512Mi',
     },
     service_port: {
+      type: 'number',
       label: '原生资源',
       description: '服务端口',
       default: 80,
     },
     service_protocol: {
-      label: '原生资源',
-      description: '服务协议',
-      default: 'TCP',
+      ...INPUT_SERVICE_PROTOCOL,
     },
     service_targetPort: {
+      type: 'number',
       label: '原生资源',
       description: '目标端口',
       default: 80,
