@@ -113,16 +113,14 @@ function getColumns(self): Array<any> {
           </Menu.Item>
         </Menu>
       );
+      const query = { edit: true, type: 'CronJob', name: record.name }
       return (
         <div className="actionBox commonData" onClick={(e) => e.stopPropagation()}>
         <Dropdown.Button
           overlay={dropdown}
           type="ghost"
           onClick={() =>
-            unifiedHistory.push({
-              pathname: '/workloads/CronJob/yamlEditor/createWorkLoad',
-              params: { edit: true, type: 'CronJob', name: record.name },
-            })}
+            unifiedHistory.push(`/workloads/CronJob/yamlEditor/createWorkLoad?${queryString.stringify(query)}`)}
         >
           查看/编辑Yaml
         </Dropdown.Button>

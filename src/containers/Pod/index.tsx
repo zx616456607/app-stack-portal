@@ -251,6 +251,7 @@ class Pod extends React.Component<PodProps, PodState> {
   }
   onMenuChange = async (key, name, self, record) => {
     const unifiedHistory = getUnifiedHistory()
+    const query = { edit: true, type: 'Pod', name: record.name }
     if (key === 'delete') {
       this.redistributionPod(name, 'true')
     }
@@ -258,10 +259,7 @@ class Pod extends React.Component<PodProps, PodState> {
       this.redistributionPod(name)
     }
     if (key === 'yaml') {
-      unifiedHistory.push({
-        pathname: '/workloads/Pod/yamlEditor/createWorkLoad',
-        params: { edit: true, type: 'Pod', name: record.name },
-      })
+      unifiedHistory.push(`/workloads/Pod/yamlEditor/createWorkLoad?${queryString.stringify(query)}`)
     }
   }
   reload = async () => {

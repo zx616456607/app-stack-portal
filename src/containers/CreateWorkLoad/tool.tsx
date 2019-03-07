@@ -144,11 +144,22 @@ class SampleInner extends React.Component<SampleProps, SampleState> {
   handleChange = (value) => {
     this.setState({ value })
   }
+  getRouteData = () => {
+    const { location: { search }, match: { params } } = this.props
+    let paramsData
+    if (search) {
+      paramsData = queryString.parse(search)
+      paramsData.type = params.type
+    } else {
+      paramsData = params
+    }
+    return paramsData
+  }
   async componentDidMount() {
-    const { location: { params }  } = this.props
+    const routeData = this.getRouteData()
     const filterResource = [ 'Deployment', 'StatefulSet', 'Job', 'CronJob' ]
-    if (params && filterResource.includes(params.type)) {
-      this.setState({ value: [params.type] })
+    if (routeData && filterResource.includes(routeData.type)) {
+      this.setState({ value: [routeData.type] })
     }
     const payload = { cluster: this.props.cluster }
     const istioEnable =
