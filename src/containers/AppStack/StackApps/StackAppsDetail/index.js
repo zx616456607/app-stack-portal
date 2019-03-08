@@ -240,7 +240,7 @@ class StackAppsDetail extends React.Component {
             this.setState({
               delModal: false,
             })
-            historyPush.push('/app-stack')
+            historyPush('/app-stack')
             notification.success({ message: '删除成功' })
           } else {
             notification.warn({ message: '删除失败' })
