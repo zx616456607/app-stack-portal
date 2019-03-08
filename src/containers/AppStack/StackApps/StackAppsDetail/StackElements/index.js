@@ -21,8 +21,73 @@ import TimeHover from '@tenx-ui/time-hover'
 import UnifiedLink from '@tenx-ui/utils/es/UnifiedLink'
 
 const Search = Input.Search
-const SUPPORT_WORK_LOAD = [ 'Deployment', 'Service', 'StatefulSet', 'Job', 'CronJob', 'Pod' ]
+const ELEMENT_KEY_KIND_MAP = {
+  deployments: 'Deployment',
+  services: 'Service',
+  configMaps: 'ConfigMap',
+  cronJobs: 'CronJob',
+  jobs: 'Job',
+  pvcs: 'PersistentVolumeClaim',
+  secrets: 'Secret',
+}
+const getElementResource = spec => {
+  const ResourceNodes = []
+  const cpu = cpuFormat(
+    getDeepValue(spec, 'template.spec.containers.0.resources.requests.memory'.split('.')),
+    getDeepValue(spec, 'template.spec.containers.0.resources'.split('.'))
+  )
+  if (cpu && cpu !== '-') {
+    ResourceNodes.push(<Row key="cpu" className={styles.resourceLine}>
+      <Col span={8}>CPU:</Col>
+      <Col span={16}>{cpu}</Col>
+    </Row>)
+  }
+  const memory = memoryFormat(getDeepValue(spec, 'template.spec.containers.0.resources'.split('.'))) || '-'
+  if (memory && memory !== '-') {
+    ResourceNodes.push(<Row key="memory" className={styles.resourceLine}>
+      <Col span={8}>内存:</Col>
+      <Col span={16}>{memory}</Col>
+    </Row>)
+  }
+  const storage = getDeepValue(spec, 'resources.requests.storage'.split('.'))
+  if (storage) {
+    ResourceNodes.push(<Row key="storage" className={styles.resourceLine}>
+      <Col span={8}>存储:</Col>
+      <Col span={16}>{storage}</Col>
+    </Row>)
+  }
+  if (ResourceNodes.length === 0) {
+    ResourceNodes.push(<span key="-">-</span>)
+  }
+  return ResourceNodes
+}
 
+const getElementUrl = (name, kind, element, cluster) => {
+  switch (kind) {
+    case 'Deployment':
+    case 'StatefulSet':
+    case 'Job':
+    case 'CronJob':
+    case 'Pod':
+      return `/workloads/${kind}/${name}`
+    case 'Service':
+      return `/net-management/${kind}/${name}`
+    case 'PersistentVolumeClaim': {
+      const storageType = getDeepValue(element, [ 'metadata', 'labels', 'system/storageType' ])
+      if (storageType === 'ceph') {
+        return `/storage-management/privateStorage/k8s-pool/${cluster}/${name}`
+      }
+      if (storageType === 'nfs' || storageType === 'glusterfs') {
+        return `/storage-management/shareStorage/${cluster}/${name}?diskType=${storageType}`
+      }
+      return
+    }
+    case 'Secret':
+      return '/app_manage/configs/secrets'
+    default:
+      return
+  }
+}
 
 @autoFitFS(50)
 @connect(state => {
@@ -31,60 +96,29 @@ const SUPPORT_WORK_LOAD = [ 'Deployment', 'Service', 'StatefulSet', 'Job', 'Cron
   let { appStacksDetail } = appStack
   let stackElements = []
   if (appStacksDetail) {
-    const {
-      deployments = [],
-      services = [],
-      configMaps = [],
-    } = appStacksDetail
     const appObj = {}
-    deployments.forEach(({ spec, metadata: { name, creationTimestamp, labels, uid } }) => {
-      const appName = labels['system/appName']
-      if (appName) {
-        appObj[appName] = {
-          kind: 'Application',
-          name: appName,
-          creationTimestamp,
-          uid: appName,
+    Object.keys(ELEMENT_KEY_KIND_MAP).forEach(key => {
+      const elements = appStacksDetail[key] || []
+      const kind = ELEMENT_KEY_KIND_MAP[key]
+      elements.forEach(element => {
+        const { spec, metadata: { name, creationTimestamp, labels, uid } } = element
+        const appName = labels['system/appName']
+        if (appName) {
+          appObj[appName] = {
+            kind: 'Application',
+            name: appName,
+            creationTimestamp,
+            uid: appName,
+          }
         }
-      }
-      stackElements.push({
-        kind: 'Deployment',
-        name,
-        creationTimestamp,
-        uid,
-        resource: <React.Fragment>
-          <Row className={styles.resourceLine}>
-            <Col span={8}>CPU:</Col>
-            <Col span={16}>{
-              cpuFormat(
-                getDeepValue(spec, 'template.spec.containers.0.resources.requests.memory'.split('.')),
-                getDeepValue(spec, 'template.spec.containers.0.resources'.split('.'))
-              ) || '-'
-            }</Col>
-          </Row>
-          <Row className={styles.resourceLine}>
-            <Col span={8}>内存:</Col>
-            <Col span={16}>{
-              memoryFormat(getDeepValue(spec, 'template.spec.containers.0.resources'.split('.'))) || '-'
-            }</Col>
-          </Row>
-        </React.Fragment>,
-      })
-    })
-    services.forEach(({ metadata: { name, creationTimestamp, uid } }) => {
-      stackElements.push({
-        kind: 'Service',
-        name,
-        creationTimestamp,
-        uid,
-      })
-    })
-    configMaps.forEach(({ metadata: { name, creationTimestamp, uid } }) => {
-      stackElements.push({
-        kind: 'ConfigMap',
-        name,
-        creationTimestamp,
-        uid,
+        stackElements.push({
+          kind,
+          name,
+          creationTimestamp,
+          uid,
+          resource: getElementResource(spec, kind),
+          url: getElementUrl(name, kind, element, cluster),
+        })
       })
     })
     stackElements = Object.keys(appObj).map(key => appObj[key]).concat(stackElements)
@@ -109,10 +143,9 @@ class StackElements extends React.Component {
     {
       title: '资源名称',
       dataIndex: 'name',
-      render: (name, { kind }) => {
-        if (SUPPORT_WORK_LOAD.indexOf(kind) > -1) {
-          const pathPrefix = (kind === 'Service' ? '/net-management' : '/workloads')
-          return <UnifiedLink to={`${pathPrefix}/${kind}/${name}`}>{name}</UnifiedLink>
+      render: (name, { url }) => {
+        if (url) {
+          return <UnifiedLink to={url}>{name}</UnifiedLink>
         }
         return name
       },
