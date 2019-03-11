@@ -14,6 +14,19 @@ import getDeepValue from '@tenx-ui/utils/lib/getDeepValue'
 import Detail from './detail'
 import { findDOMNode } from 'react-dom';
 import autoFitFS from '@tenx-ui/utils/lib/autoFitFS'
+import get from 'lodash/get'
+import cloneDeep from 'lodash/cloneDeep'
+
+// 当前显示的资源类型
+const ELEMENT_KEY_KIND_MAP = {
+  deployments: 'Deployment',
+  services: 'Service',
+  configMaps: 'ConfigMap',
+  cronJobs: 'CronJob',
+  jobs: 'Job',
+  pvcs: 'PersistentVolumeClaim',
+  secrets: 'Secret',
+}
 
 const config = {
   rankdir: 'LR',
@@ -41,83 +54,93 @@ function mapStateToProps(state) {
   return { appStackDetail  }
 }
 
-const defaultAppConfig = {
-  id: '',
-  label: '',
-  width: 50, height: 50,
-  onClick: () => {},
-  isAnimated: true,
-  shape: 'dottedcylinder',
-}
-
-const defaultDpConfig = {
-  id: '',
-  label: '',
-  width: 50, height: 50,
-  onClick: () => {},
-  isAnimated: true,
-  shape: 'cloud',
-}
-
-const defaultPodConfig = {
-  id: '',
-  label: '',
-  width: 50, height: 50,
-  onClick: () => {},
-  isAnimated: true,
-  shape: 'circle',
-}
-
-const defaultcMConfig = {
-  id: '',
-  label: '',
-  width: 50, height: 50,
-  onClick: () => {},
-  isAnimated: true,
-  shape: 'triangle',
-}
-
-const defaultEdgeConfig = {
-  source: '',
-  target: '',
-  withArrow: true,
-  arrowOffset: 10,
-  label: '',
-  isAnimated: true,
+// 'circle', 'triangle', 'square', 'pentagon', 'hexagon', 'heptagon'
+// 'octagon', 'cloud', 'sheet', 'cylinder', 'dottedcylinder'
+function findDefaultConfig(key: string) {
+  const defaultConfig = {
+    id: '',
+    label: '',
+    width: 50, height: 50,
+    onClick: () => {},
+    isAnimated: true,
+    shape: 'sheet',
+  }
+  const defaultEdgeConfig = {
+    source: '',
+    target: '',
+    withArrow: true,
+    arrowOffset: 10,
+    label: '',
+    isAnimated: true,
+  }
+  if (key === 'edge') { return defaultEdgeConfig }
+  if (key === 'app') { return Object.assign({}, defaultConfig, { shape: 'dottedcylinder' }) }
+  if (key === 'deployments') { return  Object.assign({}, defaultConfig, { shape: 'cloud' }) }
+  if (key === 'pod') { return  Object.assign({}, defaultConfig, { shape: 'circle' }) }
+  if (key === 'configMaps') { return  Object.assign({}, defaultConfig, { shape: 'triangle' }) }
+  if (key === 'cronJobs') { return  Object.assign({}, defaultConfig, { shape: 'square' }) }
+  if (key === 'jobs') { return  Object.assign({}, defaultConfig, { shape: 'pentagon' }) }
+  if (key === 'pvcs') { return  Object.assign({}, defaultConfig, { shape: 'hexagon' }) }
+  if (key === 'secrets') { return  Object.assign({}, defaultConfig, { shape: 'octagon' }) }
+  if (key === 'services') { return  Object.assign({}, defaultConfig, { shape: 'cylinder' }) }
+  return defaultConfig
 }
 
 function formateEdgesAndNodes(appStack: any, onClick: (lname: string, e: any) => void, notIncludesApp): any[] {
   const edgeEdge: any[] = []
   const NodeArray: any[] = []
   // 整理deployment 数据的函数
-  function formateDp(dpArray: any[], appNode?: string): void {
-    dpArray.forEach(dpNode => {
-      const name = getDeepValue(dpNode, ['metadata', 'name'])
-      NodeArray.push(Object.assign({}, defaultDpConfig, { id: `deployment-${name}`, label: name, onClick }))
-      if (appNode) {
-        edgeEdge.push(Object.assign({}, defaultEdgeConfig, { source: `app-${appNode}`, target: `deployment-${name}` }))
+  function formateResource(resourceObject: any, appNode?: string): void {
+    for (const key in resourceObject) {
+      if (resourceObject.hasOwnProperty(key)) {
+        resourceObject[key].forEach(dpNode => {
+          const name = getDeepValue(dpNode, ['metadata', 'name'])
+          NodeArray.push(Object.assign({}, findDefaultConfig(key),
+          { id: `${key}-${name}`, label: <Label kind={key} name={name}/>, onClick }))
+          if (appNode) {
+            edgeEdge.push(Object.assign({}, findDefaultConfig('edge'),
+            { source: `app-${appNode}`, target: `${key}-${name}` }))
+          }
+          const podsArray = getDeepValue(dpNode, ['pods']) || []
+          podsArray.forEach(pods => {
+            const podsName = getDeepValue(pods, [ 'metadata', 'name' ])
+            NodeArray.push(Object.assign({}, findDefaultConfig('pod'),
+            { id: podsName, label: <Label kind={'pod'} name={podsName} parentKind={key}/>, onClick }))
+            edgeEdge.push(Object.assign({}, findDefaultConfig('edge'),
+            { source: `${key}-${name}`, target: podsName }))
+          });
+          const cmArray = getDeepValue(dpNode, ['configMap']) || {}
+          Object.keys(cmArray).forEach((cmName) => {
+            NodeArray.push(Object.assign({},  findDefaultConfig('configMaps'),
+            { id: cmName, label: <Label kind={'configMap'} name={cmName}/> }))
+            edgeEdge.push(Object.assign({}, findDefaultConfig('edge'),
+            { source: `${key}-${name}`, target: cmName }))
+          })
+        });
       }
-      const podsArray = getDeepValue(dpNode, ['pods']) || []
-      podsArray.forEach(pods => {
-        const podsName = getDeepValue(pods, [ 'metadata', 'name' ])
-        NodeArray.push(Object.assign({}, defaultPodConfig, { id: podsName, label: podsName, onClick }))
-        edgeEdge.push(Object.assign({}, defaultEdgeConfig, { source: `deployment-${name}`, target: podsName }))
-      });
-      const cmArray = getDeepValue(dpNode, ['configMap']) || {}
-      Object.keys(cmArray).forEach((cmName) => {
-        NodeArray.push(Object.assign({}, defaultcMConfig, { id: cmName, label: cmName }))
-        edgeEdge.push(Object.assign({}, defaultEdgeConfig, { source: `deployment-${name}`, target: cmName }))
-      })
-    });
+    }
   }
-  Object.entries(appStack).forEach(([appNode, dpNodeArray]) => {
-    NodeArray.push(Object.assign({}, defaultAppConfig, { id: `app-${appNode}`, label: appNode }))
-    formateDp(dpNodeArray as any[], appNode)
+  Object.entries(appStack).forEach(([appNode, resourceObject]) => {
+    NodeArray.push(Object.assign({}, findDefaultConfig('app'),
+      { id: `app-${appNode}`,
+        label: <Label kind={'stack'} name={appNode}/> }))
+    formateResource(resourceObject as any, appNode)
   })
-  formateDp(notIncludesApp)
+  formateResource(notIncludesApp)
   return [edgeEdge, NodeArray]
 }
 
+// parentKind 是用来存储数据的
+function Label({ kind, name, parentKind = '' }) {
+  return (
+    <div>
+      <div>
+        <strong>{kind}</strong>
+      </div>
+      <div>{name}</div>
+    </div>
+  )
+}
 @autoFitFS(50)
 @connect(mapStateToProps)
 export default class ResourceTopology extends React.Component<RTProps, RTState> {
@@ -130,28 +153,47 @@ export default class ResourceTopology extends React.Component<RTProps, RTState> 
     pods: [],
   }
   componentDidMount() {
-    const deployments: any[] = getDeepValue(this.props.appStackDetail, ['deployments']) || []
-    const appStack: any = {}
-    const appArray: string[] = []
-    const notIncludesApp: any[] = [] // 用于存放没有app的dp
-    deployments.forEach((dp) => {
-      const appName: string = getDeepValue(dp, ['metadata', 'labels', 'system/appName'])
-      if (appName) {
-        if (!appArray.includes(appName)) {
-          appArray.push(appName)
-          appStack[appName] = [dp]
-        } else {
-          appStack[appName].push(dp)
-        }
-      } else {
-        notIncludesApp.push(dp)
+    const appStackDetail = this.props.appStackDetail || {}
+    const newAppStackDetail = {}
+    Object.keys(ELEMENT_KEY_KIND_MAP).forEach((key) => {
+      if (appStackDetail[key]) {
+        newAppStackDetail[key] = appStackDetail[key]
       }
     })
-    const [ edgesArray, nodeArray] = formateEdgesAndNodes(appStack, this.onNodeClick, notIncludesApp)
+    const appStack: any = {}
+    let appArray: string[] = []
+    const notIncludesApp: any[] = [] // 用于存放没有app的dp
+    for (const key in newAppStackDetail) {
+      if (newAppStackDetail.hasOwnProperty(key)) {
+        newAppStackDetail[key].forEach(node => {
+          const appName: string = get(node, ['metadata', 'labels', 'system/appstack'])
+          if (appName) {
+            if (!appArray.includes(appName)) {
+              appArray.push(appName)
+              if (!appStack[appName]) {
+                appStack[appName] = { [key]: [node] }
+              } else {
+                appStack[appName] = Object.assign(appStack[appName], { [key]: [node] })
+              }
+            } else {
+              appStack[appName][key].push(node)
+            }
+          } else {
+            notIncludesApp.push(node)
+          }
+        });
+        appArray = []
+      }
+    }
+    const [ edgesArray, nodeArray] =
+    formateEdgesAndNodes(appStack, this.onNodeClick, notIncludesApp)
     this.setState({ nodeArray, edgesArray })
   }
-  findPods(name: string): any {
-    const deployments: any[] = getDeepValue(this.props.appStackDetail, ['deployments']) || []
+  findPods(nameinfo: any): any {
+    const name = nameinfo.name
+    const kind = nameinfo.kind
+    const newKind = kind === 'pod' ? nameinfo.parentKind : kind
+    const deployments: any[] = getDeepValue(this.props.appStackDetail, [newKind]) || []
     const choiceDp = deployments.filter((dp) => {
       const lname = dp.metadata.name
       return lname === name
@@ -165,7 +207,8 @@ export default class ResourceTopology extends React.Component<RTProps, RTState> 
     return podsArray
   }
   onNodeClick = (_, e, nodeInfo: any): void => {
-    const lname = nodeInfo.label
+    const lname = nodeInfo.label.props.name
+    const nameInfo = nodeInfo.label.props
     e.stopPropagation();
     const { nodeArray } = this.state;
     const newNodes = [...nodeArray]
@@ -177,7 +220,7 @@ export default class ResourceTopology extends React.Component<RTProps, RTState> 
         n.active = true;
       }
     })
-    const Pods = this.findPods(lname)
+    const Pods = this.findPods(nameInfo)
     // return
     this.setState({ pods: Pods },
     () => this.setState({ nodeArray: newNodes, isVisible: true  }))

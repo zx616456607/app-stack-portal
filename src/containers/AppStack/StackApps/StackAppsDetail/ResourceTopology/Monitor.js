@@ -54,6 +54,12 @@ class Monitor extends React.PureComponent {
     sourceTypeArray.forEach(item => {
       clearInterval(this[`${item}RealTimeInterval`])
     })
+    this.props.dispatch({
+      type: 'nativeDetail/updateState',
+      payload: {
+        monitor: {},
+      },
+    })
   }
 
   componentDidMount() {
