@@ -17,6 +17,7 @@
         }
       }
     },
+    "serviceName": "nginx",
     "replicas": {
       "get_input": "replicas"
     },

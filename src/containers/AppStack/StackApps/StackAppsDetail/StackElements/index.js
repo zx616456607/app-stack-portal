@@ -20,16 +20,8 @@ import getDeepValue from '@tenx-ui/utils/lib/getDeepValue'
 import TimeHover from '@tenx-ui/time-hover'
 import UnifiedLink from '@tenx-ui/utils/es/UnifiedLink'
 
+import { ELEMENT_KEY_KIND_MAP } from '../../../../../utils/constants'
 const Search = Input.Search
-const ELEMENT_KEY_KIND_MAP = {
-  deployments: 'Deployment',
-  services: 'Service',
-  configMaps: 'ConfigMap',
-  cronJobs: 'CronJob',
-  jobs: 'Job',
-  pvcs: 'PersistentVolumeClaim',
-  secrets: 'Secret',
-}
 const getElementResource = spec => {
   const ResourceNodes = []
   const cpu = cpuFormat(
