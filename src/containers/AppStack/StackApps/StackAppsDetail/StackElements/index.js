@@ -82,6 +82,8 @@ const getElementUrl = (name, kind, element, cluster) => {
       }
       return
     }
+    case 'ConfigMap':
+      return '/app_manage/configs'
     case 'Secret':
       return '/app_manage/configs/secrets'
     default:

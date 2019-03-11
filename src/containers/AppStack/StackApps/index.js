@@ -23,6 +23,15 @@ import styles from './style/index.less'
 import UnifiedLink from '@tenx-ui/utils/es/UnifiedLink'
 import stack from '../../../assets/img/AppStack/stack.png'
 
+// 堆栈卡片：工作负载统计数量 hover 时的 tooltip 内容
+const WORKLOAD_COUNT_KEY_FILED_MAP = {
+  workloadDeploymentCount: 'Deployment',
+  statefulSetCount: 'StatefulSet',
+  cronJobCount: 'CronJob',
+  jobCount: 'Job',
+  workloadServiceCount: 'Service',
+  // workloadPodCount: 'Pod',
+}
 const Search = Input.Search;
 
 @connect(state => {
@@ -110,6 +119,20 @@ class StackApps extends React.Component {
     }
     this.getAppStackList(query)
   }
+  renderWorkloadTooltip = appStack => {
+    const { workloadTotal = 0 } = appStack
+    let tooltip = []
+    Object.keys(WORKLOAD_COUNT_KEY_FILED_MAP).forEach(key => {
+      const resCount = appStack[key]
+      if (resCount) {
+        tooltip.push(`${WORKLOAD_COUNT_KEY_FILED_MAP[key]}: ${resCount}`)
+      }
+    })
+    tooltip = tooltip.join(', ')
+    return <Ellipsis tooltip={tooltip} placement="bottom">
+      {workloadTotal + ''}
+    </Ellipsis>
+  }
   render() {
     const { loading, appStack } = this.props
     const { pSize } = this.state
@@ -196,26 +219,24 @@ class StackApps extends React.Component {
                     </UnifiedLink>
                     <div className={styles.itemBottom}>
                       <div>
-                        <h5>应用</h5>
-                        <span className={styles.itemCount}>
-                          <Ellipsis>
-                            {`${v.appCount}`}
-                          </Ellipsis>
-                        </span>
-                      </div>
-                      <div>
                         <h5>服务</h5>
                         <span className={styles.itemCount}>
-                          <Ellipsis>
+                          <Ellipsis tooltip={`Pod: ${v.podCount}`} placement="bottom">
                             {`${v.serviceCount}`}
                           </Ellipsis>
                         </span>
                       </div>
                       <div>
-                        <h5>容器</h5>
+                        <h5>工作负载</h5>
                         <span className={styles.itemCount}>
-                          <Ellipsis>
-                            {`${v.containerCount}`}
+                          {this.renderWorkloadTooltip(v)}
+                        </span>
+                      </div>
+                      <div>
+                        <h5>存储</h5>
+                        <span className={styles.itemCount}>
+                          <Ellipsis placement="bottom">
+                            {`${v.persistentVolumeClaimCount}`}
                           </Ellipsis>
                         </span>
                       </div>
