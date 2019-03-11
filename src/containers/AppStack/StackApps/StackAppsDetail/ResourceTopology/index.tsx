@@ -16,16 +16,37 @@ import { findDOMNode } from 'react-dom';
 import autoFitFS from '@tenx-ui/utils/lib/autoFitFS'
 import get from 'lodash/get'
 import cloneDeep from 'lodash/cloneDeep'
+import { ELEMENT_KEY_KIND_MAP } from '../../../../../utils/constants'
 
-// 当前显示的资源类型
-const ELEMENT_KEY_KIND_MAP = {
-  deployments: 'Deployment',
-  services: 'Service',
-  configMaps: 'ConfigMap',
-  cronJobs: 'CronJob',
-  jobs: 'Job',
-  pvcs: 'PersistentVolumeClaim',
-  secrets: 'Secret',
+const defaultConfig = {
+  id: '',
+  label: '',
+  width: 50, height: 50,
+  onClick: () => {},
+  isAnimated: true,
+  shape: 'sheet',
+}
+
+const defaultEdgeConfig = {
+  source: '',
+  target: '',
+  withArrow: true,
+  arrowOffset: 10,
+  label: '',
+  isAnimated: true,
+}
+
+const MappingShape = {
+  edge: defaultEdgeConfig,
+  app: Object.assign({}, defaultConfig, { shape: 'dottedcylinder' }),
+  deployments: Object.assign({}, defaultConfig, { shape: 'cloud' }),
+  pod: Object.assign({}, defaultConfig, { shape: 'circle' }),
+  configMaps: Object.assign({}, defaultConfig, { shape: 'triangle' }),
+  cronJobs: Object.assign({}, defaultConfig, { shape: 'square' }),
+  jobs: Object.assign({}, defaultConfig, { shape: 'pentagon' }),
+  pvcs: Object.assign({}, defaultConfig, { shape: 'hexagon' }),
+  secrets: Object.assign({}, defaultConfig, { shape: 'octagon' }),
+  services: Object.assign({}, defaultConfig, { shape: 'cylinder' }),
 }
 
 const config = {
@@ -54,36 +75,8 @@ function mapStateToProps(state) {
   return { appStackDetail  }
 }
 
-// 'circle', 'triangle', 'square', 'pentagon', 'hexagon', 'heptagon'
-// 'octagon', 'cloud', 'sheet', 'cylinder', 'dottedcylinder'
 function findDefaultConfig(key: string) {
-  const defaultConfig = {
-    id: '',
-    label: '',
-    width: 50, height: 50,
-    onClick: () => {},
-    isAnimated: true,
-    shape: 'sheet',
-  }
-  const defaultEdgeConfig = {
-    source: '',
-    target: '',
-    withArrow: true,
-    arrowOffset: 10,
-    label: '',
-    isAnimated: true,
-  }
-  if (key === 'edge') { return defaultEdgeConfig }
-  if (key === 'app') { return Object.assign({}, defaultConfig, { shape: 'dottedcylinder' }) }
-  if (key === 'deployments') { return  Object.assign({}, defaultConfig, { shape: 'cloud' }) }
-  if (key === 'pod') { return  Object.assign({}, defaultConfig, { shape: 'circle' }) }
-  if (key === 'configMaps') { return  Object.assign({}, defaultConfig, { shape: 'triangle' }) }
-  if (key === 'cronJobs') { return  Object.assign({}, defaultConfig, { shape: 'square' }) }
-  if (key === 'jobs') { return  Object.assign({}, defaultConfig, { shape: 'pentagon' }) }
-  if (key === 'pvcs') { return  Object.assign({}, defaultConfig, { shape: 'hexagon' }) }
-  if (key === 'secrets') { return  Object.assign({}, defaultConfig, { shape: 'octagon' }) }
-  if (key === 'services') { return  Object.assign({}, defaultConfig, { shape: 'cylinder' }) }
-  return defaultConfig
+  return MappingShape[key] || defaultConfig
 }
 
 function formateEdgesAndNodes(appStack: any, onClick: (lname: string, e: any) => void, notIncludesApp): any[] {
@@ -183,7 +176,7 @@ export default class ResourceTopology extends React.Component<RTProps, RTState> 
           }
         });
         appArray = []
-      }
+       }
     }
     const [ edgesArray, nodeArray] =
     formateEdgesAndNodes(appStack, this.onNodeClick, notIncludesApp)

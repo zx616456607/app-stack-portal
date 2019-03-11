@@ -47,3 +47,12 @@ export const FRESH_FREQUENCY = {
     freshInterval: '6小时',
   },
 }
+export const ELEMENT_KEY_KIND_MAP = {
+  deployments: 'Deployment',
+  services: 'Service',
+  configMaps: 'ConfigMap',
+  cronJobs: 'CronJob',
+  jobs: 'Job',
+  pvcs: 'PersistentVolumeClaim',
+  secrets: 'Secret',
+}
