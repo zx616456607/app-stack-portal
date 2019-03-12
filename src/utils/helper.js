@@ -19,7 +19,7 @@ import cloneDeep from 'lodash/cloneDeep'
 const TENX_MARK = 'tenxcloud.com'
 // 延时函数
 const delay = ({ timeout = 1000, data = {}, success = true }) => new Promise(
-  (resolve, reject) => setTimeout(() => (success ? resolve(data) : reject()), timeout)
+  (resolve, reject) => setTimeout(() => (success ? resolve(data) : reject(new Error('delay timeout'))), timeout)
 )
 
 /**

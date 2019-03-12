@@ -69,9 +69,11 @@ function* _authorize(_, { select, call, put }) {
   if (redirect) {
     unifiedHistory.replace(redirect)
   } else {
+    const queryStr = queryString.stringify(otherQuery)
+    const search = queryStr && `?${queryStr}`
     unifiedHistory.replace({
       pathname: locationPathname,
-      search: `?${queryString.stringify(otherQuery)}`,
+      search,
     })
   }
   const { data: user } = yield call(getUserById, jwtToken.userID)
