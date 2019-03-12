@@ -18,7 +18,10 @@ import inputs from './inputs.json'
 let options = {
   inPorts: [ 'in' ],
   outPorts: null,
+  /** 部署的时候是否会转换成 yaml */
   _deploy_2_yaml: true,
+  /** 是否允许单独部署 */
+  _deploy_single: false,
   _link_rules: {
     required: false,
     types: [ 'devs.Service', 'devs.ConfigMap' ],

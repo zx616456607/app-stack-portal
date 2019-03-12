@@ -15,6 +15,7 @@ import { getOptions } from './_base'
 
 let options = {
   _deploy_2_yaml: true,
+  _deploy_single: false,
   _link_rules: {
     required: false,
     types: [

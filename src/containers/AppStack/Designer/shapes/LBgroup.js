@@ -15,6 +15,7 @@ import { getOptions } from './_base'
 
 let options = {
   _deploy_2_yaml: false,
+  _deploy_single: false,
   _link_rules: {
     required: true,
     message: '集群网络出口至少与一个服务连线',

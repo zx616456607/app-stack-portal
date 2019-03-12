@@ -116,6 +116,7 @@ const options = {
     items: [],
   },
   _deploy_2_yaml: false,
+  _deploy_single: false,
   _link_rules: {
     required: false,
     types: [],

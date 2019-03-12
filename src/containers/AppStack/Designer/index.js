@@ -219,6 +219,23 @@ _paper: {}`,
         })
         return
       }
+      // check if element can single deploy
+      let _canSingleDeploy = false
+      _graph.cells.every(cell => {
+        if (cell._deploy_single) {
+          _canSingleDeploy = true
+          return false
+        }
+        return true
+      })
+      if (!_canSingleDeploy) {
+        notification.info({
+          message: '保存堆栈模版失败',
+          description: '堆栈不支持独享存储、共享存储、集群网络出口、服务配置元素的单独保存模板',
+          duration: 5,
+        })
+        return
+      }
       // check link
       let linkCheckPassed = true
       const links = _graph.cells.filter(({ type }) => type === 'link')

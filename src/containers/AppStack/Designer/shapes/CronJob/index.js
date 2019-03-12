@@ -19,6 +19,7 @@ let options = {
   inPorts: [ 'in' ],
   outPorts: null,
   _deploy_2_yaml: true,
+  _deploy_single: true,
   _link_rules: {
     required: false,
     types: [
