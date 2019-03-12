@@ -19,6 +19,7 @@ import { cpuFormat, memoryFormat } from '../../../utils/helper'
 import getDeepValue from '@tenx-ui/utils/lib/getDeepValue'
 import { connect } from 'dva'
 import { Authority as SecretIcon } from '@tenx-ui/icon'
+import Ellipsis from '@tenx-ui/ellipsis'
 const Option = Select.Option
 const mapState = ({ nativeDetail: { podDetail } }) => ({ data: podDetail })
 
@@ -271,9 +272,17 @@ class Config extends React.PureComponent {
       {
         Array.isArray(cell.value)
           ? cell.value.map((c, j) => (
-            <pre key={j} className={styles.text}>{c}</pre>
+            <div key={j} className={styles.text}>
+              <Ellipsis tooltip={c.length > 20 ? c : false}>
+                {c}
+              </Ellipsis>
+            </div>
           ))
-          : <pre className={styles.text}>{cell.value}</pre>
+          : <div className={styles.text}>
+            <Ellipsis tooltip={cell.value.length > 20 ? cell.value : false}>
+              {cell.value}
+            </Ellipsis>
+          </div>
       }
     </div>
   ))

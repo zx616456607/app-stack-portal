@@ -250,9 +250,13 @@ class DetailHeader extends React.PureComponent {
               {
                 type === 'Service' &&
                   <React.Fragment>
-                    <div className={styles.normal}>集群IP: {
-                      getDeepValue(data, 'spec.clusterIP'.split('.')) || '--'
-                    }</div>
+                    <div className={styles.normal}>集群IP:
+                      <span className={styles.ellipsisText}>
+                        <Ellipsis>
+                          {getDeepValue(data, 'spec.clusterIP'.split('.')) || '--'}
+                        </Ellipsis>
+                      </span>
+                    </div>
                     <div className={styles.normal}>{
                       popoverItem(getDeepValue(data, 'metadata.annotations'.split('.')) || {}, '注释')
                     }</div>
