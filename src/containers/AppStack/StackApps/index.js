@@ -16,7 +16,7 @@ import QueueAnim from 'rc-queue-anim'
 import { connect } from 'dva'
 import { Card, Button, notification, Input, Pagination } from 'antd'
 import { Stack as StackIcon } from '@tenx-ui/icon'
-import { Circle as CircleIcon } from '@tenx-ui/icon'
+// import { Circle as CircleIcon } from '@tenx-ui/icon'
 import Loader from '@tenx-ui/loader'
 import Ellipsis from '@tenx-ui/ellipsis'
 import styles from './style/index.less'
@@ -60,7 +60,7 @@ class StackApps extends React.Component {
       notification.warn({ message: '获取堆栈列表失败', description: '' })
     }
   }
-  status = item => {
+  /* status = item => {
     let status = {
       text: '未知',
       color: '#ccc',
@@ -91,7 +91,7 @@ class StackApps extends React.Component {
       }
     }
     return status
-  }
+  } */
   changePage = (page, pageSize) => {
     const query = {
       from: (page - 1) * pageSize,
@@ -205,15 +205,14 @@ class StackApps extends React.Component {
                             </Ellipsis>
                           </h2>
                         </div>
-                        <div className={styles.status} style={{ color: this.status(v).color }}>
+                        {/* <div className={styles.status} style={{ color: this.status(v).color }}>
                           <CircleIcon style={{ marginRight: 4 }}/>
                           {this.status(v).text}
-                        </div>
+                        </div> */}
                         <div className={styles.description}>
                           <Ellipsis lines={2}>
                             {v.description || '--'}
                           </Ellipsis>
-
                         </div>
                       </div>
                     </UnifiedLink>
