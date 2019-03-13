@@ -113,21 +113,27 @@ class StackTemplateDeploy extends React.Component {
   }
 
   renderInput = input => {
-    const { type, description } = input
+    const { type, description, optionDesc } = input
+    let optionDescStr = ''
+    if (optionDesc) {
+      optionDescStr = `(${optionDesc})`
+    }
     switch (type) {
       case 'select':
         return (
           <Select
             showSearch
             dropdownMatchSelectWidth={false}
-            placeholder={description}
+            placeholder={`${description} ${optionDescStr}`}
             filterOption={(value, option) =>
               option.props.children.toLowerCase().indexOf(value.toLowerCase()) >= 0
             }
           >
             {
               this.getSelectOptions(input).map(({ name, id, disabled }) =>
-                <Option key={id} disabled={disabled}>{name}</Option>
+                <Option key={id} disabled={disabled}>
+                  {name} {optionDescStr}
+                </Option>
               )
             }
           </Select>

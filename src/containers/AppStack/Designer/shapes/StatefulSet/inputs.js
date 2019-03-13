@@ -90,6 +90,7 @@ const inputs = {
     description: '存储类型',
     backend: true,
     configType: 'ceph',
+    optionDesc: '块存储',
     default: '',
     needCluster: true,
   },

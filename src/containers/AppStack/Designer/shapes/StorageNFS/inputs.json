@@ -10,6 +10,7 @@
     "description": "存储类型",
     "backend": true,
     "configType": "nfs",
+    "optionDesc": "NFS",
     "default": "",
     "needCluster": true
   },
