@@ -49,6 +49,7 @@ export const FRESH_FREQUENCY = {
 }
 export const ELEMENT_KEY_KIND_MAP = {
   deployments: 'Deployment',
+  statefulSets: 'StatefulSet',
   services: 'Service',
   configMaps: 'ConfigMap',
   cronJobs: 'CronJob',

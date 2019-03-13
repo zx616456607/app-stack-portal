@@ -79,6 +79,15 @@ function findDefaultConfig(key: string) {
   return MappingShape[key] || defaultConfig
 }
 
+function formateKind(kind = '') {
+  const kindArray = kind.split('')
+  if (kindArray[kindArray.length - 1] === 's') {
+    kindArray.pop()
+  }
+  kindArray[0] = kindArray[0].toUpperCase()
+  return kindArray.join('')
+}
+
 function formateEdgesAndNodes(appStack: any, onClick: (lname: string, e: any) => void, notIncludesApp): any[] {
   const edgeEdge: any[] = []
   const NodeArray: any[] = []
@@ -89,7 +98,7 @@ function formateEdgesAndNodes(appStack: any, onClick: (lname: string, e: any) =>
         resourceObject[key].forEach(dpNode => {
           const name = getDeepValue(dpNode, ['metadata', 'name'])
           NodeArray.push(Object.assign({}, findDefaultConfig(key),
-          { id: `${key}-${name}`, label: <Label kind={key} name={name}/>, onClick }))
+          { id: `${key}-${name}`, label: <Label kind={key} name={name} showKind={formateKind(key)}/>, onClick }))
           if (appNode) {
             edgeEdge.push(Object.assign({}, findDefaultConfig('edge'),
             { source: `app-${appNode}`, target: `${key}-${name}` }))
@@ -98,14 +107,14 @@ function formateEdgesAndNodes(appStack: any, onClick: (lname: string, e: any) =>
           podsArray.forEach(pods => {
             const podsName = getDeepValue(pods, [ 'metadata', 'name' ])
             NodeArray.push(Object.assign({}, findDefaultConfig('pod'),
-            { id: podsName, label: <Label kind={'pod'} name={podsName} parentKind={key}/>, onClick }))
+            { id: podsName, label: <Label kind={'pod'} name={podsName} parentKind={key} showKind={'Pod'}/>, onClick }))
             edgeEdge.push(Object.assign({}, findDefaultConfig('edge'),
             { source: `${key}-${name}`, target: podsName }))
           });
           const cmArray = getDeepValue(dpNode, ['configMap']) || {}
           Object.keys(cmArray).forEach((cmName) => {
             NodeArray.push(Object.assign({},  findDefaultConfig('configMaps'),
-            { id: cmName, label: <Label kind={'configMap'} name={cmName}/> }))
+            { id: cmName, label: <Label kind={'configMap'} name={cmName} showKind={'ConfigMap'}/>, onClick }))
             edgeEdge.push(Object.assign({}, findDefaultConfig('edge'),
             { source: `${key}-${name}`, target: cmName }))
           })
@@ -116,7 +125,7 @@ function formateEdgesAndNodes(appStack: any, onClick: (lname: string, e: any) =>
   Object.entries(appStack).forEach(([appNode, resourceObject]) => {
     NodeArray.push(Object.assign({}, findDefaultConfig('app'),
       { id: `app-${appNode}`,
-        label: <Label kind={'stack'} name={appNode}/> }))
+        label: <Label kind={'stack'} showKind={'Stack'} name={appNode}/>, onClick }))
     formateResource(resourceObject as any, appNode)
   })
   formateResource(notIncludesApp)
@@ -124,11 +133,11 @@ function formateEdgesAndNodes(appStack: any, onClick: (lname: string, e: any) =>
 }
 
 // parentKind 是用来存储数据的
-function Label({ kind, name, parentKind = '' }) {
+function Label({ kind, name, parentKind = '', showKind }) {
   return (
     <div>
       <div>
-        <strong>{kind}</strong>
+        <strong>{showKind}</strong>
       </div>
       <div>{name}</div>
     </div>
@@ -201,7 +210,9 @@ export default class ResourceTopology extends React.Component<RTProps, RTState> 
   }
   onNodeClick = (_, e, nodeInfo: any): void => {
     const lname = nodeInfo.label.props.name
+    const kind = nodeInfo.label.props.kind
     const nameInfo = nodeInfo.label.props
+    const filterArray = [ 'deployments', 'jobs', 'pod', 'statefulSets' ]
     e.stopPropagation();
     const { nodeArray } = this.state;
     const newNodes = [...nodeArray]
@@ -209,12 +220,12 @@ export default class ResourceTopology extends React.Component<RTProps, RTState> 
       if (n.active !== undefined) {
         delete n.active;
       }
-      if (n.id === lname) {
+      if (n.label.props.name === lname && n.label.props.kind === kind) {
         n.active = true;
       }
     })
+    if (!filterArray.includes(nameInfo.kind)) { return this.setState({ nodeArray: newNodes }) }
     const Pods = this.findPods(nameInfo)
-    // return
     this.setState({ pods: Pods },
     () => this.setState({ nodeArray: newNodes, isVisible: true  }))
   }
