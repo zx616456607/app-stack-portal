@@ -28,6 +28,7 @@ import { k8sNameCheck } from '../../../../utils/helper'
 import getDeepValue from '@tenx-ui/utils/lib/getDeepValue'
 import * as _builtInFunction from '../../Designer/shapes/_builtInFunction'
 import { fullGraph } from '../../Designer/shapes'
+import sortBy from 'lodash/sortBy'
 
 const FormItem = Form.Item
 const Option = Select.Option
@@ -147,7 +148,12 @@ class StackTemplateDeploy extends React.Component {
     {
       title: '参数类型',
       dataIndex: 'kind',
-      width: '20%',
+      width: '15%',
+    },
+    {
+      title: '元素 ID',
+      dataIndex: '_shortId',
+      width: '10%',
     },
     {
       title: '参数值',
@@ -177,7 +183,7 @@ class StackTemplateDeploy extends React.Component {
     {
       title: '参数描述',
       dataIndex: 'description',
-      width: '20%',
+      width: '15%',
     },
   ]
 
@@ -258,6 +264,10 @@ class StackTemplateDeploy extends React.Component {
           templateInputs[inputObj.label] = templateInputs[inputObj.label] || []
           templateInputs[inputObj.label].push(inputObj)
         })
+      })
+      // sort inputs: sort by id and desc
+      Object.keys(templateInputs).forEach(key => {
+        templateInputs[key] = sortBy(templateInputs[key], [ '_shortId', 'description' ])
       })
       // sort inputs: move input without default value to the front
       Object.keys(templateInputs).forEach(key => {
