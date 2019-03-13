@@ -71,17 +71,17 @@ const inputs = {
   },
   'volume-1-_mountPath': {
     label: '原生资源',
-    desription: '挂载目录',
+    description: '挂载目录',
     default: '/usr/share/nginx/html',
   },
   vct1_name: {
     label: '原生资源',
-    desription: 'pvc名称',
+    description: 'pvc名称',
     default: 'www',
   },
   storage_size: {
     label: '原生资源',
-    desription: '存储大小',
+    description: '存储大小',
     default: '1Gi',
   },
   storageClass: {
