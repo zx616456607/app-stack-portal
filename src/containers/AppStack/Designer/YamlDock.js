@@ -95,7 +95,9 @@ export default class YamlDock extends React.PureComponent {
       position="bottom"
       dimMode="none"
       onSizeChange={newDockSize => {
-        if (dockSize < DOCK_DEFAULT_HEADER_SIZE) return
+        if (newDockSize < DOCK_DEFAULT_HEADER_SIZE || newDockSize >= window.innerHeight) {
+          return
+        }
         this.setState({ dockSize: newDockSize }, () => {
           this.yarmlEditor.resize()
           onSizeChange(newDockSize)
