@@ -465,7 +465,7 @@ class StackTemplateDeploy extends React.Component {
               break
             }
             case 'Service': {
-              typeText = '服务发现'
+              typeText = '服务或服务发现'
               keys409 = keys409.filter(key => key.indexOf('service_name') > -1)
               break
             }
