@@ -21,9 +21,7 @@
     },
     "resources": {
       "requests": {
-        "storage": {
-          "get_input": "storage_size"
-        }
+        "storage": "512Mi"
       }
     }
   }

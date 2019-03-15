@@ -16,7 +16,7 @@ import QueueAnim from 'rc-queue-anim'
 import { connect } from 'dva'
 import { Card, Button, notification, Input, Pagination } from 'antd'
 import { Stack as StackIcon } from '@tenx-ui/icon'
-import { Circle as CircleIcon } from '@tenx-ui/icon'
+// import { Circle as CircleIcon } from '@tenx-ui/icon'
 import Loader from '@tenx-ui/loader'
 import Ellipsis from '@tenx-ui/ellipsis'
 import styles from './style/index.less'
@@ -31,6 +31,12 @@ const WORKLOAD_COUNT_KEY_FILED_MAP = {
   jobCount: 'Job',
   workloadServiceCount: 'Service',
   // workloadPodCount: 'Pod',
+}
+// 堆栈卡片：存储统计数量 hover 时的 tooltip 内容
+const STORAGE_COUNT_KEY_FILED_MAP = {
+  cephVolumeCount: '独享型',
+  nfsVolumeCount: 'NFS',
+  glusterfsVolumeCount: 'GlusterFS',
 }
 const Search = Input.Search;
 
@@ -60,7 +66,7 @@ class StackApps extends React.Component {
       notification.warn({ message: '获取堆栈列表失败', description: '' })
     }
   }
-  status = item => {
+  /* status = item => {
     let status = {
       text: '未知',
       color: '#ccc',
@@ -91,7 +97,7 @@ class StackApps extends React.Component {
       }
     }
     return status
-  }
+  } */
   changePage = (page, pageSize) => {
     const query = {
       from: (page - 1) * pageSize,
@@ -131,6 +137,20 @@ class StackApps extends React.Component {
     tooltip = tooltip.join(', ')
     return <Ellipsis tooltip={tooltip} placement="bottom">
       {workloadTotal + ''}
+    </Ellipsis>
+  }
+  renderStorageTooltip = appStack => {
+    const { persistentVolumeClaim = 0 } = appStack
+    let tooltip = []
+    Object.keys(STORAGE_COUNT_KEY_FILED_MAP).forEach(key => {
+      const resCount = appStack[key]
+      if (resCount) {
+        tooltip.push(`${STORAGE_COUNT_KEY_FILED_MAP[key]}: ${resCount}`)
+      }
+    })
+    tooltip = tooltip.join(', ')
+    return <Ellipsis tooltip={tooltip} placement="bottom">
+      {persistentVolumeClaim + ''}
     </Ellipsis>
   }
   render() {
@@ -205,15 +225,14 @@ class StackApps extends React.Component {
                             </Ellipsis>
                           </h2>
                         </div>
-                        <div className={styles.status} style={{ color: this.status(v).color }}>
+                        {/* <div className={styles.status} style={{ color: this.status(v).color }}>
                           <CircleIcon style={{ marginRight: 4 }}/>
                           {this.status(v).text}
-                        </div>
+                        </div> */}
                         <div className={styles.description}>
                           <Ellipsis lines={2}>
                             {v.description || '--'}
                           </Ellipsis>
-
                         </div>
                       </div>
                     </UnifiedLink>
@@ -235,9 +254,7 @@ class StackApps extends React.Component {
                       <div>
                         <h5>存储</h5>
                         <span className={styles.itemCount}>
-                          <Ellipsis placement="bottom">
-                            {`${v.persistentVolumeClaimCount}`}
-                          </Ellipsis>
+                          {this.renderStorageTooltip(v)}
                         </span>
                       </div>
                     </div>

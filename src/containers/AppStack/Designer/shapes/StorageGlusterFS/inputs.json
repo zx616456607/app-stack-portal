@@ -15,6 +15,7 @@
     "description": "存储类型",
     "backend": true,
     "configType": "glusterfs",
+    "optionDesc": "GlusterFS",
     "default": "",
     "needCluster": true
   }

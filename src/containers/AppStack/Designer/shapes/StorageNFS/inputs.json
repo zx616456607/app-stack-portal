@@ -10,12 +10,8 @@
     "description": "存储类型",
     "backend": true,
     "configType": "nfs",
+    "optionDesc": "NFS",
     "default": "",
     "needCluster": true
-  },
-  "storage_size": {
-    "label": "原生资源",
-    "description": "存储大小",
-    "default": "1Gi"
   }
 }

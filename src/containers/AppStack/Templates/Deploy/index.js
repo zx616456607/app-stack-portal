@@ -28,7 +28,51 @@ import { k8sNameCheck } from '../../../../utils/helper'
 import getDeepValue from '@tenx-ui/utils/lib/getDeepValue'
 import * as _builtInFunction from '../../Designer/shapes/_builtInFunction'
 import { fullGraph } from '../../Designer/shapes'
+import sortBy from 'lodash/sortBy'
 
+const ELEMENT_KIND_INPUT_MAP = {
+  AppStack: {
+    key: 'stackName',
+    overwrite: true,
+    text: '堆栈',
+  },
+  Application: {
+    key: 'app_name',
+    text: '应用',
+  },
+  Deployment: {
+    key: 'deployment_name',
+    text: '服务',
+  },
+  Service: {
+    key: 'service_name',
+    text: '服务或服务发现',
+  },
+  ConfigMap: {
+    key: 'configMap_name',
+    text: '服务配置',
+  },
+  CronJob: {
+    key: 'cronJob_name',
+    text: 'CronJob',
+  },
+  Job: {
+    key: 'job_name',
+    text: 'Job',
+  },
+  Secret: {
+    key: 'secret_name',
+    text: '加密配置',
+  },
+  StatefulSet: {
+    key: 'statefulSet_name',
+    text: 'StatefulSet',
+  },
+  PersistentVolumeClaim: {
+    key: 'pvc_name',
+    text: '存储',
+  },
+}
 const FormItem = Form.Item
 const Option = Select.Option
 const { TextArea } = Input
@@ -112,21 +156,27 @@ class StackTemplateDeploy extends React.Component {
   }
 
   renderInput = input => {
-    const { type, description } = input
+    const { type, description, optionDesc } = input
+    let optionDescStr = ''
+    if (optionDesc) {
+      optionDescStr = `(${optionDesc})`
+    }
     switch (type) {
       case 'select':
         return (
           <Select
             showSearch
             dropdownMatchSelectWidth={false}
-            placeholder={description}
+            placeholder={`${description} ${optionDescStr}`}
             filterOption={(value, option) =>
               option.props.children.toLowerCase().indexOf(value.toLowerCase()) >= 0
             }
           >
             {
               this.getSelectOptions(input).map(({ name, id, disabled }) =>
-                <Option key={id} disabled={disabled}>{name}</Option>
+                <Option key={id} disabled={disabled}>
+                  {name} {optionDescStr}
+                </Option>
               )
             }
           </Select>
@@ -147,7 +197,12 @@ class StackTemplateDeploy extends React.Component {
     {
       title: '参数类型',
       dataIndex: 'kind',
-      width: '20%',
+      width: '15%',
+    },
+    {
+      title: '元素 ID',
+      dataIndex: '_shortId',
+      width: '10%',
     },
     {
       title: '参数值',
@@ -177,7 +232,7 @@ class StackTemplateDeploy extends React.Component {
     {
       title: '参数描述',
       dataIndex: 'description',
-      width: '20%',
+      width: '15%',
     },
   ]
 
@@ -258,6 +313,10 @@ class StackTemplateDeploy extends React.Component {
           templateInputs[inputObj.label] = templateInputs[inputObj.label] || []
           templateInputs[inputObj.label].push(inputObj)
         })
+      })
+      // sort inputs: sort by id and desc
+      Object.keys(templateInputs).forEach(key => {
+        templateInputs[key] = sortBy(templateInputs[key], [ '_shortId', 'description' ])
       })
       // sort inputs: move input without default value to the front
       Object.keys(templateInputs).forEach(key => {
@@ -447,8 +506,21 @@ class StackTemplateDeploy extends React.Component {
         if (code === 409) {
           const { kind, name: name409 } = details
           let keys409 = Object.keys(values).filter(key => values[key] === name409)
-          let typeText
-          switch (kind) {
+          const keyText = ELEMENT_KIND_INPUT_MAP[kind]
+          if (!keyText) {
+            notification.warn({
+              message: '启动应用堆栈失败',
+              description: message,
+            })
+            return
+          }
+          if (keyText.overwrite) {
+            keys409 = [ keyText.key ]
+          } else {
+            keys409 = keys409.filter(key => key.indexOf(keyText.key) > -1)
+          }
+          const typeText = keyText.text
+          /* switch (kind) {
             case 'AppStack': {
               keys409 = [ 'stackName' ]
               typeText = '堆栈'
@@ -465,7 +537,7 @@ class StackTemplateDeploy extends React.Component {
               break
             }
             case 'Service': {
-              typeText = '服务发现'
+              typeText = '服务或服务发现'
               keys409 = keys409.filter(key => key.indexOf('service_name') > -1)
               break
             }
@@ -480,7 +552,7 @@ class StackTemplateDeploy extends React.Component {
                 description: message,
               })
               return
-          }
+          } */
           keys409.forEach(key => {
             setFields({
               [key]: {

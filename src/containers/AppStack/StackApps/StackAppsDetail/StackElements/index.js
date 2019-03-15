@@ -15,10 +15,15 @@ import { Button, Table, Input, notification, Row, Col } from 'antd'
 import styles from './style/index.less'
 import { connect } from 'react-redux'
 import { cpuFormat, memoryFormat } from '../../../../../utils/helper'
+import {
+  getDeploymentStatus, getStatefulSetStatus, getCronJobStatue, getJobStatus,
+  getPodStatus,
+} from '../../../../../utils/status_identify'
 import autoFitFS from '@tenx-ui/utils/lib/autoFitFS'
 import getDeepValue from '@tenx-ui/utils/lib/getDeepValue'
 import TimeHover from '@tenx-ui/time-hover'
 import UnifiedLink from '@tenx-ui/utils/es/UnifiedLink'
+import NativeStatus from '../../../../../components/NativeStatus'
 
 import { ELEMENT_KEY_KIND_MAP } from '../../../../../utils/constants'
 const Search = Input.Search
@@ -83,6 +88,37 @@ const getElementUrl = (name, kind, element, cluster) => {
   }
 }
 
+const getElementStatus = (kind, element) => {
+  switch (kind) {
+    case 'Deployment': {
+      const status = getDeploymentStatus(element)
+      return <NativeStatus status={status} phase={status.phase} />
+    }
+    case 'StatefulSet': {
+      const status = getStatefulSetStatus(element)
+      return <NativeStatus status={status} phase={status.phase} />
+    }
+    case 'Job': {
+      const status = getJobStatus(element)
+      return <NativeStatus type={kind} status={status} phase={status.phase} />
+    }
+    case 'CronJob': {
+      const status = getCronJobStatue(element)
+      return <NativeStatus type={kind} status={status} phase={status.phase} />
+    }
+    case 'Pod': {
+      const status = getPodStatus(element)
+      return <NativeStatus type={kind} status={status} phase={status.phase} />
+    }
+    case 'Service':
+    case 'ConfigMap':
+    case 'Secret':
+    case 'PersistentVolumeClaim':
+    default:
+      return '-'
+  }
+}
+
 @autoFitFS(50)
 @connect(state => {
   const { appStack, loading, app } = state
@@ -108,6 +144,7 @@ const getElementUrl = (name, kind, element, cluster) => {
         stackElements.push({
           kind,
           name,
+          status: getElementStatus(kind, element),
           creationTimestamp,
           uid,
           resource: getElementResource(spec, kind),
@@ -143,6 +180,11 @@ class StackElements extends React.Component {
         }
         return name
       },
+    },
+    {
+      title: '状态',
+      dataIndex: 'status',
+      render: status => status || '-',
     },
     {
       title: '规格',

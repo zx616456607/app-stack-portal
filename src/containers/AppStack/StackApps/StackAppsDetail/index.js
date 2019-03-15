@@ -12,14 +12,15 @@
 
 import React from 'react'
 import { Card, Button, Tabs, notification } from 'antd'
-import { Stack as StackIcon, Circle as CircleIcon } from '@tenx-ui/icon'
+import { Stack as StackIcon } from '@tenx-ui/icon'
 import { connect } from 'dva'
 import styles from './style/index.less'
 import * as modal from '@tenx-ui/modal'
 import Loader from '@tenx-ui/loader'
-import { getServiceStatus } from '../../../../utils/helper'
+// import { getServiceStatus } from '../../../../utils/helper'
 import { Switch, Route, routerRedux } from 'dva/router'
 import { historyPush } from '@tenx-ui/utils/es/UnifiedLink'
+import getDeepValue from '@tenx-ui/utils/lib/getDeepValue'
 
 const TabPane = Tabs.TabPane
 const childRoutes = [
@@ -110,7 +111,7 @@ class StackAppsDetail extends React.Component {
     }
     return activeKey
   }
-  convertStatus = () => {
+  /* convertStatus = () => {
     const runningList = []
     const pendingList = []
     const stoppedList = []
@@ -168,7 +169,7 @@ class StackAppsDetail extends React.Component {
       })
     }
     return status
-  }
+  } */
   start = () => {
     const name = this.props.match.params.name
     const { cluster, appStackStart, getStackDetail } = this.props
@@ -256,7 +257,7 @@ class StackAppsDetail extends React.Component {
   render() {
     const name = this.props.match.params.name
     const {
-      loading, children, location: { pathname },
+      loading, children, location: { pathname }, appStacksDetail,
     } = this.props
     const contentLoading = loading.effects['appStack/fetchAppStackDetail']
     const delLoading = loading.effects['appStack/stackDelete']
@@ -272,10 +273,13 @@ class StackAppsDetail extends React.Component {
           </div>
           <div className={styles.detailName}>
             <h1>{name}</h1>
-            <div className={styles.status}>
+            <div className={styles.desc}>
+              描述： {getDeepValue(appStacksDetail, [ 'appStack', 'spec', 'description' ]) || '--'}
+            </div>
+            {/* <div className={styles.status}>
               状态： <CircleIcon style={{ color: this.convertStatus().color }}/>
               <span style={{ color: this.convertStatus().color }}>{this.convertStatus().txt}</span>
-            </div>
+            </div> */}
           </div>
         </div>
         <div className={styles.detailInfoRight}>

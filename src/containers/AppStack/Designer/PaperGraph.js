@@ -378,7 +378,9 @@ export default class PaperGraph extends React.PureComponent {
   addLabelId = cell => {
     const _shortId = this.state.idShortIdMap[cell.id]
     if (cell.attributes.type === 'devs.Application') {
-      cell.attributes._app_stack_input.app_name.label = `应用-${_shortId}`
+      if (getDeepValue(cell, [ 'attributes', '_app_stack_input', 'app_name' ])) {
+        cell.attributes._app_stack_input.app_name.label = `应用-${_shortId}`
+      }
     }
     cell.attributes.attrs['label-id'] = { text: _shortId }
     this.paper.findViewByModel(cell).update()
