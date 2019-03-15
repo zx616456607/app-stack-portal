@@ -32,6 +32,12 @@ const WORKLOAD_COUNT_KEY_FILED_MAP = {
   workloadServiceCount: 'Service',
   // workloadPodCount: 'Pod',
 }
+// 堆栈卡片：存储统计数量 hover 时的 tooltip 内容
+const STORAGE_COUNT_KEY_FILED_MAP = {
+  cephVolumeCount: '独享型',
+  nfsVolumeCount: 'NFS',
+  glusterfsVolumeCount: 'GlusterFS',
+}
 const Search = Input.Search;
 
 @connect(state => {
@@ -131,6 +137,20 @@ class StackApps extends React.Component {
     tooltip = tooltip.join(', ')
     return <Ellipsis tooltip={tooltip} placement="bottom">
       {workloadTotal + ''}
+    </Ellipsis>
+  }
+  renderStorageTooltip = appStack => {
+    const { persistentVolumeClaim = 0 } = appStack
+    let tooltip = []
+    Object.keys(STORAGE_COUNT_KEY_FILED_MAP).forEach(key => {
+      const resCount = appStack[key]
+      if (resCount) {
+        tooltip.push(`${STORAGE_COUNT_KEY_FILED_MAP[key]}: ${resCount}`)
+      }
+    })
+    tooltip = tooltip.join(', ')
+    return <Ellipsis tooltip={tooltip} placement="bottom">
+      {persistentVolumeClaim + ''}
     </Ellipsis>
   }
   render() {
@@ -234,9 +254,7 @@ class StackApps extends React.Component {
                       <div>
                         <h5>存储</h5>
                         <span className={styles.itemCount}>
-                          <Ellipsis placement="bottom">
-                            {`${v.persistentVolumeClaimCount}`}
-                          </Ellipsis>
+                          {this.renderStorageTooltip(v)}
                         </span>
                       </div>
                     </div>
