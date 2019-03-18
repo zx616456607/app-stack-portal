@@ -89,14 +89,19 @@ const getElementUrl = (name, kind, element, cluster) => {
 }
 
 const getElementStatus = (kind, element) => {
+  // @Todo: should move to NativeStatus component
   switch (kind) {
     case 'Deployment': {
       const status = getDeploymentStatus(element)
       return <NativeStatus status={status} phase={status.phase} />
     }
     case 'StatefulSet': {
-      const status = getStatefulSetStatus(element)
-      return <NativeStatus status={status} phase={status.phase} />
+      const {
+        phase,
+        currentReplicas: availableReplicas, // Special treatment
+        replicas,
+      } = getStatefulSetStatus(element)
+      return <NativeStatus status={{ availableReplicas, replicas }} phase={phase} />
     }
     case 'Job': {
       const status = getJobStatus(element)

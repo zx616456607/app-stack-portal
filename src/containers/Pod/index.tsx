@@ -97,6 +97,7 @@ function getColumns(self): Array<any> {
     dataIndex: 'status',
     key: 'status',
     render: (status) => {
+      // @Todo: should move to NativeStatus component
       const { phase, startTime, restartCountTotal } = status
       return <NativeStatus
         status={{ startTime, restartCountTotal }}

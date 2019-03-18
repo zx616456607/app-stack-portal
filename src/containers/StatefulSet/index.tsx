@@ -57,7 +57,12 @@ function getColumns(self): Array<any> {
     dataIndex: 'status',
     key: 'status',
     render: (status) => {
-      const { phase, currentReplicas: availableReplicas, replicas } = status
+      // @Todo: should move to NativeStatus component
+      const {
+        phase,
+        currentReplicas: availableReplicas, // Special treatment
+        replicas,
+      } = status
       return <NativeStatus
         status={{ availableReplicas, replicas }}
         phase={phase}
