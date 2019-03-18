@@ -363,8 +363,10 @@ _paper: {}`,
           onTabChange={this.onYamlTabChange}
           onSizeChange={size => this.setState({ yamlDockSize: size })}
           onYamlChange={({ templateYamlStr: template, inputYamlStr: input }) => {
-            this.setState({ templateYamlStr: template, inputYamlStr: input })
-            this.yaml2Graph(template, input)
+            this.setState({ templateYamlStr: template, inputYamlStr: input }, () => {
+              // must call this in setState cb
+              this.yaml2Graph(template, input)
+            })
           }}
           value={{ templateYamlStr, inputYamlStr }}
         />

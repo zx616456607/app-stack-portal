@@ -51,6 +51,12 @@ export default class YamlDock extends React.PureComponent {
   static getDerivedStateFromProps(nextProps) {
     // Should be a controlled component.
     if ('value' in nextProps) {
+      /* const { value } = nextProps
+      const stateValue = state.value
+      if (value.templateYamlStr === stateValue.templateYamlStr
+        && value.inputYamlStr === stateValue.inputYamlStr) {
+        return null
+      } */
       return {
         value: nextProps.value || {},
       }
@@ -76,13 +82,15 @@ export default class YamlDock extends React.PureComponent {
   }
 
   onYamlChange = (yamlStr, type) => {
+    // console.log('yamlStr', yamlStr)
     const { value } = this.state
     value[type] = yamlStr
-    this.setState(value)
-    clearTimeout(this.onYamlChangeTimeout)
+    // this.setState(value)
+    this.props.onYamlChange({ [type]: yamlStr })
+    /* clearTimeout(this.onYamlChangeTimeout)
     this.onYamlChangeTimeout = setTimeout(() => {
       this.props.onYamlChange({ [type]: yamlStr })
-    }, 300)
+    }, 300) */
   }
 
   render() {
@@ -144,6 +152,7 @@ export default class YamlDock extends React.PureComponent {
           </Tabs>
         </div>
         {
+          // @Todo: undo has bug
           tabKey === 'template' &&
           <TenxEditor
             name="app_stack_template"
