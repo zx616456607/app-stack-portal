@@ -212,7 +212,7 @@ export default class ResourceTopology extends React.Component<RTProps, RTState> 
     const lname = nodeInfo.label.props.name
     const kind = nodeInfo.label.props.kind
     const nameInfo = nodeInfo.label.props
-    const filterArray = [ 'deployments', 'jobs', 'pod', 'statefulSets' ]
+    const filterArray = [ 'deployments', 'pod', 'statefulSets' ]
     e.stopPropagation();
     const { nodeArray } = this.state;
     const newNodes = [...nodeArray]
