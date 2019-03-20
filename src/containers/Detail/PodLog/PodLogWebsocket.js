@@ -23,6 +23,7 @@ import autoFitFS from '@tenx-ui/utils/lib/autoFitFS'
 
 const RETRY_TIMEOUT = 5000
 export const MAX_LOGS_NUMBER = 500
+let wsAuthData = ''
 
 const mapState = ({ app: { watchToken, cluster, project, user }, nativeDetail }) => {
   return {
@@ -92,24 +93,14 @@ export default class PodLogSocket extends React.PureComponent {
     //   </div>
     // ] : logs.map(this.renderLog)
   }
-  onSetupSocket = ws => {
+  onSetupSocket = (ws, watchAuthInfo) => {
     this.logRef && this.logRef.clearLogs()
     const initState = {
       logsLoading: true,
     }
     this.setState(initState)
     this.ws = ws
-    const { watchToken, name, cluster, namespace, project } = this.props
-    const watchAuthInfo = {
-      accessToken: watchToken,
-      type: 'log',
-      name,
-      cluster,
-      namespace,
-
-    }
-    project && (watchAuthInfo.teamspace = project)
-    ws.send(JSON.stringify(watchAuthInfo))
+    ws.send(watchAuthInfo)
     ws.onmessage = event => {
       if (event.data === 'TENXCLOUD_END_OF_STREAM') { // 服务器主动断开, 不重连
         this.setState({
@@ -139,24 +130,28 @@ export default class PodLogSocket extends React.PureComponent {
       this.setState(initState)
     }
   }
-
   renderWS() {
-    // if status is not in progress, skip socket
-    // if (IN_PROGRESS_STATUS.indexOf(status) < 0 && watchedBuilds.length === 0) {
-    //   return null
-    // }
-
-    const { reconnect } = this.state
+    const { watchToken, name, cluster, namespace, project } = this.props
+    const watchAuthInfo = {
+      accessToken: watchToken,
+      type: 'log',
+      name,
+      cluster,
+      namespace,
+    }
+    project && (watchAuthInfo.teamspace = project)
+    const watchAuthInfoStr = JSON.stringify(watchAuthInfo)
+    wsAuthData = watchAuthInfoStr
     const protocol = paasApi.protocol === 'http' ? 'ws' : 'wss'
     return <WebSocket
       url={`${protocol}://${paasApi.host}/spi/v2/watch`}
-      onSetup={this.onSetupSocket}
-      reconnect={reconnect}
+      onSetup={ws => this.onSetupSocket(ws, watchAuthInfoStr)}
+      reconnect={wsAuthData !== watchAuthInfoStr}
     />
   }
   render() {
     return (
-      <div style={{ height: this.props.autoFitFsH }} className={styles.TenxLogs}>
+      <div style={{ height: this.props.autoFitFsH }}>
         <TenxLogs
           ref={ref => (this.logRef = ref)}
           logs={[

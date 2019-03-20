@@ -110,7 +110,7 @@ class NativeDetail extends React.PureComponent {
     if (type === 'Pod') {
       res.push({
         path: `${this.pathPrefix}/${type}/:id/log`,
-        component: require('./PodLog').default,
+        component: require('./PodLog/PodLogWebsocket').default,
         tabName: '日志',
         tabKey: 'log',
       })
