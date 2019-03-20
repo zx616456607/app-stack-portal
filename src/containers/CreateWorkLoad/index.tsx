@@ -22,6 +22,7 @@ import getDeepValue from '@tenx-ui/utils/lib/getDeepValue'
 import { analyzeYamlBase } from './tool'
 import { confirm } from '@tenx-ui/modal'
 import { getUnifiedHistory } from '@tenx-ui/utils/es/UnifiedLink'
+import set from 'lodash/set'
 
 interface CreateWorkLoadProps extends RouteComponentProps, SubscriptionAPI {
   cluster: string,
@@ -147,7 +148,17 @@ class CreateWorkLoad extends React.Component<CreateWorkLoadProps, CreateWorkLoad
     const { match: { params }  } = this.props
     const urlCluster = params.cluster
     const cluster = urlCluster === undefined ? this.props.cluster : urlCluster
-    const payload = { cluster, yaml: this.props.yamlValue }
+    const jsonConfigs = this.props.yamlValue.split('---').map((yamlConfig) => {
+      try {
+        const json = yaml.load(yamlConfig)
+        set(json, [ 'metadata', 'resourceVersion' ], undefined) // 这个字段会导致后台创建失败, 需要去掉
+        return yaml.dump(json)
+      } catch (e) {
+        console.warn(e)
+        return {}
+      }
+    }).join('---')
+    const payload = { cluster, yaml: jsonConfigs }
     const unifiedHistory = getUnifiedHistory()
     if (!this.state.editflag) { // 创建
       try {
