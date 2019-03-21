@@ -39,8 +39,12 @@ export default {
   outputPath: `./dist${publicDir}`,
   hash: true,
   ignoreMomentLocale: true,
+  es5ImcompatibleVersions: true,
   extraBabelIncludes: [
     'node_modules/strict-uri-encode',
+    "node_modules/url-parse-lax",
+    "node_modules/is-ip",
+    "node_modules/ip-regex",
   ],
   extraBabelPlugins: [
     [
