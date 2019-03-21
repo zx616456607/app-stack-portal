@@ -98,7 +98,7 @@ export function getDeploymentStatus(_service) {
     readyReplicas,
   } = status
   const { strategy = {} } = service.spec || {}
-  if (status.replicas > specReplicas && strategy.type === 'RollingUpdate') {
+  if (specReplicas > 0 && status.replicas > specReplicas && strategy.type === 'RollingUpdate') {
     const newCount = metadata.annotations['rollingupdate/newCount']
     if (newCount === undefined) {
       phase = 'ScrollRelease'
@@ -175,7 +175,7 @@ export function getStatefulSetStatus(_service) {
     readyReplicas = 0,
   } = status
   const { updateStrategy = {} } = service.spec || {}
-  if (status.replicas > specReplicas && updateStrategy.type === 'RollingUpdate') {
+  if (specReplicas > 0 && status.replicas > specReplicas && updateStrategy.type === 'RollingUpdate') {
     phase = 'RollingUpdate'
     return {
       phase,
