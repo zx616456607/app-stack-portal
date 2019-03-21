@@ -175,7 +175,8 @@ class StackTemplateDeploy extends React.Component {
             {
               this.getSelectOptions(input).map(({ name, id, disabled }) =>
                 <Option key={id} disabled={disabled}>
-                  {name} {optionDescStr}
+                  {/* 这里使用模版字符串，保证 filter 时拿到的 children 是字符串 */}
+                  {`${name} ${optionDescStr}`}
                 </Option>
               )
             }
