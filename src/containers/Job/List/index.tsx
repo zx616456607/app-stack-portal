@@ -201,7 +201,7 @@ class Job extends React.Component<JobProps, JobState> {
         self.props.dispatch({ type: 'NativeResourceList/deleteNativeResourceList', payload })
           .then(() => self.reload())
           .then(() => {
-             notification.success({ message: '删除成功', description: '' })
+             notification.success({ message: '正在删除, 请稍后刷新', description: '' })
              self.setState({ selectedRowKeys: [] as string[] })
             } )
         .catch(() => notification.warn({ message: '删除操作失败', description: '' }))
