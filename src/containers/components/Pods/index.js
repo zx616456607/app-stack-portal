@@ -89,7 +89,7 @@ export default class Pods extends React.PureComponent {
             },
           }).catch(() => notification.warn({ message: '删除操作失败', description: '' }))
         if (res && res.status === 'Success') {
-          notification.success({ message: '删除成功' })
+          notification.success({ message: '正在删除, 请稍后刷新' })
           _this.props.refreshPodList()
         }
       },
