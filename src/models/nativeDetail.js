@@ -76,10 +76,14 @@ export default {
       const { app: { cluster }, nativeDetail: { type, name } } = yield select(state => state)
       const res = yield call(getPodsList, { cluster, type, name })
       if (res.data) {
+        let pods = (res.data && res.data.items) || []
+        if (type === 'CronJob') {
+          pods = pods.reverse()
+        }
         yield put({
           type: 'updateState',
           payload: {
-            pods: (res.data && res.data.items) || [],
+            pods,
           },
         })
       }
