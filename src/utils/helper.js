@@ -389,7 +389,9 @@ const formatMonitorName = data => {
   data.forEach(item => {
     const { container_name, metrics } = item
     let name = container_name.split('-')
-    name.splice(-2, 1)
+    if (name.length >= 4) {
+      name.splice(-2, 1)
+    }
     name = name.join('-')
     metrics.forEach(metric => {
       metric.container_name = name

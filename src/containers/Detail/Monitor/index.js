@@ -31,7 +31,7 @@ const sourceTypeArray = [
   METRICS_NETWORK_RECEIVED, METRICS_DISK_READ, METRICS_DISK_WRITE,
 ]
 
-const MONITOR_TYPE_ARRAY = ['Deployment', 'StatefulSet', 'Job']
+const MONITOR_TYPE_ARRAY = [ 'Deployment', 'StatefulSet', 'Job' ]
 
 const mapStateToProps = ({
   app: { cluster },
