@@ -37,7 +37,7 @@
     "@tenx-ui/loader": "^0.0.3",
     "@tenx-ui/logs": "1.3.6",
     "@tenx-ui/modal": "^1.0.9",
-    "@tenx-ui/monitorChart": "^1.0.1",
+    "@tenx-ui/monitorChart": "^1.0.7",
     "@tenx-ui/page": "^1.0.2",
     "@tenx-ui/relation-chart": "^0.2.11",
     "@tenx-ui/resource-custom-config": "^0.0.5",

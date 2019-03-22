@@ -31,6 +31,8 @@ const sourceTypeArray = [
   METRICS_NETWORK_RECEIVED, METRICS_DISK_READ, METRICS_DISK_WRITE,
 ]
 
+const MONITOR_TYPE_ARRAY = ['Deployment', 'StatefulSet', 'Job']
+
 const mapStateToProps = ({
   app: { cluster },
   nativeDetail: { monitor, realTimeMonitor, type, pods },
@@ -63,9 +65,8 @@ class Monitor extends React.PureComponent {
 
   async componentDidMount() {
     const { type: monitorType } = this.props
-    if (monitorType === 'StatefulSet') {
+    if (MONITOR_TYPE_ARRAY.includes(monitorType)) {
       await this.fetchPodList()
-      this.intervalLoadMetrics()
     }
     this.intervalLoadMetrics()
   }
